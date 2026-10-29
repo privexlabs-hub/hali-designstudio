@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <title>Hali — Design system</title>
+  <link rel="icon" href="assets/icons/favicon.svg">
+  <link rel="stylesheet" href="_ds/hali-b4-project-managment-design-system-8cb0828f-e4cd-40a6-8da1-4182aed7d477/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/hali-b4-project-managment-design-system-8cb0828f-e4cd-40a6-8da1-4182aed7d477/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/hali-b4-project-managment-design-system-8cb0828f-e4cd-40a6-8da1-4182aed7d477/tokens/themes.css">
+  <link rel="stylesheet" href="_ds/hali-b4-project-managment-design-system-8cb0828f-e4cd-40a6-8da1-4182aed7d477/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/hali-b4-project-managment-design-system-8cb0828f-e4cd-40a6-8da1-4182aed7d477/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/hali-b4-project-managment-design-system-8cb0828f-e4cd-40a6-8da1-4182aed7d477/tokens/layout.css">
+  <link rel="stylesheet" href="_ds/hali-b4-project-managment-design-system-8cb0828f-e4cd-40a6-8da1-4182aed7d477/tokens/base.css">
+  <link rel="stylesheet" href="_ds/hali-b4-project-managment-design-system-8cb0828f-e4cd-40a6-8da1-4182aed7d477/styles.css">
+  <script src="_ds/hali-b4-project-managment-design-system-8cb0828f-e4cd-40a6-8da1-4182aed7d477/_ds_bundle.js"></script>
+  <script src="studio/brand.js"></script>
+  <style>
+    html, body { margin: 0; background: var(--surface-page); color: var(--text-primary); font-family: var(--font-sans); }
+    a { color: var(--text-link); } a:hover { color: var(--text-link-hover); }
+    html { scroll-behavior: smooth; } @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  </style>
+</helmet>
+
+<div style="min-height: 100vh; background: var(--surface-page); color: var(--text-primary);">
+  <header style="position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: 12px; height: 56px; padding: 0 var(--gutter); border-bottom: 1px solid var(--border-default); background: var(--surface-card);">
+    <a href="Brand Studio.dc.html" aria-label="Brand Studio home" style="display: flex; align-items: center;"><x-import component-from-global-scope="HaliDesignSystem_02149f.Logo" height="24" hint-size="77px,24px"></x-import></a>
+    <nav aria-label="Studio" style="flex: 1; min-width: 0; display: flex; gap: 2px; overflow-x: auto;">
+      <sc-for list="{{ studioNav }}" as="n" hint-placeholder-count="7">
+        <a href="{{ n.href }}" aria-current="{{ n.current }}" style="flex: none; padding: 8px 10px; border-radius: var(--radius-control); font: 500 13px/1 var(--font-sans); text-decoration: none; color: var(--text-primary); background: {{ n.bg }}; white-space: nowrap;">{{ n.label }}</a>
+      </sc-for>
+    </nav>
+    <x-import component-from-global-scope="HaliDesignSystem_02149f.IconButton" icon="{{ themeIcon }}" label="Switch light or dark theme" size="sm" on-click="{{ toggleTheme }}" hint-size="32px,32px"></x-import>
+  </header>
+  <div aria-live="polite" style="position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); z-index: 60; pointer-events: none;">
+    <sc-if value="{{ copiedMsg }}" hint-placeholder-val="{{ false }}"><div style="padding: 8px 14px; border-radius: var(--radius-control); background: var(--surface-inverse); color: var(--text-inverse); font: 500 13px/1 var(--font-sans); box-shadow: var(--shadow-overlay);">{{ copiedMsg }}</div></sc-if>
+  </div>
+
+  <div style="max-width: 1360px; margin: 0 auto; display: flex; gap: 40px; padding: 0 var(--gutter);">
+    <nav aria-label="Sections" style="display: {{ sideNavDisplay }}; flex: none; width: 200px; position: sticky; top: 56px; align-self: flex-start; max-height: calc(100vh - 56px); overflow: auto; padding: 32px 0; flex-direction: column; gap: 2px;">
+      <span style="font: 500 12px/1.2 var(--font-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--text-tertiary); padding: 0 10px 10px;">Design system · v{{ version }}</span>
+      <sc-for list="{{ sections }}" as="s" hint-placeholder-count="12">
+        <a href="{{ s.href }}" onClick="{{ s.onClick }}" aria-current="{{ s.on }}" style="display: flex; gap: 10px; align-items: center; padding: 8px 10px; border-radius: var(--radius-control); text-decoration: none; color: var(--text-primary); background: {{ s.bg }}; font: 500 13px/1 var(--font-sans);"><span style="font: 400 11px/1 var(--font-mono); color: var(--text-tertiary); width: 18px;">{{ s.num }}</span>{{ s.label }}</a>
+      </sc-for>
+    </nav>
+
+    <main style="flex: 1; min-width: 0; padding: 32px 0 120px; display: flex; flex-direction: column; gap: 72px;">
+      <sc-if value="{{ topNavShow }}" hint-placeholder-val="{{ false }}">
+        <nav aria-label="Sections" style="display: flex; gap: 6px; overflow-x: auto; margin: -16px calc(var(--gutter) * -1) 0; padding: 0 var(--gutter) 4px;">
+          <sc-for list="{{ sections }}" as="s" hint-placeholder-count="12"><a href="{{ s.href }}" onClick="{{ s.onClick }}" style="flex: none; height: 32px; display: flex; align-items: center; padding: 0 12px; border: 1px solid var(--border-default); border-radius: var(--radius-pill); background: {{ s.bg }}; color: var(--text-primary); text-decoration: none; font: 500 12px/1 var(--font-sans);">{{ s.label }}</a></sc-for>
+        </nav>
+      </sc-if>
+
+      <!-- 01 OVERVIEW -->
+      <section id="overview" data-screen-label="01 Overview" style="display: flex; flex-direction: column; gap: 24px; scroll-margin-top: 80px;">
+        <span style="font: 500 12px/1.2 var(--font-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--text-tertiary);">01 · Overview</span>
+        <h1 style="margin: 0; font: 600 clamp(32px, 5vw, 48px)/1.08 var(--font-sans); letter-spacing: -0.03em; max-width: 820px; text-wrap: balance;">The record: quiet paper and ink, where certainty is visible in the line itself.</h1>
+        <p style="margin: 0; font: 400 16px/1.6 var(--font-sans); color: var(--text-secondary); max-width: 680px; text-wrap: pretty;">Hali is a commercial operating platform for independent branding and design agencies. This system governs the product, the brand studio and every exported asset. Tokens on this page are the same values the editor and templates use. Click any value to copy it.</p>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 0; border-top: 1px solid var(--border-default);">
+          <sc-for list="{{ principles }}" as="p" hint-placeholder-count="5">
+            <div style="padding: 16px 16px 16px 0; border-bottom: 1px solid var(--border-default); display: flex; flex-direction: column; gap: 6px;">
+              <span style="font: 600 15px/1.3 var(--font-sans);">{{ p.a }}</span>
+              <span style="font: 400 13px/1.5 var(--font-sans); color: var(--text-secondary);">{{ p.b }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 0;">
+          <span style="font: 600 15px/1.3 var(--font-sans); padding-bottom: 10px;">Three surfaces, one system</span>
+          <sc-for list="{{ surfaces }}" as="s" hint-placeholder-count="3">
+            <div style="display: grid; grid-template-columns: minmax(0, 220px) minmax(0, 1fr); gap: 16px; padding: 12px 0; border-top: 1px solid var(--border-subtle);">
+              <span style="font: 500 14px/1.4 var(--font-sans);">{{ s.a }}</span>
+              <span style="font: 400 14px/1.5 var(--font-sans); color: var(--text-secondary);">{{ s.b }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+
+      <!-- 02 LOGO -->
+      <section id="logo" data-screen-label="02 Logo" style="display: flex; flex-direction: column; gap: 24px; scroll-margin-top: 80px;">
+        <span style="font: 500 12px/1.2 var(--font-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--text-tertiary);">02 · Logo</span>
+        <h2 style="margin: 0; font: 600 30px/1.15 var(--font-sans); letter-spacing: -0.02em;">The folded agreement</h2>
+        <p style="margin: 0; font: 400 15px/1.6 var(--font-sans); color: var(--text-secondary); max-width: 680px;">A Deep Sea tile with its top-right corner folded — a page that has been read, marked and kept — holding a monoline h. The wordmark's i-dot is a tiny folded sheet. The identity is a proposal; an optical pass is needed before trademark filing.</p>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr)); gap: 16px;">
+          <sc-for list="{{ logos }}" as="l" hint-placeholder-count="8">
+            <div style="display: flex; flex-direction: column; border: 1px solid var(--border-default); border-radius: var(--radius-surface); overflow: hidden; background: var(--surface-card);">
+              <div style="height: 140px; display: grid; place-items: center; background: {{ l.bg }}; padding: 24px;"><img src="{{ l.src }}" alt="{{ l.name }}" style="max-width: 100%; max-height: {{ l.h }}; display: block;"></div>
+              <div style="padding: 10px 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px; border-top: 1px solid var(--border-default);">
+                <span style="display: flex; flex-direction: column; gap: 2px; min-width: 0;"><span style="font: 500 13px/1.3 var(--font-sans);">{{ l.name }}</span><span style="font: 400 11px/1.3 var(--font-mono); color: var(--text-tertiary);">{{ l.use }}</span></span>
+                <a href="{{ l.src }}" download="{{ l.file }}" aria-label="Download {{ l.name }} SVG" style="flex: none; display: inline-flex; align-items: center; gap: 4px; font: 500 12px/1 var(--font-sans);"><i class="icon-download" style="font-size: 14px;"></i>SVG</a>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 24px;">
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <span style="font: 600 15px/1.3 var(--font-sans);">Clear space and minimum size</span>
+            <div style="display: grid; place-items: center; height: 180px; border: 1px solid var(--border-default); border-radius: var(--radius-surface); background: var(--n-25);">
+              <div style="padding: 22px; border: 1.5px dashed var(--blue-500); position: relative;"><img src="assets/logo/hali-symbol.svg" alt="Hali symbol with clear space" style="width: 72px; height: 72px; display: block;"><span style="position: absolute; top: 4px; left: 6px; font: 400 10px/1 var(--font-mono); color: var(--blue-700);">0.3×</span></div>
+            </div>
+            <span style="font: 400 13px/1.5 var(--font-sans); color: var(--text-secondary);">Clear space equals the folded corner (≈30% of symbol height) on every side. Minimum: symbol 16px, wordmark 14px, lockup 20px tall.</span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <span style="font: 600 15px/1.3 var(--font-sans);">Favicon and avatar</span>
+            <div style="display: flex; gap: 16px; align-items: flex-end; flex-wrap: wrap; padding: 20px; border: 1px solid var(--border-default); border-radius: var(--radius-surface); background: var(--surface-card);">
+              <sc-for list="{{ icons }}" as="i" hint-placeholder-count="5"><a href="{{ i.src }}" download="{{ i.file }}" style="display: flex; flex-direction: column; align-items: center; gap: 6px; text-decoration: none; color: var(--text-secondary); font: 400 11px/1 var(--font-mono);"><img src="{{ i.src }}" alt="{{ i.name }}" style="width: {{ i.size }}; height: {{ i.size }}; border-radius: {{ i.radius }}; display: block;">{{ i.name }}</a></sc-for>
+            </div>
+            <span style="font: 400 13px/1.5 var(--font-sans); color: var(--text-secondary);">On agency pages and client portals the agency's own favicon and mark lead; Hali appears only as a mono footer attribution.</span>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <span style="font: 600 15px/1.3 var(--font-sans);">Don't</span>
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 180px), 1fr)); gap: 12px;">
+            <sc-for list="{{ misuse }}" as="m" hint-placeholder-count="5">
+              <div style="display: flex; flex-direction: column; border: 1px solid var(--border-default); border-radius: var(--radius-surface); overflow: hidden;">
+                <div style="height: 110px; display: grid; place-items: center; background: {{ m.bg }}; overflow: hidden;"><img src="{{ m.src }}" alt="" style="width: 120px; transform: {{ m.transform }}; filter: {{ m.filter }}; display: block;"></div>
+                <div style="padding: 8px 10px; display: flex; gap: 6px; align-items: flex-start; border-top: 1px solid var(--border-default); background: var(--surface-card);"><i class="icon-circle-x" style="font-size: 14px; color: var(--error-icon); margin-top: 1px;"></i><span style="font: 400 12px/1.4 var(--font-sans);">{{ m.label }}</span></div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </section>
+
+      <!-- 03 COLOUR -->
+      <section id="colour" data-screen-label="03 Colour" style="display: flex; flex-direction: column; gap: 24px; scroll-margin-top: 80px;">
+        <span style="font: 500 12px/1.2 var(--font-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--text-tertiary);">03 · Colour</span>
+        <h2 style="margin: 0; font: 600 30px/1.15 var(--font-sans); letter-spacing: -0.02em;">Warm neutrals, one accent, hues for meaning</h2>
+        <p style="margin: 0; font: 400 15px/1.6 var(--font-sans); color: var(--text-secondary); max-width: 680px;">Deep Sea is used for the brand mark and for committing or agreed states only. Blue, amber, red and green carry meaning and are never decoration. Contrast ratios are computed from the exact values. Dark values apply in the agency workspace and this studio only — public pages, client portals and emails stay light.</p>
+        <sc-for list="{{ colorGroups }}" as="g" hint-placeholder-count="2">
+          <div style="display: flex; flex-direction: column; gap: 0;">
+            <span style="font: 600 15px/1.3 var(--font-sans); padding-bottom: 10px;">{{ g.name }}</span>
+            <sc-for list="{{ g.items }}" as="c" hint-placeholder-count="4">
+              <div style="display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 16px; padding: 14px 0; border-top: 1px solid var(--border-subtle); align-items: start;">
+                <button onClick="{{ c.copyHex }}" title="Copy {{ c.hex }}" aria-label="Copy {{ c.name }} {{ c.hex }}" style="width: 72px; height: 72px; border-radius: var(--radius-surface); border: 1px solid var(--border-default); background: {{ c.hex }}; cursor: pointer; display: flex; flex-direction: column; justify-content: flex-end; padding: 6px; font: 500 10px/1 var(--font-mono); color: {{ c.on }};">Aa</button>
+                <div style="display: flex; flex-direction: column; gap: 8px; min-width: 0;">
+                  <div style="display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: baseline;">
+                    <span style="font: 600 14px/1.3 var(--font-sans);">{{ c.name }}</span>
+                    <span style="font: 400 13px/1.3 var(--font-sans); color: var(--text-secondary);">{{ c.role }}</span>
+                  </div>
+                  <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                    <sc-for list="{{ c.chips }}" as="x" hint-placeholder-count="4">
+                      <button onClick="{{ x.onClick }}" title="Copy {{ x.text }}" style="display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 8px; border: 1px solid var(--border-default); border-radius: var(--radius-control); background: var(--surface-card); color: var(--text-primary); font: 400 12px/1 var(--font-mono); cursor: pointer;" style-hover="background: var(--surface-hover);"><i class="{{ x.icon }}" style="font-size: 12px; color: var(--icon-secondary);"></i>{{ x.text }}</button>
+                    </sc-for>
+                  </div>
+                  <span style="font: 400 13px/1.5 var(--font-sans); color: var(--text-primary); max-width: 640px;">{{ c.usage }}</span>
+                  <div style="display: flex; flex-wrap: wrap; gap: 6px 16px; font: 400 12px/1.4 var(--font-mono); color: var(--text-secondary);">
+                    <span>Ink text {{ c.cInk }}</span><span>White text {{ c.cWhite }}</span><span>On Paper {{ c.cPaper }}</span>
+                    <span style="display: inline-flex; align-items: center; gap: 6px;">Dark theme <span style="width: 12px; height: 12px; border-radius: 3px; border: 1px solid var(--border-strong); background: {{ c.dark }};"></span>{{ c.dark }}</span>
+                  </div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-for>
+        <div style="display: flex; flex-direction: column; gap: 0;">
+          <span style="font: 600 15px/1.3 var(--font-sans); padding-bottom: 10px;">Semantic aliases — use these in code, not raw scale values</span>
+          <sc-for list="{{ aliases }}" as="a" hint-placeholder-count="6">
+            <div style="display: grid; grid-template-columns: 20px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 8px 0; border-top: 1px solid var(--border-subtle);">
+              <span style="width: 20px; height: 20px; border-radius: 4px; background: {{ a.css }}; border: 1px solid var(--border-strong);"></span>
+              <span style="display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: center; min-width: 0;">
+                <button onClick="{{ a.copy.onClick }}" style="display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 8px; border: 1px solid var(--border-default); border-radius: var(--radius-control); background: var(--surface-card); color: var(--text-primary); font: 400 12px/1 var(--font-mono); cursor: pointer;"><i class="{{ a.copy.icon }}" style="font-size: 12px; color: var(--icon-secondary);"></i>{{ a.copy.text }}</button>
+                <span style="font: 400 13px/1.4 var(--font-sans); color: var(--text-secondary);">{{ a.use }}</span>
+              </span>
+              <span style="font: 400 12px/1 var(--font-mono); color: var(--text-tertiary);">→ {{ a.ref }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+
+      <!-- 04 TYPE -->
+      <section id="type" data-screen-label="04 Type" style="display: flex; flex-direction: column; gap: 24px; scroll-margin-top: 80px;">
+        <span style="font: 500 12px/1.2 var(--font-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--text-tertiary);">04 · Type</span>
+        <h2 style="margin: 0; font: 600 30px/1.15 var(--font-sans); letter-spacing: -0.02em;">One superfamily: Geist and Geist Mono</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 16px;">
+          <sc-for list="{{ families }}" as="f" hint-placeholder-count="2">
+            <div style="display: flex; flex-direction: column; gap: 12px; padding: 20px; border: 1px solid var(--border-default); border-radius: var(--radius-surface); background: var(--surface-card);">
+              <span style="font: {{ f.sample }}; letter-spacing: -0.03em;">Aa Gg 0123</span>
+              <span style="font: 600 15px/1.3 var(--font-sans);">{{ f.name }}</span>
+              <span style="font: 400 13px/1.5 var(--font-sans); color: var(--text-secondary);">{{ f.use }}</span>
+              <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                <sc-for list="{{ f.chips }}" as="x" hint-placeholder-count="2"><button onClick="{{ x.onClick }}" style="display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 8px; border: 1px solid var(--border-default); border-radius: var(--radius-control); background: var(--surface-card); color: var(--text-primary); font: 400 12px/1 var(--font-mono); cursor: pointer;"><i class="{{ x.icon }}" style="font-size: 12px; color: var(--icon-secondary);"></i>{{ x.text }}</button></sc-for>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display: flex; flex-direction: column;">
+          <span style="font: 600 15px/1.3 var(--font-sans); padding-bottom: 10px;">Semantic type roles</span>
+          <sc-for list="{{ typeRoles }}" as="t" hint-placeholder-count="8">
+            <div style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 260px); gap: 8px 24px; padding: 14px 0; border-top: 1px solid var(--border-subtle); align-items: center;">
+              <span style="font: {{ t.css }}; letter-spacing: {{ t.ls }}; text-transform: {{ t.tt }}; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ t.sample }}</span>
+              <span style="display: flex; flex-direction: column; gap: 4px; align-items: flex-start;">
+                <button onClick="{{ t.copy.onClick }}" style="display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 8px; border: 1px solid var(--border-default); border-radius: var(--radius-control); background: var(--surface-card); color: var(--text-primary); font: 400 12px/1 var(--font-mono); cursor: pointer;"><i class="{{ t.copy.icon }}" style="font-size: 12px; color: var(--icon-secondary);"></i>{{ t.copy.text }}</button>
+                <span style="font: 400 11px/1.4 var(--font-mono); color: var(--text-tertiary);">{{ t.spec }} · {{ t.use }}</span>
+              </span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 24px;">
+          <div style="display: flex; flex-direction: column; gap: 0;">
+            <span style="font: 600 15px/1.3 var(--font-sans); padding-bottom: 10px;">Size scale</span>
+            <sc-for list="{{ typeScale }}" as="t" hint-placeholder-count="6">
+              <div style="display: flex; align-items: baseline; gap: 12px; padding: 6px 0; border-top: 1px solid var(--border-subtle);">
+                <button onClick="{{ t.copy.onClick }}" style="flex: none; width: 118px; display: inline-flex; align-items: center; gap: 6px; height: 24px; padding: 0 6px; border: 1px solid var(--border-default); border-radius: var(--radius-control); background: var(--surface-card); color: var(--text-primary); font: 400 11px/1 var(--font-mono); cursor: pointer;"><i class="{{ t.copy.icon }}" style="font-size: 11px; color: var(--icon-secondary);"></i>{{ t.copy.text }}</button>
+                <span style="font: 400 11px/1 var(--font-mono); color: var(--text-tertiary); width: 34px;">{{ t.px }}</span>
+                <span style="font-size: {{ t.px }}; font-weight: 500; line-height: 1.2; white-space: nowrap; overflow: hidden; letter-spacing: -0.01em;">Scope v2</span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <span style="font: 600 15px/1.3 var(--font-sans);">Weights, tracking and line height</span>
+            <sc-for list="{{ typeMisc }}" as="t" hint-placeholder-count="6">
+              <div style="display: flex; justify-content: space-between; gap: 12px; align-items: center; padding: 6px 0; border-top: 1px solid var(--border-subtle);">
+                <span style="font: 400 13px/1.4 var(--font-sans); color: var(--text-secondary);">{{ t.label }}</span>
+                <button onClick="{{ t.copy.onClick }}" style="display: inline-flex; align-items: center; gap: 6px; height: 24px; padding: 0 6px; border: 1px solid var(--border-default); border-radius: var(--radius-control); background: var(--surface-card); color: var(--text-primary); font: 400 11px/1 var(--font-mono); cursor: pointer;"><i class="{{ t.copy.icon }}" style="font-size: 11px; color: var(--icon-secondary);"></i>{{ t.copy.text }}</button>
+              </div>
+            </sc-for>
+            <span style="font: 400 13px/1.5 var(--font-sans); color: var(--text-secondary);">Headlines 600 with −0.02 to −0.03em. Body 14px in the agency app, 16px for clients and public pages, 17px in documents. Money uses tabular figures and is never below 13px.</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 05 SPACING -->
+      <section id="spacing" data-screen-label="05 Spacing" style="display: flex; flex-direction: column; gap: 24px; scroll-margin-top: 80px;">
+        <span style="font: 500 12px/1.2 var(--font-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--text-tertiary);">05 · Spacing</span>
+        <h2 style="margin: 0; font: 600 30px/1.15 var(--font-sans); letter-spacing: -0.02em;">4px base; 8, 12, 16 and 24 do most of the work</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 32px;">
+          <div style="display: flex; flex-direction: column;">
+            <sc-for list="{{ spacing }}" as="s" hint-placeholder-count="8">
+              <div style="display: flex; align-items: center; gap: 12px; padding: 6px 0; border-top: 1px solid var(--border-subtle);">
+                <button onClick="{{ s.copy.onClick }}" style="flex: none; width: 128px; display: inline-flex; align-items: center; gap: 6px; height: 24px; padding: 0 6px; border: 1px solid var(--border-default); border-radius: var(--radius-control); background: var(--surface-card); color: var(--text-primary); font: 400 11px/1 var(--font-mono); cursor: pointer;"><i class="{{ s.copy.icon }}" style="font-size: 11px; color: var(--icon-secondary);"></i>{{ s.copy.text }}</button>
+                <span style="font: 400 11px/1 var(--font-mono); color: var(--text-tertiary); width: 34px;">{{ s.px }}</span>
+                <span style="height: 12px; width: {{ s.px }}; background: var(--sea-300); border-radius: 2px;"></span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 16px;">
+            <span style="font: 600 15px/1.3 var(--font-sans);">Sizes and layout widths</span>
+            <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+              <sc-for list="{{ sizes }}" as="x" hint-placeholder-count="8"><button onClick="{{ x.onClick }}" style="display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 8px; border: 1px solid var(--border-default); border-radius: var(--radius-control); background: var(--surface-card); color: var(--text-primary); font: 400 12px/1 var(--font-mono); cursor: pointer;"><i class="{{ x.icon }}" style="font-size: 12px; color: var(--icon-secondary);"></i>{{ x.text }}</button></sc-for>
+            </div>
+            <span style="font: 400 13px/1.5 var(--font-sans); color: var(--text-secondary);">Touch targets are at least 44px. Generous whitespace on public and client surfaces; denser lists in the agency app.</span>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column;">
+          <span style="font: 600 15px/1.3 var(--font-sans); padding-bottom: 10px;">Grid and breakpoints</span>
+          <sc-for list="{{ breakpoints }}" as="b" hint-placeholder-count="5">
+            <div style="display: grid; grid-template-columns: 48px 96px minmax(0, 1fr); gap: 12px; padding: 10px 0; border-top: 1px solid var(--border-subtle); align-items: baseline;">
+              <span style="font: 500 13px/1 var(--font-mono);">{{ b.a }}</span>
+              <span style="font: 400 12px/1.3 var(--font-mono); color: var(--text-secondary);">{{ b.b }}</span>
+              <span style="font: 400 13px/1.5 var(--font-sans); color: var(--text-secondary);">{{ b.c }} · {{ b.d }} — {{ b.e }}</span>
+            </div>
+          </sc-for>
+          <div style="display: grid; grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr)); gap: var(--grid-gap); margin-top: 16px; height: 64px;">
+            <sc-for list="{{ gridCols }}" as="g" hint-placeholder-count="12"><span style="background: var(--blue-50); border: 1px dashed var(--blue-500); border-radius: 3px;"></span></sc-for>
+          </div>
+          <span style="font: 400 12px/1.4 var(--font-mono); color: var(--text-tertiary); padding-top: 8px;">Live grid for this window: var(--grid-columns) columns, var(--grid-gap) gap.</span>
+        </div>
+      </section>
+
+      <!-- 06 RADIUS & SHADOW -->
+      <section id="radius" data-screen-label="06 Radius and shadow" style="display: flex; flex-direction: column; gap: 24px; scroll-margin-top: 80px;">
+        <span style="font: 500 12px/1.2 var(--font-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--text-tertiary);">06 · Radius &amp; shadow</span>
+        <h2 style="margin: 0; font: 600 30px/1.15 var(--font-sans); letter-spacing: -0.02em;">Borders over shadows</h2>
+        <p style="margin: 0; font: 400 15px/1.6 var(--font-sans); color: var(--text-secondary); max-width: 680px;">Cards are 1px <code style="font-family: var(--font-mono); font-size: 13px;">--border-default</code>. Shadows are for overlays and floating previews only. The dialog scrim is the only transparency. No glass, no left-border accent cards.</p>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 150px), 1fr)); gap: 16px;">
+          <sc-for list="{{ radii }}" as="r" hint-placeholder-count="6">
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <div style="height: 88px; border: 1.5px solid var(--text-primary); border-radius: {{ r.v }}; background: var(--surface-card);"></div>
+              <button onClick="{{ r.copy.onClick }}" style="align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; height: 24px; padding: 0 6px; border: 1px solid var(--border-default); border-radius: var(--radius-control); background: var(--surface-card); color: var(--text-primary); font: 400 11px/1 var(--font-mono); cursor: pointer;"><i class="{{ r.copy.icon }}" style="font-size: 11px; color: var(--icon-secondary);"></i>{{ r.copy.text }}</button>
+              <span style="font: 400 12px/1.4 var(--font-sans); color: var(--text-secondary);">{{ r.v }} · {{ r.use }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 24px; padding: 24px; background: var(--surface-sunken); border-radius: var(--radius-surface);">
+          <sc-for list="{{ shadows }}" as="s" hint-placeholder-count="3">
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+              <div style="height: 96px; border-radius: var(--radius-surface); background: var(--surface-card); box-shadow: var({{ s.token }});"></div>
+              <button onClick="{{ s.copy.onClick }}" style="align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; height: 24px; padding: 0 6px; border: 1px solid var(--border-default); border-radius: var(--radius-control); background: var(--surface-card); color: var(--text-primary); font: 400 11px/1 var(--font-mono); cursor: pointer;"><i class="{{ s.copy.icon }}" style="font-size: 11px; color: var(--icon-secondary);"></i>{{ s.copy.text }}</button>
+              <span style="font: 400 12px/1.4 var(--font-sans); color: var(--text-secondary);">{{ s.use }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center;">
+          <span style="font: 500 13px/1 var(--font-sans); margin-right: 6px;">Elevation (z-index)</span>
+          <sc-for list="{{ zindex }}" as="x" hint-placeholder-count="6"><button onClick="{{ x.onClick }}" style="display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 8px; border: 1px solid var(--border-default); border-radius: var(--radius-control); background: var(--surface-card); color: var(--text-primary); font: 400 12px/1 var(--font-mono); cursor: pointer;"><i class="{{ x.icon }}" style="font-size: 12px; color: var(--icon-secondary);"></i>{{ x.text }}</button></sc-for>
+        </div>
+      </section>
+
+      <!-- 07 MOTIF -->
+      <section id="motif" data-screen-label="07 Motif" style="display: flex; flex-direction: column; gap: 24px; scroll-margin-top: 80px;">
+        <span style="font: 500 12px/1.2 var(--font-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--text-tertiary);">07 · Motif</span>
+        <h2 style="margin: 0; font: 600 30px/1.15 var(--font-sans); letter-spacing: -0.02em;">The line carries certainty</h2>
+        <p style="margin: 0; font: 400 15px/1.6 var(--font-sans); color: var(--text-secondary); max-width: 680px;">Dotted = suggested by Hali. Dashed = not yet agreed. Solid = recorded. Colour adds who must act. The motif works in greyscale and in print.</p>
+        <div style="display: flex; flex-direction: column;">
+          <sc-for list="{{ states }}" as="s" hint-placeholder-count="6">
+            <div style="display: grid; grid-template-columns: minmax(0, 140px) minmax(0, 200px) minmax(0, 1fr); gap: 16px; padding: 14px 0; border-top: 1px solid var(--border-subtle); align-items: center;">
+              <span style="border-top: {{ s.line }} {{ s.color }}; height: 0; display: block;"></span>
+              <x-import component-from-global-scope="HaliDesignSystem_02149f.CommercialState" state="{{ s.id }}" hint-size="140px,26px"></x-import>
+              <span style="font: 400 13px/1.5 var(--font-sans); color: var(--text-secondary);">{{ s.meaning }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 24px;">
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <span style="font: 600 15px/1.3 var(--font-sans);">Imagery and placeholders</span>
+            <div style="height: 160px; border-radius: var(--radius-surface); background: repeating-linear-gradient(45deg, var(--n-200) 0 2px, transparent 2px 18px); border: 1px solid var(--border-default); display: grid; place-items: center; font: 500 11px/1 var(--font-mono); text-transform: uppercase; letter-spacing: .05em; color: var(--text-tertiary);">Agency work image</div>
+            <span style="font: 400 13px/1.5 var(--font-sans); color: var(--text-secondary);">Imagery comes from the agency's own work only — no stock, illustration or gradients. Empty slots use the diagonal hatch. Crop to fill; keep subjects clear of text. For text on photos, use a flat Ink overlay of 30–60% so text reaches 4.5:1.</span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <span style="font: 600 15px/1.3 var(--font-sans);">Iconography — Lucide, 2px outline</span>
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 6px;">
+              <sc-for list="{{ iconSet }}" as="i" hint-placeholder-count="12">
+                <button onClick="{{ i.onClick }}" title="Copy icon name {{ i.name }}" style="display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 4px; border: 1px solid var(--border-default); border-radius: var(--radius-control); background: var(--surface-card); color: var(--text-primary); cursor: pointer;"><i class="icon-{{ i.name }}" style="font-size: 18px; color: var(--icon-secondary);"></i><span style="font: 400 10px/1.2 var(--font-mono); color: var(--text-secondary);">{{ i.name }}</span><span style="font: 400 10px/1.2 var(--font-sans); color: var(--text-tertiary);">{{ i.meaning }}</span></button>
+              </sc-for>
+            </div>
+            <span style="font: 400 13px/1.5 var(--font-sans); color: var(--text-secondary);">Sizes 14 / 16 / 18 / 22px. Colour <code style="font-family: var(--font-mono);">--icon-secondary</code> unless it carries state. Status icons always sit beside text. Sparkle is reserved for Hali suggestions.</span>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <span style="font: 600 15px/1.3 var(--font-sans);">Charts and data</span>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 24px; align-items: end;">
+            <div style="display: flex; flex-direction: column; gap: 10px; padding: 20px; border: 1px solid var(--border-default); border-radius: var(--radius-surface); background: var(--surface-card);">
+              <span style="font: 500 12px/1.2 var(--font-mono); text-transform: uppercase; letter-spacing: .04em; color: var(--text-tertiary);">Illustrative · engagement value</span>
+              <sc-for list="{{ chartRows }}" as="r" hint-placeholder-count="3">
+                <div style="display: grid; grid-template-columns: 84px minmax(0, 1fr) 84px; gap: 10px; align-items: center;">
+                  <span style="font: 400 12px/1.2 var(--font-sans); color: var(--text-secondary);">{{ r.label }}</span>
+                  <span style="height: 14px; width: {{ r.w }}; border: {{ r.line }}; background: {{ r.bg }}; border-radius: 2px; box-sizing: border-box;"></span>
+                  <span style="font: 500 13px/1 var(--font-sans); font-variant-numeric: tabular-nums; text-align: right;">{{ r.value }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <span style="font: 400 13px/1.6 var(--font-sans); color: var(--text-secondary);">Never sum potential and approved values together. Use solid fills for recorded figures and dashed outlines for proposed ones. Label axes and values directly; avoid legends where a label fits. Always show currency and basis. Charts never animate.</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 08 VOICE -->
+      <section id="voice" data-screen-label="08 Voice" style="display: flex; flex-direction: column; gap: 20px; scroll-margin-top: 80px;">
+        <span style="font: 500 12px/1.2 var(--font-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--text-tertiary);">08 · Voice</span>
+        <h2 style="margin: 0; font: 600 30px/1.15 var(--font-sans); letter-spacing: -0.02em;">Clear, not legalistic. Firm, not aggressive.</h2>
+        <div style="display: flex; flex-direction: column;">
+          <sc-for list="{{ voicePairs }}" as="v" hint-placeholder-count="4">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 8px 24px; padding: 14px 0; border-top: 1px solid var(--border-subtle);">
+              <span style="display: flex; gap: 8px; font: 400 14px/1.5 var(--font-sans);"><i class="icon-circle-check" style="font-size: 16px; color: var(--success-icon); margin-top: 2px;"></i>{{ v.yes }}</span>
+              <span style="display: flex; gap: 8px; font: 400 14px/1.5 var(--font-sans); color: var(--text-secondary);"><i class="icon-circle-x" style="font-size: 16px; color: var(--error-icon); margin-top: 2px;"></i>{{ v.no }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <a href="Brand Voice.dc.html" style="font: 500 14px/1.4 var(--font-sans);">Open the full brand voice and knowledge reference →</a>
+      </section>
+
+      <!-- 09 COMPONENTS -->
+      <section id="components" data-screen-label="09 Components" style="display: flex; flex-direction: column; gap: 28px; scroll-margin-top: 80px;">
+        <span style="font: 500 12px/1.2 var(--font-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--text-tertiary);">09 · Components</span>
+        <h2 style="margin: 0; font: 600 30px/1.15 var(--font-sans); letter-spacing: -0.02em;">Components and states</h2>
+        <p style="margin: 0; font: 400 15px/1.6 var(--font-sans); color: var(--text-secondary); max-width: 680px;">Live design-system components. Hover shifts one neutral step; press one further step; no scale or bounce. Focus is a 2px page-colour gap plus a 2px blue ring. Motion is 120–200ms on opacity and colour only, and nothing animates on records or money.</p>
+        <div style="display: flex; flex-direction: column; gap: 0; overflow-x: auto;">
+          <div style="display: grid; grid-template-columns: 96px repeat(7, minmax(108px, 1fr)); gap: 8px; padding-bottom: 8px; min-width: 900px;">
+            <span></span>
+            <sc-for list="{{ btnStates }}" as="s" hint-placeholder-count="7"><span style="font: 400 11px/1 var(--font-mono); color: var(--text-tertiary); text-transform: uppercase; letter-spacing: .04em;">{{ s.label }}</span></sc-for>
+          </div>
+          <sc-for list="{{ btnRows }}" as="r" hint-placeholder-count="5">
+            <div style="display: grid; grid-template-columns: 96px repeat(7, minmax(108px, 1fr)); gap: 8px; padding: 8px 0; border-top: 1px solid var(--border-subtle); align-items: center; min-width: 900px;">
+              <span style="font: 500 13px/1 var(--font-sans);">{{ r.name }}</span>
+              <sc-for list="{{ r.cells }}" as="c" hint-placeholder-count="7">
+                <x-import component-from-global-scope="HaliDesignSystem_02149f.Button" variant="{{ c.variant }}" size="sm" force-state="{{ c.fs }}" disabled="{{ c.disabled }}" loading="{{ c.loading }}" success="{{ c.success }}" hint-size="100px,32px">{{ c.label }}</x-import>
+              </sc-for>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 24px;">
+          <div style="display: flex; flex-direction: column; gap: 14px;">
+            <span style="font: 600 15px/1.3 var(--font-sans);">Inputs</span>
+            <x-import component-from-global-scope="HaliDesignSystem_02149f.TextInput" label="Agency name" placeholder="Studio North" help="Shown on your public page." hint-size="100%,88px"></x-import>
+            <x-import component-from-global-scope="HaliDesignSystem_02149f.TextInput" label="Email" default-value="name@" error="Enter a full email address so the agency can reply." hint-size="100%,88px"></x-import>
+            <x-import component-from-global-scope="HaliDesignSystem_02149f.TextInput" label="Project reference" default-value="SN-0142" valid="{{ true }}" hint-size="100%,72px"></x-import>
+            <x-import component-from-global-scope="HaliDesignSystem_02149f.TextInput" label="Agreed fee" default-value="6,000" prefix="$" disabled="{{ true }}" help="Locked after the agreement is recorded." hint-size="100%,88px"></x-import>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 14px;">
+            <span style="font: 600 15px/1.3 var(--font-sans);">Selection</span>
+            <x-import component-from-global-scope="HaliDesignSystem_02149f.Checkbox" label="Include two revision rounds" default-checked="{{ true }}" hint-size="100%,24px"></x-import>
+            <x-import component-from-global-scope="HaliDesignSystem_02149f.Checkbox" label="Disabled option" disabled="{{ true }}" hint-size="100%,24px"></x-import>
+            <x-import component-from-global-scope="HaliDesignSystem_02149f.Switch" label="Email the client when a round is sent" checked="{{ switchOn }}" on-change="{{ toggleSwitch }}" hint-size="100%,28px"></x-import>
+            <span style="font: 600 15px/1.3 var(--font-sans); padding-top: 8px;">Badges and progress</span>
+            <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+              <sc-for list="{{ badges }}" as="b" hint-placeholder-count="5"><x-import component-from-global-scope="HaliDesignSystem_02149f.StatusBadge" tone="{{ b.tone }}" icon="{{ b.icon }}" hint-size="80px,24px">{{ b.label }}</x-import></sc-for>
+            </div>
+            <x-import component-from-global-scope="HaliDesignSystem_02149f.ProgressBar" value="{{ 66 }}" label="Revision rounds used · 2 of 3" hint-size="100%,40px"></x-import>
+            <div style="display: flex; gap: 12px; align-items: center;">
+              <x-import component-from-global-scope="HaliDesignSystem_02149f.Avatar" name="Studio North" size="lg" kind="org" hint-size="40px,40px"></x-import>
+              <x-import component-from-global-scope="HaliDesignSystem_02149f.Avatar" name="Ada Mensah" size="md" hint-size="32px,32px"></x-import>
+              <x-import component-from-global-scope="HaliDesignSystem_02149f.Spinner" label="Loading" hint-size="18px,18px"></x-import>
+              <x-import component-from-global-scope="HaliDesignSystem_02149f.Money" amount="{{ 7800 }}" currency="USD" size="lg" basis="If approved" hint-size="120px,24px"></x-import>
+            </div>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <span style="font: 600 15px/1.3 var(--font-sans);">Feedback</span>
+          <sc-for list="{{ alerts }}" as="a" hint-placeholder-count="4"><x-import component-from-global-scope="HaliDesignSystem_02149f.Alert" tone="{{ a.tone }}" title="{{ a.title }}" hint-size="100%,60px">{{ a.body }}</x-import></sc-for>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <span style="font: 600 15px/1.3 var(--font-sans);">Navigation and cards</span>
+          <x-import component-from-global-scope="HaliDesignSystem_02149f.Tabs" items="{{ demoTabs }}" value="{{ demoTab }}" on-change="{{ onDemoTab }}" hint-size="100%,40px"></x-import>
+          <x-import component-from-global-scope="HaliDesignSystem_02149f.Card" title="Brand identity · Scope v2" description="Logo suite, colour, typography and a 12-page guideline document." hint-size="100%,120px">
+            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;"><x-import component-from-global-scope="HaliDesignSystem_02149f.CommercialState" state="agreed" hint-size="90px,26px"></x-import><x-import component-from-global-scope="HaliDesignSystem_02149f.Money" amount="{{ 6000 }}" currency="USD" basis="Agreed" hint-size="100px,20px"></x-import></div>
+          </x-import>
+          <span style="font: 400 13px/1.5 var(--font-sans); color: var(--text-secondary);">Cards are used only where a record is a unit (scope item, change order, decision). Lists are rows with dividers, not card grids. On phones, tables become stacked cards and dialogs become bottom sheets.</span>
+        </div>
+      </section>
+
+      <!-- 10 SLIDES -->
+      <section id="slides" data-screen-label="10 Slides" style="display: flex; flex-direction: column; gap: 24px; scroll-margin-top: 80px;">
+        <span style="font: 500 12px/1.2 var(--font-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--text-tertiary);">10 · Slides</span>
+        <h2 style="margin: 0; font: 600 30px/1.15 var(--font-sans); letter-spacing: -0.02em;">Presentations and documents</h2>
+        <p style="margin: 0; font: 400 15px/1.6 var(--font-sans); color: var(--text-secondary); max-width: 680px;">16:9 at 1920×1080. Paper is the default slide background; Deep Sea marks section dividers; Ink for closing slides. Text never below 24px at full size. One idea per slide. Logo lockup top-left on title slides, symbol bottom-right elsewhere.</p>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 16px;">
+          <div style="aspect-ratio: 16 / 9; container-type: inline-size; border: 1px solid var(--border-default); border-radius: var(--radius-sm); background: #FBFAF7; color: #1C1A18; position: relative; overflow: hidden;">
+            <img src="assets/logo/hali-lockup-horizontal.svg" alt="" style="position: absolute; left: 6cqw; top: 6cqw; height: 4cqw;">
+            <div style="position: absolute; left: 6cqw; right: 6cqw; bottom: 8cqw; display: flex; flex-direction: column; gap: 2cqw;">
+              <span style="font: 500 1.6cqw/1 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: .06em; color: #5C5751;">Title slide</span>
+              <span style="font: 600 6cqw/1.05 Geist, sans-serif; letter-spacing: -0.03em;">One record from proposal to invoice</span>
+            </div>
+          </div>
+          <div style="aspect-ratio: 16 / 9; container-type: inline-size; border: 1px solid var(--border-default); border-radius: var(--radius-sm); background: #285B57; color: #FFFFFF; position: relative; overflow: hidden;">
+            <span style="position: absolute; left: 6cqw; top: 6cqw; font: 500 8cqw/1 'Geist Mono', monospace; color: #86B9B3;">02</span>
+            <span style="position: absolute; left: 6cqw; right: 6cqw; bottom: 8cqw; font: 600 5.4cqw/1.08 Geist, sans-serif; letter-spacing: -0.03em;">Section divider: how a change is priced</span>
+            <img src="assets/logo/hali-symbol-light.svg" alt="" style="position: absolute; right: 5cqw; top: 5cqw; height: 5cqw;">
+          </div>
+          <div style="aspect-ratio: 16 / 9; container-type: inline-size; border: 1px solid var(--border-default); border-radius: var(--radius-sm); background: #FBFAF7; color: #1C1A18; position: relative; overflow: hidden;">
+            <span style="position: absolute; left: 6cqw; top: 6cqw; font: 600 3.6cqw/1.1 Geist, sans-serif; letter-spacing: -0.02em;">Data slide</span>
+            <div style="position: absolute; left: 6cqw; right: 6cqw; top: 18cqw; display: flex; flex-direction: column; gap: 2.4cqw;">
+              <div style="display: flex; align-items: center; gap: 2cqw;"><span style="width: 18cqw; font: 400 1.8cqw/1 Geist, sans-serif; color: #5C5751;">Agreed</span><span style="height: 4cqw; width: 46cqw; background: #285B57; border-radius: 0.4cqw;"></span><span style="font: 500 2.2cqw/1 Geist, sans-serif;">$6,000</span></div>
+              <div style="display: flex; align-items: center; gap: 2cqw;"><span style="width: 18cqw; font: 400 1.8cqw/1 Geist, sans-serif; color: #5C5751;">Proposed</span><span style="height: 4cqw; width: 14cqw; border: 0.3cqw dashed #3462B8; background: #EEF3FB; border-radius: 0.4cqw; box-sizing: border-box;"></span><span style="font: 500 2.2cqw/1 Geist, sans-serif;">$1,800</span></div>
+            </div>
+            <span style="position: absolute; left: 6cqw; bottom: 5cqw; font: 400 1.4cqw/1 'Geist Mono', monospace; color: #736D65; text-transform: uppercase; letter-spacing: .05em;">Illustrative figures</span>
+            <img src="assets/logo/hali-symbol.svg" alt="" style="position: absolute; right: 5cqw; bottom: 4cqw; height: 4cqw;">
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column;">
+          <sc-for list="{{ slideRules }}" as="r" hint-placeholder-count="5">
+            <div style="display: grid; grid-template-columns: minmax(0, 200px) minmax(0, 1fr); gap: 16px; padding: 10px 0; border-top: 1px solid var(--border-subtle);">
+              <span style="font: 500 14px/1.4 var(--font-sans);">{{ r.a }}</span>
+              <span style="font: 400 14px/1.5 var(--font-sans); color: var(--text-secondary);">{{ r.b }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+
+      <!-- 11 UI KITS -->
+      <section id="ui-kits" data-screen-label="11 UI kits" style="display: flex; flex-direction: column; gap: 24px; scroll-margin-top: 80px;">
+        <span style="font: 500 12px/1.2 var(--font-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--text-tertiary);">11 · UI kits</span>
+        <h2 style="margin: 0; font: 600 30px/1.15 var(--font-sans); letter-spacing: -0.02em;">Surfaces and their layout rules</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 16px;">
+          <sc-for list="{{ kits }}" as="k" hint-placeholder-count="4">
+            <div style="display: flex; flex-direction: column; border: 1px solid var(--border-default); border-radius: var(--radius-surface); overflow: hidden; background: var(--surface-card);">
+              <div style="height: 150px; background: var(--surface-sunken); padding: 16px; display: flex; gap: 8px; box-sizing: border-box;">
+                <span style="display: {{ k.side }}; width: 22%; background: var(--surface-card); border: 1px solid var(--border-default); border-radius: 4px;"></span>
+                <span style="flex: 1; display: flex; justify-content: center;"><span style="width: {{ k.col }}; display: flex; flex-direction: column; gap: 6px;">
+                  <span style="height: 14px; width: 50%; background: var(--n-300); border-radius: 3px;"></span>
+                  <span style="height: 40px; background: var(--surface-card); border: 1px solid var(--border-default); border-radius: 4px;"></span>
+                  <span style="height: 40px; background: var(--surface-card); border: 1.5px dashed var(--blue-500); border-radius: 4px;"></span>
+                  <span style="height: 18px; width: 40%; background: {{ k.cta }}; border-radius: 3px;"></span>
+                </span></span>
+              </div>
+              <div style="padding: 14px 16px; display: flex; flex-direction: column; gap: 6px;">
+                <span style="font: 600 15px/1.3 var(--font-sans);">{{ k.name }}</span>
+                <span style="font: 400 13px/1.5 var(--font-sans); color: var(--text-secondary);">{{ k.desc }}</span>
+                <span style="font: 400 12px/1.4 var(--font-mono); color: var(--text-tertiary);">{{ k.spec }}</span>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+
+      <!-- 12 GOVERNANCE -->
+      <section id="governance" data-screen-label="12 Governance" style="display: flex; flex-direction: column; gap: 24px; scroll-margin-top: 80px;">
+        <span style="font: 500 12px/1.2 var(--font-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--text-tertiary);">12 · Governance</span>
+        <h2 style="margin: 0; font: 600 30px/1.15 var(--font-sans); letter-spacing: -0.02em;">Keeping it consistent</h2>
+        <div style="display: flex; flex-direction: column;">
+          <sc-for list="{{ governance }}" as="g" hint-placeholder-count="6">
+            <div style="display: grid; grid-template-columns: minmax(0, 200px) minmax(0, 1fr); gap: 16px; padding: 12px 0; border-top: 1px solid var(--border-subtle);">
+              <span style="font: 500 14px/1.4 var(--font-sans);">{{ g.a }}</span>
+              <span style="font: 400 14px/1.55 var(--font-sans); color: var(--text-secondary); white-space: pre-line;">{{ g.b }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px; padding: 20px; border: 1px solid var(--border-default); border-radius: var(--radius-surface); background: var(--surface-card);">
+          <span style="font: 600 15px/1.3 var(--font-sans);">Accessibility release checklist · WCAG 2.2 AA</span>
+          <sc-for list="{{ a11y }}" as="a" hint-placeholder-count="6">
+            <x-import component-from-global-scope="HaliDesignSystem_02149f.Checkbox" label="{{ a.label }}" hint-size="100%,24px"></x-import>
+          </sc-for>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { ready: false, theme: 'light', copied: null, active: 'overview', win: typeof window !== 'undefined' ? window.innerWidth : 1280, switchOn: true, demoTab: 'scope' };
+  componentDidMount() {
+    const boot = () => { if (!window.HaliBrand) return setTimeout(boot, 40); this.setState({ ready: true, theme: window.HaliBrand.theme() }); }; boot();
+    this.onResize = () => this.setState({ win: window.innerWidth });
+    this.onScroll = () => { if (this.raf) return; this.raf = requestAnimationFrame(() => { this.raf = null; let cur = 'overview';
+      document.querySelectorAll('main section[id]').forEach(s => { if (s.getBoundingClientRect().top < 140) cur = s.id; }); if (cur !== this.state.active) this.setState({ active: cur }); }); };
+    window.addEventListener('resize', this.onResize); window.addEventListener('scroll', this.onScroll, { passive: true });
+  }
+  componentWillUnmount() { window.removeEventListener('resize', this.onResize); window.removeEventListener('scroll', this.onScroll); }
+  cp(text, label) {
+    return { text: label || text, icon: this.state.copied === text ? 'icon-check' : 'icon-copy',
+      onClick: async () => { const ok = await window.HaliBrand.copy(text); this.setState({ copied: ok ? text : null, msg: ok ? 'Copied ' + text : 'Copy failed — select the value and copy it manually.' }); clearTimeout(this.t); this.t = setTimeout(() => this.setState({ copied: null, msg: null }), 1600); } };
+  }
+  renderVals() {
+    const B = window.HaliBrand, st = this.state;
+    const base = { studioNav: [['Brand Studio.dc.html', 'Studio'], ['Brand Playbook.dc.html', 'Playbook'], ['Design System.dc.html', 'Design system'], ['Brand Voice.dc.html', 'Voice & knowledge'], ['Asset Library.dc.html', 'Assets'], ['Brand Studio Editor.dc.html', 'Templates'], ['Document Editor.dc.html', 'Documents']].map(([href, label]) => ({ href, label, current: href === 'Design System.dc.html' ? 'page' : undefined, bg: href === 'Design System.dc.html' ? 'var(--surface-selected)' : 'transparent' })),
+      themeIcon: st.theme === 'dark' ? 'sun' : 'moon', toggleTheme: () => this.setState({ theme: window.HaliBrand.theme(st.theme === 'dark' ? 'light' : 'dark') }) };
+    if (!B) return Object.assign(base, { version: '', sections: [], copiedMsg: null });
+    const cp = (t, l) => this.cp(t, l);
+    const SEC = [['overview', 'Overview'], ['logo', 'Logo'], ['colour', 'Colour'], ['type', 'Type'], ['spacing', 'Spacing'], ['radius', 'Radius & shadow'], ['motif', 'Motif'], ['voice', 'Voice'], ['components', 'Components'], ['slides', 'Slides'], ['ui-kits', 'UI kits'], ['governance', 'Governance']];
+    const groups = {}; B.COLORS.forEach(c => { (groups[c.group] = groups[c.group] || []).push(c); });
+    const fmt = (r) => r.toFixed(2) + ':1 ' + B.grade(r);
+    const LOGOS = [['Horizontal lockup', 'hali-lockup-horizontal.svg', '#FBFAF7', '52px', 'Primary · light'], ['Lockup reverse', 'hali-lockup-horizontal-reverse.svg', '#1C1A18', '52px', 'Dark backgrounds'], ['Lockup mono', 'hali-lockup-horizontal-mono.svg', '#FFFFFF', '52px', 'One-colour print'], ['Stacked', 'hali-lockup-stacked.svg', '#FBFAF7', '92px', 'Square spaces'],
+      ['Stacked reverse', 'hali-lockup-stacked-reverse.svg', '#285B57', '92px', 'On Deep Sea'], ['Wordmark', 'hali-wordmark.svg', '#FBFAF7', '40px', 'Where the symbol is shown nearby'], ['Wordmark reverse', 'hali-wordmark-reverse.svg', '#1C1A18', '40px', 'Dark backgrounds'], ['Symbol', 'hali-symbol.svg', '#FBFAF7', '72px', 'App icon, avatar, favicon'],
+      ['Symbol light', 'hali-symbol-light.svg', '#285B57', '72px', 'On Deep Sea / Ink'], ['Symbol ink', 'hali-symbol-ink.svg', '#F5F3EE', '72px', 'Neutral contexts'], ['Symbol mono', 'hali-symbol-mono.svg', '#FFFFFF', '72px', 'One-colour'], ['Wordmark mono', 'hali-wordmark-mono.svg', '#FFFFFF', '40px', 'One-colour']];
+    return Object.assign(base, {
+      version: B.VERSION, copiedMsg: st.msg || null, sideNavDisplay: st.win >= 960 ? 'flex' : 'none', topNavShow: st.win < 960,
+      sections: SEC.map(([id, label], i) => ({ href: '#' + id, label, num: String(i + 1).padStart(2, '0'), on: st.active === id, bg: st.active === id ? 'var(--surface-selected)' : 'transparent',
+        onClick: (e) => { e.preventDefault(); const el = document.getElementById(id); if (el) { window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 72, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); history.replaceState(null, '', '#' + id); this.setState({ active: id }); } } })),
+      principles: [['Clear, not legalistic', 'Plain words; certainty only where something is recorded.'], ['Borders over shadows', 'Flat paper surfaces; 1px borders; shadows only for overlays.'], ['One accent', 'Deep Sea marks the brand and agreed states. Nothing else.'], ['Meaningful colour', 'Blue proposed, amber awaiting, red problem, green success.'], ['Works without colour', 'Line style carries certainty in greyscale and print.']].map(([a, b]) => ({ a, b })),
+      surfaces: [['Public agency page & enquiry', 'Agency-branded. The agency colour leads CTAs; Hali appears only as a small attribution. Light only.'], ['Agency workspace', 'Hali chrome. 248px sidebar plus max 1080px content. Optional dark theme.'], ['Client portal', 'Agency-branded secure links. Centred 560–880px column, 16px body. Light only.']].map(([a, b]) => ({ a, b })),
+      logos: LOGOS.map(([name, file, bg, h, use]) => ({ name, file, src: 'assets/logo/' + file, bg, h, use })),
+      icons: [['favicon.svg', 'SVG', '32px', '6px'], ['favicon-32.png', '32px', '32px', '6px'], ['apple-touch-icon-180.png', '180', '56px', '12px'], ['icon-512.png', '512', '64px', '14px'], ['social-avatar-400.png', 'Avatar', '64px', '50%']].map(([f, name, size, radius]) => ({ src: 'assets/icons/' + f, file: f, name, size, radius })),
+      misuse: [['Don\'t stretch or squash', 'scaleX(1.5)', 'none', '#FBFAF7'], ['Don\'t recolour', 'none', 'hue-rotate(140deg)', '#FBFAF7'], ['Don\'t rotate', 'rotate(-14deg)', 'none', '#FBFAF7'], ['Don\'t place on busy imagery', 'none', 'none', 'repeating-linear-gradient(45deg,#C98A12 0 6px,#3462B8 6px 12px)'], ['Don\'t use the default lockup on dark', 'none', 'none', '#1C1A18']].map(([label, transform, filter, bg]) => ({ label, transform, filter, bg, src: 'assets/logo/hali-lockup-horizontal.svg' })),
+      colorGroups: Object.entries(groups).map(([name, items]) => ({ name, items: items.map(c => { const f = B.formats(c.hex); const ink = B.contrast(c.hex, '#1C1A18'), wh = B.contrast(c.hex, '#FFFFFF');
+        return { name: c.name, hex: c.hex, role: c.role, usage: c.usage, dark: c.dark, on: ink >= wh ? '#1C1A18' : '#FFFFFF', copyHex: cp(c.hex).onClick,
+          chips: [cp('var(' + c.token + ')', c.token), cp(f.hex), cp(f.rgb), cp(f.hsl)], cInk: fmt(ink), cWhite: fmt(wh), cPaper: fmt(B.contrast(c.hex, '#FBFAF7')) }; }) })),
+      aliases: B.ALIASES.map(a => ({ css: 'var(' + a.token + ')', use: a.use, ref: a.ref, copy: cp('var(' + a.token + ')', a.token) })),
+      families: [{ name: 'Geist', sample: '600 56px/1 var(--font-sans)', use: 'UI and display. 400 / 500 / 600 / 700. Neutral and precise, excellent tabular figures. SIL OFL.', chips: [cp('var(--font-sans)', '--font-sans'), cp('"Geist", ui-sans-serif, system-ui, sans-serif', 'stack')] },
+        { name: 'Geist Mono', sample: '500 52px/1 var(--font-mono)', use: 'References, versions, timestamps, overlines (uppercase, +0.04em). 400 / 500. SIL OFL.', chips: [cp('var(--font-mono)', '--font-mono'), cp('"Geist Mono", ui-monospace, monospace', 'stack')] }],
+      typeRoles: B.TYPE_ROLES.map(([token, spec, ls, use]) => ({ css: 'var(' + token + ')', ls: token.includes('display') ? 'var(--tracking-display)' : token.includes('headline') ? 'var(--tracking-heading)' : token.includes('overline') ? '0.04em' : '0', tt: token.includes('overline') ? 'uppercase' : 'none',
+        sample: token.includes('money') ? '$7,800 · If approved' : token.includes('reference') ? 'SN-0142 · Scope v2 · 14:32' : token.includes('overline') ? 'Not included' : 'Changes priced before work starts', spec, use, copy: cp('var(' + token + ')', token) })),
+      typeScale: B.TYPE_SCALE.map(([t, px]) => ({ px: px + 'px', copy: cp('var(' + t + ')', t) })),
+      typeMisc: [['Regular', '--weight-regular'], ['Medium', '--weight-medium'], ['Semibold', '--weight-semibold'], ['Bold', '--weight-bold'], ['Display tracking −0.03em', '--tracking-display'], ['Heading tracking −0.02em', '--tracking-heading'], ['Tight 1.15', '--leading-tight'], ['Snug 1.3', '--leading-snug'], ['Normal 1.5', '--leading-normal'], ['Relaxed 1.6', '--leading-relaxed']].map(([label, t]) => ({ label, copy: cp('var(' + t + ')', t) })),
+      spacing: B.SPACING.map(([t, px]) => ({ px: px + 'px', copy: cp('var(' + t + ')', t) })),
+      sizes: B.SIZES.concat(B.LAYOUT.map(l => [l[0], l[1]])).map(([t, v]) => cp('var(' + t + ')', t + ' · ' + v)),
+      breakpoints: B.BREAKPOINTS.map(([a, b, c, d, e]) => ({ a, b, c, d, e })), gridCols: Array.from({ length: 12 }, (_, i) => i),
+      radii: B.RADII.map(([t, v, use]) => ({ v, use, copy: cp('var(' + t + ')', t) })),
+      shadows: B.SHADOWS.map(([t, v, use]) => ({ token: t, use, copy: cp('var(' + t + ')', t) })),
+      zindex: B.ZINDEX.concat(B.MOTION.map(m => [m[0], m[1]])).map(([t, v]) => cp('var(' + t + ')', t + ' · ' + v)),
+      states: B.STATES,
+      iconSet: [['file-text', 'Agreement'], ['list-checks', 'Scope'], ['message-square', 'Feedback'], ['inbox', 'Requests'], ['scan-search', 'Assessment'], ['file-diff', 'Change order'], ['shield-check', 'Authorised'], ['receipt', 'Billing'], ['clock', 'Awaiting'], ['circle-help', 'Unknown'], ['layers', 'Superseded'], ['sparkle', 'Hali suggestion'], ['lock', 'Restricted']].map(([name, meaning]) => ({ name, meaning, onClick: cp(name).onClick })),
+      chartRows: [['Agreed', '72%', '1.5px solid #285B57', '#285B57', '$6,000'], ['Proposed', '22%', '1.5px dashed #3462B8', 'var(--blue-50)', '$1,800'], ['Invoiced', '48%', '1.5px solid var(--n-300)', 'var(--n-300)', '$4,000']].map(([label, w, line, bg, value]) => ({ label, w, line, bg, value })),
+      voicePairs: [['This request may fall outside the agreed scope.', 'Scope creep detected!'], ['Your two included revision rounds are complete. This request can be handled as an additional change.', 'You exceeded your revision limit.'], ['$6,000 agreed → $7,800 if approved', 'Revenue recovered: $1,800'], ['Approve change', 'OK']].map(([yes, no]) => ({ yes, no })),
+      btnStates: ['Default', 'Hover', 'Pressed', 'Focus', 'Disabled', 'Loading', 'Success'].map(label => ({ label })),
+      btnRows: [['Primary', 'primary', 'Create proposal'], ['Commit', 'commit', 'Approve change'], ['Secondary', 'secondary', 'Save draft'], ['Ghost', 'ghost', 'Cancel'], ['Danger', 'danger', 'Delete']].map(([name, variant, label]) => ({ name,
+        cells: [null, 'hover', 'pressed', 'focus', 'd', 'l', 's'].map(k => ({ variant, label, fs: k && k.length > 1 ? k : null, disabled: k === 'd', loading: k === 'l', success: k === 's' })) })),
+      switchOn: st.switchOn, toggleSwitch: () => this.setState({ switchOn: !st.switchOn }),
+      badges: [['neutral', 'Draft', 'pencil-line'], ['info', 'Sent', 'send'], ['attention', 'Due Friday', 'clock'], ['success', 'Exported', 'check'], ['error', 'Failed', 'circle-alert']].map(([tone, label, icon]) => ({ tone, label, icon })),
+      alerts: [['info', 'Hali found a possible difference', 'This request may fall outside Scope v2. Review it before replying.'], ['attention', 'Awaiting client decision', 'Studio North sent a proposed change 3 days ago.'], ['success', 'Approved and recorded', 'The change is now part of the agreement.'], ['error', 'Export failed', 'The file could not be created. Try again, or export as PNG.']].map(([tone, title, body]) => ({ tone, title, body })),
+      demoTabs: [{ id: 'scope', label: 'Scope' }, { id: 'requests', label: 'Requests', count: 3 }, { id: 'changes', label: 'Change orders', count: 1, attention: true }, { id: 'billing', label: 'Billing' }], demoTab: st.demoTab, onDemoTab: (id) => this.setState({ demoTab: id }),
+      slideRules: [['Size', '1920 × 1080 (16:9). Export PDF for sharing, PPTX for editing.'], ['Type', 'Titles 64–96px Geist 600 −0.03em. Body ≥ 28px. Mono overlines 24px uppercase.'], ['Colour', 'Paper default; Deep Sea for section dividers; Ink for closing. Accent only for agreed or brand moments.'], ['Layout', '96px margins. Left-aligned titles. Centre only for single-statement slides.'], ['Data', 'One chart per slide; label values directly; currency and basis on every figure; mark illustrative data.']].map(([a, b]) => ({ a, b })),
+      kits: [['Agency workspace', 'Commercial control and daily coordination. Dense rows, sidebar navigation.', 'sidebar 248px · content ≤ 1080px · body 14px', 'block', '100%', 'var(--n-900)'], ['Client portal', 'Informed decisions on agency-branded secure links.', 'column 560–880px · body 16px · light only', 'none', '70%', 'var(--sea-600)'], ['Public agency page', 'The agency\'s front door and enquiry form. Agency colour on CTAs.', 'column ≤ 880px · Hali attribution in footer', 'none', '78%', 'var(--amber-500)'], ['Brand studio', 'This tool: templates, editor and brand reference.', '3-panel editor · bottom sheets under 960px', 'block', '100%', 'var(--sea-600)']].map(([name, desc, spec, side, col, cta]) => ({ name, desc, spec, side, col, cta })),
+      governance: [['Ownership', 'One design-system owner approves token, component and logo changes. The brand owner approves voice and brand facts.'], ['Versioning', 'Semantic versioning. Current v1.4.0. Major = removed or renamed tokens/components; minor = additions; patch = fixes.'], ['Naming', 'Tokens: --{category}-{role}-{variant}, e.g. --action-commit-bg-hover, --text-secondary. Components: PascalCase nouns. Files: kebab-case.'], ['Contribution', 'Propose with the problem, the screens affected and an accessibility check. Prefer composing existing components before adding new ones.'], ['Deprecation', 'Keep a deprecated alias for one major version and note it in the changelog. Example: --font-serif now aliases --font-display and will be removed in v2.0.'], ['Consistency', 'Use semantic aliases in code, not raw scale values. Templates read the same tokens as this page — change a token in one place.']].map(([a, b]) => ({ a, b })),
+      a11y: ['Text meets 4.5:1 (3:1 for 24px+ or 18.66px bold)', 'Every action reachable by keyboard; visible focus ring', 'Touch targets ≥ 44px on touch surfaces', 'Status never shown by colour alone — line style or text too', 'Motion respects prefers-reduced-motion', 'Errors say what happened and how to fix it', 'Images have alt text; decorative images are hidden'].map(label => ({ label }))
+    });
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <title>Hali Brand Studio — Editor</title>
+  <link rel="icon" href="assets/icons/favicon.svg">
+  <link rel="stylesheet" href="_ds/hali-b4-project-managment-design-system-8cb0828f-e4cd-40a6-8da1-4182aed7d477/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/hali-b4-project-managment-design-system-8cb0828f-e4cd-40a6-8da1-4182aed7d477/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/hali-b4-project-managment-design-system-8cb0828f-e4cd-40a6-8da1-4182aed7d477/tokens/themes.css">
+  <link rel="stylesheet" href="_ds/hali-b4-project-managment-design-system-8cb0828f-e4cd-40a6-8da1-4182aed7d477/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/hali-b4-project-managment-design-system-8cb0828f-e4cd-40a6-8da1-4182aed7d477/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/hali-b4-project-managment-design-system-8cb0828f-e4cd-40a6-8da1-4182aed7d477/tokens/layout.css">
+  <link rel="stylesheet" href="_ds/hali-b4-project-managment-design-system-8cb0828f-e4cd-40a6-8da1-4182aed7d477/tokens/base.css">
+  <link rel="stylesheet" href="_ds/hali-b4-project-managment-design-system-8cb0828f-e4cd-40a6-8da1-4182aed7d477/styles.css">
+  <script src="_ds/hali-b4-project-managment-design-system-8cb0828f-e4cd-40a6-8da1-4182aed7d477/_ds_bundle.js"></script>
+  <script src="studio/templates.js"></script>
+  <script src="studio/export.js"></script>
+  <style>
+    html, body { margin: 0; height: 100%; background: var(--surface-page); color: var(--text-primary); font-family: var(--font-sans); overflow: hidden; }
+    a { color: var(--text-link); } a:hover { color: var(--text-link-hover); }
+    @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; transition: none !important; } }
+  </style>
+</helmet>
+
+<div style="height: 100vh; height: 100dvh; display: flex; flex-direction: column; background: var(--surface-page); color: var(--text-primary); font-family: var(--font-sans);">
+
+  <header style="flex: none; height: 56px; display: flex; align-items: center; gap: 8px; padding: 0 12px; border-bottom: 1px solid var(--border-default); background: var(--surface-card); min-width: 0;">
+    <a href="Brand Studio.dc.html" title="Brand Studio home" style="display: flex; align-items: center; flex: none; padding: 4px;">
+      <x-import component-from-global-scope="HaliDesignSystem_02149f.Logo" variant="symbol" height="28" hint-size="28px,28px"></x-import>
+    </a>
+    <input value="{{ docName }}" onChange="{{ onDocName }}" aria-label="Design name" style="flex: 1 1 120px; min-width: 0; max-width: 360px; height: 32px; border: 1px solid transparent; border-radius: var(--radius-control); background: transparent; color: var(--text-primary); font: 500 14px/1 var(--font-sans); padding: 0 8px;" style-hover="border-color: var(--border-default);" style-focus="border-color: var(--border-input-hover); outline: none;">
+    <div style="flex: 1 1 0; min-width: 0;"></div>
+    <x-import component-from-global-scope="HaliDesignSystem_02149f.Button" variant="secondary" size="sm" icon-start="layout-template" on-click="{{ openGallery }}" hint-size="110px,32px">Templates</x-import>
+    <x-import component-from-global-scope="HaliDesignSystem_02149f.IconButton" icon="undo-2" label="Undo" size="sm" disabled="{{ cantUndo }}" on-click="{{ undo }}" hint-size="32px,32px"></x-import>
+    <x-import component-from-global-scope="HaliDesignSystem_02149f.IconButton" icon="redo-2" label="Redo" size="sm" disabled="{{ cantRedo }}" on-click="{{ redo }}" hint-size="32px,32px"></x-import>
+    <x-import component-from-global-scope="HaliDesignSystem_02149f.IconButton" icon="{{ previewIcon }}" label="{{ previewLabel }}" size="sm" on-click="{{ togglePreview }}" hint-size="32px,32px"></x-import>
+    <x-import component-from-global-scope="HaliDesignSystem_02149f.IconButton" icon="{{ themeIcon }}" label="Switch light or dark theme" size="sm" on-click="{{ toggleTheme }}" hint-size="32px,32px"></x-import>
+    <x-import component-from-global-scope="HaliDesignSystem_02149f.Button" variant="primary" size="sm" icon-start="download" on-click="{{ openExport }}" hint-size="96px,32px">Export</x-import>
+  </header>
+
+  <sc-if value="{{ notice }}" hint-placeholder-val="{{ false }}">
+    <div style="flex: none; padding: 8px 12px; border-bottom: 1px solid var(--border-default); background: var(--surface-card);">
+      <x-import component-from-global-scope="HaliDesignSystem_02149f.Alert" tone="{{ notice.tone }}" hint-size="100%,44px">{{ notice.text }}</x-import>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ ready }}" hint-placeholder-val="{{ true }}">
+  <div style="flex: 1; min-height: 0; display: flex; position: relative;">
+
+    <!-- LEFT: pages + layers -->
+    <aside aria-label="Pages and layers" style="display: {{ leftDisplay }}; position: {{ panelPos }}; left: 0; right: 0; bottom: {{ sheetBottom }}; z-index: 40; width: {{ leftWidth }}; max-height: {{ sheetMax }}; flex: none; flex-direction: column; border-right: 1px solid var(--border-default); border-top: 1px solid var(--border-default); background: var(--surface-card); overflow: hidden; box-shadow: {{ sheetShadow }};">
+      <div style="flex: none; padding: 12px 12px 8px; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+        <span style="font: 500 12px/1.2 var(--font-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--text-tertiary);">Pages · {{ pageCount }}</span>
+        <x-import component-from-global-scope="HaliDesignSystem_02149f.Button" variant="ghost" size="sm" icon-start="plus" on-click="{{ openAddEnd }}" hint-size="80px,32px">Add page</x-import>
+      </div>
+      <sc-if value="{{ addMenuOpen }}" hint-placeholder-val="{{ false }}">
+        <div style="flex: none; margin: 0 12px 8px; padding: 8px; border: 1px solid var(--border-default); border-radius: var(--radius-surface); background: var(--surface-subtle); display: flex; flex-direction: column; gap: 4px;">
+          <span style="font: 400 12px/1.4 var(--font-sans); color: var(--text-secondary); padding: 0 4px 4px;">{{ addMenuLabel }}</span>
+          <sc-for list="{{ pageLayouts }}" as="pl" hint-placeholder-count="3">
+            <button onClick="{{ pl.onClick }}" style="text-align: left; height: 32px; padding: 0 8px; border: 0; border-radius: var(--radius-control); background: transparent; color: var(--text-primary); font: 400 13px/1 var(--font-sans); cursor: pointer;" style-hover="background: var(--surface-sunken);">{{ pl.name }}</button>
+          </sc-for>
+          <button onClick="{{ closeAddMenu }}" style="text-align: left; height: 28px; padding: 0 8px; border: 0; background: transparent; color: var(--text-tertiary); font: 400 12px/1 var(--font-sans); cursor: pointer;">Cancel</button>
+        </div>
+      </sc-if>
+      <div style="flex: 1 1 50%; min-height: 80px; overflow: auto; padding: 0 12px 12px; display: flex; flex-direction: column; gap: 8px;">
+        <sc-for list="{{ pagesView }}" as="p" hint-placeholder-count="1">
+          <div draggable="true" onDragStart="{{ p.onDragStart }}" onDragOver="{{ p.onDragOver }}" onDrop="{{ p.onDrop }}" style="border: {{ p.border }}; border-radius: var(--radius-surface); padding: 8px; background: {{ p.bg }}; display: flex; flex-direction: column; gap: 6px;">
+            <button onClick="{{ p.onSelect }}" aria-current="{{ p.active }}" style="display: flex; gap: 10px; align-items: center; padding: 0; border: 0; background: transparent; color: var(--text-primary); cursor: pointer; text-align: left; min-width: 0;">
+              <span style="flex: none; display: grid; place-items: center; width: 64px; height: 64px; background: var(--surface-sunken); border-radius: var(--radius-sm); overflow: hidden;">{{ p.thumb }}</span>
+              <span style="display: flex; flex-direction: column; gap: 2px; min-width: 0;">
+                <span style="font: 500 12px/1.2 var(--font-mono); color: var(--text-tertiary);">{{ p.num }}</span>
+                <span style="font: 500 13px/1.3 var(--font-sans); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ p.name }}</span>
+              </span>
+            </button>
+            <div style="display: flex; gap: 2px; justify-content: flex-end;">
+              <x-import component-from-global-scope="HaliDesignSystem_02149f.IconButton" icon="arrow-up" label="Move page up" size="sm" disabled="{{ p.first }}" on-click="{{ p.onUp }}" hint-size="32px,32px"></x-import>
+              <x-import component-from-global-scope="HaliDesignSystem_02149f.IconButton" icon="arrow-down" label="Move page down" size="sm" disabled="{{ p.last }}" on-click="{{ p.onDown }}" hint-size="32px,32px"></x-import>
+              <x-import component-from-global-scope="HaliDesignSystem_02149f.IconButton" icon="copy" label="Duplicate page" size="sm" on-click="{{ p.onDup }}" hint-size="32px,32px"></x-import>
+              <x-import component-from-global-scope="HaliDesignSystem_02149f.IconButton" icon="between-horizontal-start" label="Insert page before" size="sm" on-click="{{ p.onInsertBefore }}" hint-size="32px,32px"></x-import>
+              <x-import component-from-global-scope="HaliDesignSystem_02149f.IconButton" icon="between-horizontal-end" label="Insert page after" size="sm" on-click="{{ p.onInsertAfter }}" hint-size="32px,32px"></x-import>
+              <x-import component-from-global-scope="HaliDesignSystem_02149f.IconButton" icon="trash-2" label="Delete page" size="sm" disabled="{{ p.only }}" on-click="{{ p.onDel }}" hint-size="32px,32px"></x-import>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="flex: none; padding: 10px 12px 6px; border-top: 1px solid var(--border-default); display: flex; flex-direction: column; gap: 8px;">
+        <span style="font: 500 12px/1.2 var(--font-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--text-tertiary);">Add to page</span>
+        <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px;">
+          <sc-for list="{{ addTools }}" as="t" hint-placeholder-count="8">
+            <button onClick="{{ t.onClick }}" title="{{ t.label }}" style="display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 2px; border: 1px solid var(--border-default); border-radius: var(--radius-control); background: var(--surface-card); color: var(--text-primary); font: 400 11px/1 var(--font-sans); cursor: pointer;" style-hover="background: var(--surface-hover);">
+              <i class="{{ t.icon }}" style="font-size: 16px; color: var(--icon-secondary);"></i>{{ t.label }}
+            </button>
+          </sc-for>
+        </div>
+      </div>
+      <div style="flex: 1 1 40%; min-height: 80px; overflow: auto; padding: 6px 12px 12px; display: flex; flex-direction: column; gap: 2px;">
+        <span style="font: 500 12px/1.2 var(--font-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--text-tertiary); padding: 6px 0;">Layers · top first</span>
+        <sc-for list="{{ layersView }}" as="l" hint-placeholder-count="5">
+          <div style="display: flex; align-items: center; gap: 4px; border-radius: var(--radius-control); background: {{ l.bg }}; padding-left: 6px;">
+            <button onClick="{{ l.onSelect }}" style="flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px; height: 32px; border: 0; background: transparent; color: {{ l.fg }}; font: 400 13px/1 var(--font-sans); cursor: pointer; text-align: left; padding: 0;">
+              <i class="{{ l.icon }}" style="font-size: 14px; color: var(--icon-secondary); flex: none;"></i>
+              <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ l.label }}</span>
+            </button>
+            <x-import component-from-global-scope="HaliDesignSystem_02149f.IconButton" icon="{{ l.eye }}" label="{{ l.eyeLabel }}" size="sm" on-click="{{ l.onToggle }}" hint-size="32px,32px"></x-import>
+          </div>
+        </sc-for>
+      </div>
+    </aside>
+
+    <!-- CENTER: canvas -->
+    <main style="flex: 1; min-width: 0; display: flex; flex-direction: column; background: var(--surface-sunken);">
+      <div style="flex: none; height: 44px; display: flex; align-items: center; gap: 8px; padding: 0 12px; border-bottom: 1px solid var(--border-default); background: var(--surface-subtle); overflow-x: auto;">
+        <span style="font: 400 12px/1 var(--font-mono); color: var(--text-secondary); white-space: nowrap;">{{ sizeLabel }}</span>
+        <div style="flex: 1;"></div>
+        <x-import component-from-global-scope="HaliDesignSystem_02149f.IconButton" icon="zoom-out" label="Zoom out" size="sm" on-click="{{ zoomOut }}" hint-size="32px,32px"></x-import>
+        <button onClick="{{ zoomFit }}" title="Fit to screen" style="height: 28px; min-width: 56px; padding: 0 8px; border: 1px solid var(--border-default); border-radius: var(--radius-control); background: var(--surface-card); color: var(--text-primary); font: 500 12px/1 var(--font-mono); cursor: pointer;">{{ zoomLabel }}</button>
+        <x-import component-from-global-scope="HaliDesignSystem_02149f.IconButton" icon="zoom-in" label="Zoom in" size="sm" on-click="{{ zoomIn }}" hint-size="32px,32px"></x-import>
+      </div>
+      <div data-vp="1" ref="{{ viewportRef }}" onScroll="{{ onViewportScroll }}" onPointerDown="{{ onViewportDown }}" style="flex: 1; min-height: 0; overflow: auto; position: relative; overscroll-behavior: contain;">
+        <div style="min-width: 100%; width: max-content; display: flex; flex-direction: column; align-items: center; gap: 40px; padding: 32px 32px 96px; box-sizing: border-box;">
+          <sc-for list="{{ canvasPages }}" as="cp" hint-placeholder-count="1">
+            <div ref="{{ cp.ref }}" data-screen-label="{{ cp.label }}" style="display: flex; flex-direction: column; gap: 8px;">
+              <button onClick="{{ cp.onSelect }}" style="align-self: flex-start; display: flex; gap: 8px; align-items: center; border: 0; background: transparent; padding: 0; color: {{ cp.labelColor }}; font: 500 12px/1 var(--font-mono); cursor: pointer;">{{ cp.label }}</button>
+              <div style="outline: {{ cp.outline }}; outline-offset: 3px; border-radius: 1px;">{{ cp.board }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </main>
+
+    <!-- RIGHT: properties -->
+    <aside aria-label="Properties" style="display: {{ rightDisplay }}; position: {{ panelPos }}; left: 0; right: 0; bottom: {{ sheetBottom }}; z-index: 40; width: {{ rightWidth }}; max-height: {{ sheetMax }}; flex: none; flex-direction: column; border-left: 1px solid var(--border-default); border-top: 1px solid var(--border-default); background: var(--surface-card); overflow: auto; box-shadow: {{ sheetShadow }};">
+
+      <sc-if value="{{ hasSel }}" hint-placeholder-val="{{ false }}">
+        <div style="padding: 12px; display: flex; flex-direction: column; gap: 14px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <i class="{{ v.icon }}" style="font-size: 16px; color: var(--icon-secondary);"></i>
+            <span style="flex: 1; min-width: 0; font: 600 14px/1.3 var(--font-sans); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ v.title }}</span>
+            <x-import component-from-global-scope="HaliDesignSystem_02149f.IconButton" icon="x" label="Deselect" size="sm" on-click="{{ deselect }}" hint-size="32px,32px"></x-import>
+          </div>
+          <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+            <x-import component-from-global-scope="HaliDesignSystem_02149f.IconButton" icon="copy-plus" label="Duplicate (Ctrl/⌘ D)" variant="secondary" size="sm" on-click="{{ dupSel }}" hint-size="32px,32px"></x-import>
+            <x-import component-from-global-scope="HaliDesignSystem_02149f.IconButton" icon="bring-to-front" label="Bring forward" variant="secondary" size="sm" on-click="{{ layerUp }}" hint-size="32px,32px"></x-import>
+            <x-import component-from-global-scope="HaliDesignSystem_02149f.IconButton" icon="send-to-back" label="Send backward" variant="secondary" size="sm" on-click="{{ layerDown }}" hint-size="32px,32px"></x-import>
+            <x-import component-from-global-scope="HaliDesignSystem_02149f.IconButton" icon="align-center-horizontal" label="Centre horizontally on page" variant="secondary" size="sm" on-click="{{ centerH }}" hint-size="32px,32px"></x-import>
+            <x-import component-from-global-scope="HaliDesignSystem_02149f.IconButton" icon="align-center-vertical" label="Centre vertically on page" variant="secondary" size="sm" on-click="{{ centerV }}" hint-size="32px,32px"></x-import>
+            <x-import component-from-global-scope="HaliDesignSystem_02149f.IconButton" icon="trash-2" label="Delete (Delete key)" variant="secondary" size="sm" on-click="{{ deleteSel }}" hint-size="32px,32px"></x-import>
+          </div>
+
+          <sc-if value="{{ isText }}" hint-placeholder-val="{{ false }}">
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+              <label style="display: flex; flex-direction: column; gap: 6px;">
+                <span style="font: 500 12px/1.2 var(--font-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--text-tertiary);">Text</span>
+                <textarea value="{{ v.text }}" onChange="{{ h.text }}" rows="4" style="resize: vertical; min-height: 72px; padding: 8px; border: 1px solid var(--border-input); border-radius: var(--radius-control); background: var(--surface-card); color: var(--text-primary); font: 400 13px/1.45 var(--font-sans);"></textarea>
+              </label>
+              <div style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px;">
+                <label style="display: flex; flex-direction: column; gap: 6px;"><span style="font: 500 12px/1.2 var(--font-mono); text-transform: uppercase; letter-spacing: .04em; color: var(--text-tertiary);">Font</span>
+                  <select value="{{ v.font }}" onChange="{{ h.font }}" style="height: 32px; border: 1px solid var(--border-input); border-radius: var(--radius-control); background: var(--surface-card); color: var(--text-primary); font: 400 13px/1 var(--font-sans); padding: 0 6px;"><option value="sans">Geist</option><option value="mono">Geist Mono</option></select></label>
+                <label style="display: flex; flex-direction: column; gap: 6px;"><span style="font: 500 12px/1.2 var(--font-mono); text-transform: uppercase; letter-spacing: .04em; color: var(--text-tertiary);">Weight</span>
+                  <select value="{{ v.weight }}" onChange="{{ h.weight }}" style="height: 32px; border: 1px solid var(--border-input); border-radius: var(--radius-control); background: var(--surface-card); color: var(--text-primary); font: 400 13px/1 var(--font-sans); padding: 0 6px;"><option value="400">Regular 400</option><option value="500">Medium 500</option><option value="600">Semibold 600</option><option value="700">Bold 700</option></select></label>
+                <label style="display: flex; flex-direction: column; gap: 6px;"><span style="font: 500 12px/1.2 var(--font-mono); text-transform: uppercase; letter-spacing: .04em; color: var(--text-tertiary);">Size px</span>
+                  <input type="number" min="4" max="800" value="{{ v.size }}" onChange="{{ h.size }}" style="height: 32px; border: 1px solid var(--border-input); border-radius: var(--radius-control); background: var(--surface-card); color: var(--text-primary); font: 400 13px/1 var(--font-mono); padding: 0 8px; min-width: 0;"></label>
+                <label style="display: flex; flex-direction: column; gap: 6px;"><span style="font: 500 12px/1.2 var(--font-mono); text-transform: uppercase; letter-spacing: .04em; color: var(--text-tertiary);">Line height</span>
+                  <input type="number" step="0.05" min="0.6" max="3" value="{{ v.lh }}" onChange="{{ h.lh }}" style="height: 32px; border: 1px solid var(--border-input); border-radius: var(--radius-control); background: var(--surface-card); color: var(--text-primary); font: 400 13px/1 var(--font-mono); padding: 0 8px; min-width: 0;"></label>
+                <label style="display: flex; flex-direction: column; gap: 6px;"><span style="font: 500 12px/1.2 var(--font-mono); text-transform: uppercase; letter-spacing: .04em; color: var(--text-tertiary);">Tracking em</span>
+                  <input type="number" step="0.005" min="-0.2" max="0.5" value="{{ v.ls }}" onChange="{{ h.ls }}" style="height: 32px; border: 1px solid var(--border-input); border-radius: var(--radius-control); background: var(--surface-card); color: var(--text-primary); font: 400 13px/1 var(--font-mono); padding: 0 8px; min-width: 0;"></label>
+                <label style="display: flex; flex-direction: column; gap: 6px;"><span style="font: 500 12px/1.2 var(--font-mono); text-transform: uppercase; letter-spacing: .04em; color: var(--text-tertiary);">Padding px</span>
+                  <input type="number" min="0" max="400" value="{{ v.pad }}" onChange="{{ h.pad }}" style="height: 32px; border: 1px solid var(--border-input); border-radius: var(--radius-control); background: var(--surface-card); color: var(--text-primary); font: 400 13px/1 var(--font-mono); padding: 0 8px; min-width: 0;"></label>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 6px;">
+                <span style="font: 500 12px/1.2 var(--font-mono); text-transform: uppercase; letter-spacing: .04em; color: var(--text-tertiary);">Alignment</span>
+                <div style="display: flex; gap: 8px;">
+                  <div role="group" aria-label="Horizontal alignment" style="flex: 4; display: flex; gap: 2px; padding: 2px; background: var(--surface-sunken); border-radius: var(--radius-control);">
+                    <sc-for list="{{ alignOpts }}" as="o" hint-placeholder-count="4"><button onClick="{{ o.onClick }}" title="{{ o.label }}" aria-pressed="{{ o.on }}" style="flex: 1; height: 28px; border: 0; border-radius: 4px; background: {{ o.bg }}; color: var(--text-primary); cursor: pointer;"><i class="{{ o.icon }}" style="font-size: 15px;"></i></button></sc-for>
+                  </div>
+                  <div role="group" aria-label="Vertical alignment" style="flex: 3; display: flex; gap: 2px; padding: 2px; background: var(--surface-sunken); border-radius: var(--radius-control);">
+                    <sc-for list="{{ valignOpts }}" as="o" hint-placeholder-count="3"><button onClick="{{ o.onClick }}" title="{{ o.label }}" aria-pressed="{{ o.on }}" style="flex: 1; height: 28px; border: 0; border-radius: 4px; background: {{ o.bg }}; color: var(--text-primary); cursor: pointer;"><i class="{{ o.icon }}" style="font-size: 15px;"></i></button></sc-for>
+                  </div>
+                </div>
+                <div style="display: flex; gap: 6px;">
+                  <sc-for list="{{ textToggles }}" as="o" hint-placeholder-count="2"><button onClick="{{ o.onClick }}" aria-pressed="{{ o.on }}" style="height: 28px; padding: 0 10px; border: 1px solid var(--border-default); border-radius: var(--radius-control); background: {{ o.bg }}; color: var(--text-primary); font: 500 12px/1 var(--font-sans); cursor: pointer;">{{ o.label }}</button></sc-for>
+                </div>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 6px;">
+                <span style="font: 500 12px/1.2 var(--font-mono); text-transform: uppercase; letter-spacing: .04em; color: var(--text-tertiary);">Text colour · {{ v.color }}</span>
+                <div style="display: flex; flex-wrap: wrap; gap: 4px; align-items: center;">
+                  <sc-for list="{{ sw.color }}" as="s" hint-placeholder-count="10"><button onClick="{{ s.onClick }}" title="{{ s.name }}" aria-label="{{ s.name }}" style="width: 22px; height: 22px; border-radius: 4px; background: {{ s.hex }}; border: 1px solid var(--border-strong); box-shadow: {{ s.ring }}; cursor: pointer; padding: 0;"></button></sc-for>
+                  <input type="color" value="{{ v.color }}" onChange="{{ h.color }}" aria-label="Custom text colour" style="width: 28px; height: 24px; border: 0; padding: 0; background: transparent; cursor: pointer;">
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ hasFill }}" hint-placeholder-val="{{ false }}">
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+              <span style="font: 500 12px/1.2 var(--font-mono); text-transform: uppercase; letter-spacing: .04em; color: var(--text-tertiary);">Fill · {{ v.bgLabel }}</span>
+              <div style="display: flex; flex-wrap: wrap; gap: 4px; align-items: center;">
+                <button onClick="{{ h.bgNone }}" title="No fill" aria-label="No fill" style="width: 22px; height: 22px; border-radius: 4px; border: 1px solid var(--border-strong); background: repeating-linear-gradient(45deg, var(--surface-card) 0 4px, var(--surface-sunken) 4px 8px); cursor: pointer; padding: 0;"></button>
+                <sc-for list="{{ sw.bg }}" as="s" hint-placeholder-count="10"><button onClick="{{ s.onClick }}" title="{{ s.name }}" aria-label="{{ s.name }}" style="width: 22px; height: 22px; border-radius: 4px; background: {{ s.hex }}; border: 1px solid var(--border-strong); box-shadow: {{ s.ring }}; cursor: pointer; padding: 0;"></button></sc-for>
+                <input type="color" value="{{ v.bgHex }}" onChange="{{ h.bg }}" aria-label="Custom fill colour" style="width: 28px; height: 24px; border: 0; padding: 0; background: transparent; cursor: pointer;">
+              </div>
+              <div style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr); gap: 8px; margin-top: 6px;">
+                <label style="display: flex; flex-direction: column; gap: 6px;"><span style="font: 500 12px/1.2 var(--font-mono); text-transform: uppercase; letter-spacing: .04em; color: var(--text-tertiary);">Border</span>
+                  <select value="{{ v.bStyle }}" onChange="{{ h.bStyle }}" style="height: 32px; border: 1px solid var(--border-input); border-radius: var(--radius-control); background: var(--surface-card); color: var(--text-primary); font: 400 13px/1 var(--font-sans); padding: 0 4px; min-width: 0;"><option value="none">None</option><option value="solid">Solid</option><option value="dashed">Dashed</option><option value="dotted">Dotted</option></select></label>
+                <label style="display: flex; flex-direction: column; gap: 6px;"><span style="font: 500 12px/1.2 var(--font-mono); text-transform: uppercase; letter-spacing: .04em; color: var(--text-tertiary);">Width</span>
+                  <input type="number" min="0" max="60" value="{{ v.bWidth }}" onChange="{{ h.bWidth }}" style="height: 32px; border: 1px solid var(--border-input); border-radius: var(--radius-control); background: var(--surface-card); color: var(--text-primary); font: 400 13px/1 var(--font-mono); padding: 0 8px; min-width: 0;"></label>
+                <label style="display: flex; flex-direction: column; gap: 6px;"><span style="font: 500 12px/1.2 var(--font-mono); text-transform: uppercase; letter-spacing: .04em; color: var(--text-tertiary);">Radius</span>
+                  <input type="number" min="0" max="9999" value="{{ v.radius }}" onChange="{{ h.radius }}" style="height: 32px; border: 1px solid var(--border-input); border-radius: var(--radius-control); background: var(--surface-card); color: var(--text-primary); font: 400 13px/1 var(--font-mono); padding: 0 8px; min-width: 0;"></label>
+              </div>
+              <sc-if value="{{ hasBorder }}" hint-placeholder-val="{{ false }}">
+                <div style="display: flex; flex-wrap: wrap; gap: 4px; align-items: center;">
+                  <span style="font: 400 12px/1 var(--font-sans); color: var(--text-secondary); margin-right: 4px;">Border colour</span>
+                  <sc-for list="{{ sw.border }}" as="s" hint-placeholder-count="10"><button onClick="{{ s.onClick }}" title="{{ s.name }}" aria-label="{{ s.name }}" style="width: 22px; height: 22px; border-radius: 4px; background: {{ s.hex }}; border: 1px solid var(--border-strong); box-shadow: {{ s.ring }}; cursor: pointer; padding: 0;"></button></sc-for>
+                </div>
+              </sc-if>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isLine }}" hint-placeholder-val="{{ false }}">
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <span style="font: 500 12px/1.2 var(--font-mono); text-transform: uppercase; letter-spacing: .04em; color: var(--text-tertiary);">Record line</span>
+              <div role="group" aria-label="Line style" style="display: flex; gap: 2px; padding: 2px; background: var(--surface-sunken); border-radius: var(--radius-control);">
+                <sc-for list="{{ dashOpts }}" as="o" hint-placeholder-count="3"><button onClick="{{ o.onClick }}" aria-pressed="{{ o.on }}" style="flex: 1; height: 28px; border: 0; border-radius: 4px; background: {{ o.bg }}; color: var(--text-primary); font: 500 12px/1 var(--font-sans); cursor: pointer;">{{ o.label }}</button></sc-for>
+              </div>
+              <span style="font: 400 12px/1.4 var(--font-sans); color: var(--text-secondary);">Dotted = suggested by Hali · dashed = not yet agreed · solid = recorded.</span>
+              <label style="display: flex; flex-direction: column; gap: 6px;"><span style="font: 500 12px/1.2 var(--font-mono); text-transform: uppercase; letter-spacing: .04em; color: var(--text-tertiary);">Thickness px</span>
+                <input type="number" min="1" max="80" value="{{ v.thick }}" onChange="{{ h.thick }}" style="height: 32px; border: 1px solid var(--border-input); border-radius: var(--radius-control); background: var(--surface-card); color: var(--text-primary); font: 400 13px/1 var(--font-mono); padding: 0 8px;"></label>
+              <div style="display: flex; flex-wrap: wrap; gap: 4px; align-items: center;">
+                <sc-for list="{{ sw.line }}" as="s" hint-placeholder-count="10"><button onClick="{{ s.onClick }}" title="{{ s.name }}" aria-label="{{ s.name }}" style="width: 22px; height: 22px; border-radius: 4px; background: {{ s.hex }}; border: 1px solid var(--border-strong); box-shadow: {{ s.ring }}; cursor: pointer; padding: 0;"></button></sc-for>
+                <input type="color" value="{{ v.lineColor }}" onChange="{{ h.lineColor }}" aria-label="Custom line colour" style="width: 28px; height: 24px; border: 0; padding: 0; background: transparent; cursor: pointer;">
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isImage }}" hint-placeholder-val="{{ false }}">
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <span style="font: 500 12px/1.2 var(--font-mono); text-transform: uppercase; letter-spacing: .04em; color: var(--text-tertiary);">Image</span>
+              <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                <x-import component-from-global-scope="HaliDesignSystem_02149f.Button" variant="secondary" size="sm" icon-start="image-up" on-click="{{ pickImage }}" hint-size="130px,32px">{{ v.imageAction }}</x-import>
+                <sc-if value="{{ v.hasSrc }}" hint-placeholder-val="{{ false }}">
+                  <x-import component-from-global-scope="HaliDesignSystem_02149f.Button" variant="ghost" size="sm" on-click="{{ h.imageClear }}" hint-size="90px,32px">Remove</x-import>
+                </sc-if>
+              </div>
+              <span style="font: 400 12px/1.4 var(--font-sans); color: var(--text-secondary);">Use the agency's own work only. Empty slots show the brand hatch and export as hatch.</span>
+              <div role="group" aria-label="Image fit" style="display: flex; gap: 2px; padding: 2px; background: var(--surface-sunken); border-radius: var(--radius-control);">
+                <sc-for list="{{ fitOpts }}" as="o" hint-placeholder-count="2"><button onClick="{{ o.onClick }}" aria-pressed="{{ o.on }}" style="flex: 1; height: 28px; border: 0; border-radius: 4px; background: {{ o.bg }}; color: var(--text-primary); font: 500 12px/1 var(--font-sans); cursor: pointer;">{{ o.label }}</button></sc-for>
+              </div>
+              <label style="display: flex; flex-direction: column; gap: 6px;"><span style="font: 500 12px/1.2 var(--font-mono); text-transform: uppercase; letter-spacing: .04em; color: var(--text-tertiary);">Corner radius</span>
+                <input type="number" min="0" max="9999" value="{{ v.radius }}" onChange="{{ h.radius }}" style="height: 32px; border: 1px solid var(--border-input); border-radius: var(--radius-control); background: var(--surface-card); color: var(--text-primary); font: 400 13px/1 var(--font-mono); padding: 0 8px;"></label>
+              <label style="display: flex; flex-direction: column; gap: 6px;"><span style="font: 500 12px/1.2 var(--font-mono); text-transform: uppercase; letter-spacing: .04em; color: var(--text-tertiary);">Darken overlay %</span>
+                <input type="range" min="0" max="80" value="{{ v.overlay }}" onChange="{{ h.overlay }}"></label>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isLogo }}" hint-placeholder-val="{{ false }}">
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <label style="display: flex; flex-direction: column; gap: 6px;"><span style="font: 500 12px/1.2 var(--font-mono); text-transform: uppercase; letter-spacing: .04em; color: var(--text-tertiary);">Logo</span>
+                <select value="{{ v.logo }}" onChange="{{ h.logo }}" style="height: 32px; border: 1px solid var(--border-input); border-radius: var(--radius-control); background: var(--surface-card); color: var(--text-primary); font: 400 13px/1 var(--font-sans); padding: 0 6px;"><option value="lockup">Horizontal lockup</option><option value="stacked">Stacked lockup</option><option value="wordmark">Wordmark</option><option value="symbol">Symbol</option><option value="appicon">App icon (full bleed)</option></select></label>
+              <label style="display: flex; flex-direction: column; gap: 6px;"><span style="font: 500 12px/1.2 var(--font-mono); text-transform: uppercase; letter-spacing: .04em; color: var(--text-tertiary);">Tone</span>
+                <select value="{{ v.tone }}" onChange="{{ h.tone }}" style="height: 32px; border: 1px solid var(--border-input); border-radius: var(--radius-control); background: var(--surface-card); color: var(--text-primary); font: 400 13px/1 var(--font-sans); padding: 0 6px;"><option value="default">Default (light backgrounds)</option><option value="reverse">Reverse (dark backgrounds)</option><option value="mono">Mono</option><option value="ink">Ink symbol</option><option value="sea">Deep Sea symbol</option></select></label>
+              <span style="font: 400 12px/1.4 var(--font-sans); color: var(--text-secondary);">Keep clear space equal to the folded corner. Minimum: symbol 16px, lockup 20px tall.</span>
+            </div>
+          </sc-if>
+
+          <div style="display: flex; flex-direction: column; gap: 6px; padding-top: 12px; border-top: 1px solid var(--border-subtle);">
+            <span style="font: 500 12px/1.2 var(--font-mono); text-transform: uppercase; letter-spacing: .04em; color: var(--text-tertiary);">Position &amp; size</span>
+            <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px;">
+              <sc-for list="{{ geomFields }}" as="g" hint-placeholder-count="6">
+                <label style="display: flex; flex-direction: column; gap: 4px;"><span style="font: 400 11px/1 var(--font-mono); color: var(--text-tertiary);">{{ g.label }}</span>
+                  <input type="number" step="{{ g.step }}" value="{{ g.value }}" onChange="{{ g.onChange }}" style="height: 30px; border: 1px solid var(--border-input); border-radius: var(--radius-control); background: var(--surface-card); color: var(--text-primary); font: 400 12px/1 var(--font-mono); padding: 0 6px; min-width: 0;"></label>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ noSel }}" hint-placeholder-val="{{ true }}">
+        <div style="padding: 12px; display: flex; flex-direction: column; gap: 16px;">
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <span style="font: 500 12px/1.2 var(--font-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--text-tertiary);">Design</span>
+            <span style="font: 400 13px/1.4 var(--font-sans); color: var(--text-secondary);">{{ tplLabel }}</span>
+            <label style="display: flex; flex-direction: column; gap: 6px;"><span style="font: 500 12px/1.2 var(--font-mono); text-transform: uppercase; letter-spacing: .04em; color: var(--text-tertiary);">Size</span>
+              <select value="{{ fmtId }}" onChange="{{ onFormat }}" style="height: 36px; border: 1px solid var(--border-input); border-radius: var(--radius-control); background: var(--surface-card); color: var(--text-primary); font: 400 13px/1 var(--font-sans); padding: 0 6px;">
+                <sc-for list="{{ formatOptions }}" as="f" hint-placeholder-count="4"><option value="{{ f.id }}">{{ f.label }}</option></sc-for>
+              </select></label>
+            <div style="display: flex; flex-direction: column; gap: 6px;"><span style="font: 500 12px/1.2 var(--font-mono); text-transform: uppercase; letter-spacing: .04em; color: var(--text-tertiary);">Colour scheme</span>
+              <div role="group" aria-label="Colour scheme" style="display: flex; gap: 2px; padding: 2px; background: var(--surface-sunken); border-radius: var(--radius-control);">
+                <sc-for list="{{ schemeOpts }}" as="o" hint-placeholder-count="3"><button onClick="{{ o.onClick }}" aria-pressed="{{ o.on }}" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; height: 30px; border: 0; border-radius: 4px; background: {{ o.bg }}; color: var(--text-primary); font: 500 12px/1 var(--font-sans); cursor: pointer;"><span style="width: 12px; height: 12px; border-radius: 3px; background: {{ o.swatch }}; border: 1px solid var(--border-strong);"></span>{{ o.name }}</button></sc-for>
+              </div>
+            </div>
+            <span style="font: 400 12px/1.4 var(--font-sans); color: var(--text-secondary);">Changing size or scheme re-flows the layout and keeps your edited text, images and colours.</span>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 8px; padding-top: 12px; border-top: 1px solid var(--border-subtle);">
+            <span style="font: 500 12px/1.2 var(--font-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--text-tertiary);">Page {{ pageNum }}</span>
+            <input value="{{ pageName }}" onChange="{{ onPageName }}" aria-label="Page name" style="height: 32px; border: 1px solid var(--border-input); border-radius: var(--radius-control); background: var(--surface-card); color: var(--text-primary); font: 400 13px/1 var(--font-sans); padding: 0 8px;">
+            <span style="font: 400 12px/1 var(--font-sans); color: var(--text-secondary);">Background · {{ pageBg }}</span>
+            <div style="display: flex; flex-wrap: wrap; gap: 4px; align-items: center;">
+              <sc-for list="{{ sw.page }}" as="s" hint-placeholder-count="10"><button onClick="{{ s.onClick }}" title="{{ s.name }}" aria-label="{{ s.name }}" style="width: 22px; height: 22px; border-radius: 4px; background: {{ s.hex }}; border: 1px solid var(--border-strong); box-shadow: {{ s.ring }}; cursor: pointer; padding: 0;"></button></sc-for>
+              <input type="color" value="{{ pageBg }}" onChange="{{ onPageBg }}" aria-label="Custom page background" style="width: 28px; height: 24px; border: 0; padding: 0; background: transparent; cursor: pointer;">
+            </div>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 10px; padding-top: 12px; border-top: 1px solid var(--border-subtle);">
+            <span style="font: 500 12px/1.2 var(--font-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--text-tertiary);">Content on this page</span>
+            <sc-for list="{{ pageFields }}" as="f" hint-placeholder-count="3">
+              <label style="display: flex; flex-direction: column; gap: 4px;">
+                <span style="font: 500 12px/1.2 var(--font-sans); color: var(--text-secondary);">{{ f.label }}</span>
+                <textarea value="{{ f.value }}" onChange="{{ f.onChange }}" onFocus="{{ f.onFocus }}" rows="{{ f.rows }}" style="resize: vertical; padding: 8px; border: 1px solid var(--border-input); border-radius: var(--radius-control); background: var(--surface-card); color: var(--text-primary); font: 400 13px/1.45 var(--font-sans);"></textarea>
+              </label>
+            </sc-for>
+            <span style="font: 400 12px/1.4 var(--font-sans); color: var(--text-tertiary);">Template copy is illustrative. Replace [bracketed] items with confirmed facts.</span>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 8px; padding-top: 12px; border-top: 1px solid var(--border-subtle);">
+            <sc-if value="{{ resetIdle }}" hint-placeholder-val="{{ true }}">
+              <x-import component-from-global-scope="HaliDesignSystem_02149f.Button" variant="secondary" size="sm" icon-start="rotate-ccw" on-click="{{ askReset }}" hint-size="160px,32px">Reset template</x-import>
+            </sc-if>
+            <sc-if value="{{ resetAsk }}" hint-placeholder-val="{{ false }}">
+              <span style="font: 400 13px/1.4 var(--font-sans); color: var(--text-secondary);">This replaces every page with the original template at the current size. You can undo it.</span>
+              <div style="display: flex; gap: 6px;">
+                <x-import component-from-global-scope="HaliDesignSystem_02149f.Button" variant="danger" size="sm" on-click="{{ doReset }}" hint-size="130px,32px">Reset to original</x-import>
+                <x-import component-from-global-scope="HaliDesignSystem_02149f.Button" variant="ghost" size="sm" on-click="{{ cancelReset }}" hint-size="80px,32px">Cancel</x-import>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+      </sc-if>
+    </aside>
+
+    <sc-if value="{{ isMobile }}" hint-placeholder-val="{{ false }}">
+      <nav aria-label="Editor panels" style="position: absolute; left: 0; right: 0; bottom: 0; height: 56px; z-index: 41; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--border-default); background: var(--surface-card);">
+        <sc-for list="{{ mobileTabs }}" as="m" hint-placeholder-count="3">
+          <button onClick="{{ m.onClick }}" aria-pressed="{{ m.on }}" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border: 0; background: {{ m.bg }}; color: var(--text-primary); font: 500 12px/1 var(--font-sans); cursor: pointer; min-height: 44px;"><i class="{{ m.icon }}" style="font-size: 18px;"></i>{{ m.label }}</button>
+        </sc-for>
+      </nav>
+    </sc-if>
+  </div>
+  </sc-if>
+
+  <!-- Template gallery -->
+  <sc-if value="{{ gallery }}" hint-placeholder-val="{{ false }}">
+    <div role="dialog" aria-modal="true" aria-label="Choose a template" style="position: fixed; inset: 0; z-index: 50; background: var(--scrim); display: flex; align-items: center; justify-content: center; padding: {{ dialogPad }};">
+      <div style="width: 100%; max-width: 1200px; height: 100%; max-height: 860px; display: flex; flex-direction: column; background: var(--surface-page); border-radius: {{ dialogRadius }}; box-shadow: var(--shadow-overlay); overflow: hidden;">
+        <div style="flex: none; display: flex; align-items: center; gap: 12px; padding: 16px 20px; border-bottom: 1px solid var(--border-default); background: var(--surface-card);">
+          <span style="flex: 1; font: 600 18px/1.3 var(--font-sans); letter-spacing: -0.01em;">Templates</span>
+          <x-import component-from-global-scope="HaliDesignSystem_02149f.Tabs" items="{{ galleryTabs }}" value="{{ gTab }}" on-change="{{ onGalleryTab }}" style="{{ tabsStyle }}" hint-size="220px,40px"></x-import>
+          <x-import component-from-global-scope="HaliDesignSystem_02149f.IconButton" icon="x" label="Close" size="sm" on-click="{{ closeGallery }}" hint-size="32px,32px"></x-import>
+        </div>
+        <sc-if value="{{ gTemplates }}" hint-placeholder-val="{{ true }}">
+          <div style="flex: 1; min-height: 0; display: flex; flex-direction: {{ galleryDir }};">
+            <nav aria-label="Categories" style="flex: none; width: {{ galleryNavW }}; display: flex; flex-direction: {{ galleryNavDir }}; gap: 2px; padding: 12px; border-right: 1px solid var(--border-default); border-bottom: 1px solid var(--border-default); overflow: auto; background: var(--surface-card);">
+              <sc-for list="{{ galleryCats }}" as="c" hint-placeholder-count="8">
+                <button onClick="{{ c.onClick }}" aria-current="{{ c.on }}" style="flex: none; text-align: left; padding: 8px 10px; border: 0; border-radius: var(--radius-control); background: {{ c.bg }}; color: var(--text-primary); cursor: pointer; display: flex; flex-direction: column; gap: 3px;">
+                  <span style="font: 500 13px/1.2 var(--font-sans); white-space: nowrap;">{{ c.name }}</span>
+                  <span style="font: 400 11px/1.3 var(--font-mono); color: var(--text-tertiary); white-space: nowrap;">{{ c.meta }}</span>
+                </button>
+              </sc-for>
+            </nav>
+            <div style="flex: 1; min-width: 0; overflow: auto; padding: 16px 20px 32px; display: flex; flex-direction: column; gap: 16px;">
+              <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                <sc-for list="{{ galleryFmts }}" as="f" hint-placeholder-count="4">
+                  <button onClick="{{ f.onClick }}" aria-pressed="{{ f.on }}" style="height: 30px; padding: 0 12px; border: 1px solid {{ f.border }}; border-radius: var(--radius-pill); background: {{ f.bg }}; color: {{ f.fg }}; font: 500 12px/1 var(--font-sans); cursor: pointer; white-space: nowrap;">{{ f.label }}</button>
+                </sc-for>
+              </div>
+              <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px;">
+                <sc-for list="{{ galleryItems }}" as="g" hint-placeholder-count="8">
+                  <button onClick="{{ g.onClick }}" style="display: flex; flex-direction: column; gap: 8px; padding: 10px; border: 1px solid var(--border-default); border-radius: var(--radius-surface); background: var(--surface-card); color: var(--text-primary); cursor: pointer; text-align: left;" style-hover="background: var(--surface-hover); border-color: var(--border-strong);">
+                    <span style="height: 180px; display: grid; place-items: center; background: var(--surface-sunken); border-radius: var(--radius-sm); overflow: hidden;">{{ g.thumb }}</span>
+                    <span style="font: 500 13px/1.3 var(--font-sans);">{{ g.name }}</span>
+                    <span style="font: 400 11px/1.2 var(--font-mono); color: var(--text-tertiary);">{{ g.meta }}</span>
+                  </button>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ gMine }}" hint-placeholder-val="{{ false }}">
+          <div style="flex: 1; min-height: 0; overflow: auto; padding: 16px 20px 32px; display: flex; flex-direction: column; gap: 16px;">
+            <sc-if value="{{ noSaved }}" hint-placeholder-val="{{ false }}">
+              <x-import component-from-global-scope="HaliDesignSystem_02149f.EmptyState" icon="layout-template" title="No saved designs yet" hint-size="100%,200px">Designs save automatically in this browser as you edit.</x-import>
+            </sc-if>
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px;">
+              <sc-for list="{{ savedDocs }}" as="s" hint-placeholder-count="3">
+                <div style="display: flex; flex-direction: column; gap: 8px; padding: 10px; border: 1px solid {{ s.border }}; border-radius: var(--radius-surface); background: var(--surface-card);">
+                  <button onClick="{{ s.onOpen }}" style="height: 160px; display: grid; place-items: center; background: var(--surface-sunken); border: 0; border-radius: var(--radius-sm); overflow: hidden; cursor: pointer; padding: 0;">{{ s.thumb }}</button>
+                  <span style="font: 500 13px/1.3 var(--font-sans);">{{ s.name }}</span>
+                  <span style="font: 400 11px/1.3 var(--font-mono); color: var(--text-tertiary);">{{ s.meta }}</span>
+                  <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+                    <x-import component-from-global-scope="HaliDesignSystem_02149f.Button" variant="secondary" size="sm" on-click="{{ s.onOpen }}" hint-size="60px,32px">{{ s.openLabel }}</x-import>
+                    <x-import component-from-global-scope="HaliDesignSystem_02149f.Button" variant="ghost" size="sm" on-click="{{ s.onDup }}" hint-size="80px,32px">Duplicate</x-import>
+                    <x-import component-from-global-scope="HaliDesignSystem_02149f.Button" variant="{{ s.delVariant }}" size="sm" disabled="{{ s.isCurrent }}" on-click="{{ s.onDel }}" hint-size="70px,32px">{{ s.delLabel }}</x-import>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- Export dialog -->
+  <sc-if value="{{ exportOpen }}" hint-placeholder-val="{{ false }}">
+    <div role="dialog" aria-modal="true" aria-label="Export" style="position: fixed; inset: 0; z-index: 50; background: var(--scrim); display: flex; align-items: {{ exportAlign }}; justify-content: center; padding: {{ dialogPad }};">
+      <div style="width: 100%; max-width: 520px; max-height: 100%; overflow: auto; display: flex; flex-direction: column; gap: 18px; padding: 20px; background: var(--surface-card); border-radius: var(--radius-lg); box-shadow: var(--shadow-overlay);">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="flex: 1; font: 600 18px/1.3 var(--font-sans);">Export</span>
+          <x-import component-from-global-scope="HaliDesignSystem_02149f.IconButton" icon="x" label="Close" size="sm" on-click="{{ closeExport }}" hint-size="32px,32px"></x-import>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <span style="font: 500 12px/1.2 var(--font-mono); text-transform: uppercase; letter-spacing: .04em; color: var(--text-tertiary);">Format</span>
+          <div role="radiogroup" aria-label="Format" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px;">
+            <sc-for list="{{ expFormatOpts }}" as="o" hint-placeholder-count="4"><button role="radio" aria-checked="{{ o.on }}" onClick="{{ o.onClick }}" style="display: flex; flex-direction: column; gap: 4px; align-items: flex-start; padding: 10px; border: 1px solid {{ o.border }}; border-radius: var(--radius-control); background: {{ o.bg }}; color: var(--text-primary); cursor: pointer; text-align: left;"><span style="font: 600 13px/1 var(--font-sans);">{{ o.label }}</span><span style="font: 400 11px/1.3 var(--font-sans); color: var(--text-secondary);">{{ o.hint }}</span></button></sc-for>
+          </div>
+        </div>
+        <sc-if value="{{ isRaster }}" hint-placeholder-val="{{ true }}">
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <span style="font: 500 12px/1.2 var(--font-mono); text-transform: uppercase; letter-spacing: .04em; color: var(--text-tertiary);">Resolution</span>
+            <div role="group" aria-label="Resolution" style="display: flex; gap: 2px; padding: 2px; background: var(--surface-sunken); border-radius: var(--radius-control);">
+              <sc-for list="{{ expScaleOpts }}" as="o" hint-placeholder-count="3"><button onClick="{{ o.onClick }}" aria-pressed="{{ o.on }}" style="flex: 1; height: 30px; border: 0; border-radius: 4px; background: {{ o.bg }}; color: var(--text-primary); font: 500 12px/1 var(--font-mono); cursor: pointer;">{{ o.label }}</button></sc-for>
+            </div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ isJpg }}" hint-placeholder-val="{{ false }}">
+          <label style="display: flex; flex-direction: column; gap: 6px;"><span style="font: 500 12px/1.2 var(--font-mono); text-transform: uppercase; letter-spacing: .04em; color: var(--text-tertiary);">JPEG quality · {{ expQualityLabel }}</span>
+            <input type="range" min="50" max="100" value="{{ expQuality }}" onChange="{{ onExpQuality }}"></label>
+        </sc-if>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <span style="font: 500 12px/1.2 var(--font-mono); text-transform: uppercase; letter-spacing: .04em; color: var(--text-tertiary);">What to export</span>
+          <div role="radiogroup" aria-label="Scope" style="display: flex; flex-direction: column; gap: 6px;">
+            <sc-for list="{{ expScopeOpts }}" as="o" hint-placeholder-count="3"><button role="radio" aria-checked="{{ o.on }}" onClick="{{ o.onClick }}" style="display: flex; justify-content: space-between; gap: 12px; align-items: center; padding: 10px 12px; border: 1px solid {{ o.border }}; border-radius: var(--radius-control); background: {{ o.bg }}; color: var(--text-primary); cursor: pointer; text-align: left;"><span style="font: 500 13px/1.3 var(--font-sans);">{{ o.label }}</span><span style="font: 400 11px/1.3 var(--font-mono); color: var(--text-tertiary); white-space: nowrap;">{{ o.meta }}</span></button></sc-for>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 4px; padding: 10px 12px; border-radius: var(--radius-control); background: var(--surface-subtle);">
+          <span style="font: 400 11px/1.2 var(--font-mono); color: var(--text-tertiary); text-transform: uppercase; letter-spacing: .04em;">File</span>
+          <span style="font: 400 12px/1.4 var(--font-mono); color: var(--text-primary); overflow-wrap: anywhere;">{{ exportFilename }}</span>
+          <span style="font: 400 12px/1.4 var(--font-sans); color: var(--text-secondary);">{{ formatNote }}</span>
+        </div>
+        <sc-if value="{{ exportMsg }}" hint-placeholder-val="{{ false }}">
+          <x-import component-from-global-scope="HaliDesignSystem_02149f.Alert" tone="{{ exportMsg.tone }}" hint-size="100%,44px">{{ exportMsg.text }}</x-import>
+        </sc-if>
+        <div style="display: flex; gap: 8px; justify-content: space-between; flex-wrap: wrap; align-items: center;">
+          <label style="display: inline-flex; align-items: center; gap: 6px; font: 500 13px/1 var(--font-sans); color: var(--text-link); cursor: pointer;">
+            <i class="icon-file-up" style="font-size: 16px;"></i>Import design file
+            <input type="file" accept="application/json,.json" onChange="{{ importJSON }}" style="display: none;">
+          </label>
+          <x-import component-from-global-scope="HaliDesignSystem_02149f.Button" variant="commit" icon-start="download" loading="{{ exporting }}" success="{{ exportDone }}" on-click="{{ runExport }}" hint-size="140px,40px">{{ exportCta }}</x-import>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <input type="file" accept="image/*" ref="{{ fileRef }}" onChange="{{ onImageFile }}" style="display: none;">
+  <div aria-hidden="true" style="position: fixed; left: -200000px; top: 0; pointer-events: none;">{{ exportHost }}</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;snap&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Canvas&quot;}, &quot;showSafeArea&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Canvas&quot;}}">
+const SWATCHES = [
+  ['Ink', '#1C1A18'], ['Paper', '#FBFAF7'], ['White', '#FFFFFF'], ['Sand n-50', '#F5F3EE'], ['Stone n-200', '#DDD9D0'], ['Grey n-500', '#736D65'], ['Grey n-600', '#5C5751'],
+  ['Deep Sea', '#285B57'], ['Sea 700', '#1E4744'], ['Sea 300', '#86B9B3'], ['Sea 100', '#D3E6E3'], ['Blue 500 (proposed)', '#3462B8'], ['Amber 500 (awaiting)', '#C98A12'], ['Green 500 (success)', '#3A8A4A'], ['Red 500 (problem)', '#C2412D']
+];
+const LS_DOCS = 'hali-studio:docs', LS_CUR = 'hali-studio:current', LS_THEME = 'hali-studio:theme';
+const frames = (n) => new Promise(r => { const f = () => (--n <= 0 ? r() : requestAnimationFrame(f)); requestAnimationFrame(f); });
+const ICON = { text: 'icon-type', shape: 'icon-square', line: 'icon-minus', image: 'icon-image', logo: 'icon-hexagon' };
+const FONT = { sans: '"Geist", ui-sans-serif, system-ui, sans-serif', mono: '"Geist Mono", ui-monospace, monospace' };
+const pretty = (role) => !role || role.startsWith('custom') ? '' : role.replace(/-\d+$/, m => ' ' + (+m.slice(1) + 1)).replace(/-/g, ' ').replace(/^./, c => c.toUpperCase());
+const parseBorder = (b) => { const m = /^([\d.]+)px\s+(solid|dashed|dotted)\s+(#[0-9a-fA-F]{3,8}|[a-z]+)/.exec(b || ''); return m ? { w: +m[1], st: m[2], c: m[3] } : { w: 0, st: 'none', c: '#285B57' }; };
+
+class Component extends DCLogic {
+  state = { ready: false, doc: null, pi: 0, sel: null, editing: null, zoom: 'fit', vw: 900, vh: 700, win: typeof window !== 'undefined' ? window.innerWidth : 1280, theme: 'light',
+    gallery: false, gTab: 'templates', gCat: 'social', gFmt: null, exportOpen: false, exp: { format: 'png', scale: 1, quality: 92, scope: 'page' }, exporting: false, exportDone: false, exportMsg: null,
+    preview: false, sheet: null, addAt: null, resetAsk: false, exportDoc: null, notice: null, delAsk: null, dragPage: null };
+  past = []; future = []; pageEls = {}; thumbs = {};
+
+  componentDidMount() {
+    let t = 'light'; try { t = localStorage.getItem(LS_THEME) || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); } catch (e) {}
+    this.applyTheme(t);
+    const boot = () => (window.HaliTemplates && window.HaliExport ? this.init() : setTimeout(boot, 40)); boot();
+    this.onResize = () => { this.setState({ win: window.innerWidth }); this.watchViewport(); };
+    this.onMove = (e) => this.dragMove(e); this.onUp = () => this.dragEnd(); this.onKey = (e) => this.key(e);
+    this.onHash = () => this.readHash();
+    window.addEventListener('resize', this.onResize); window.addEventListener('pointermove', this.onMove); window.addEventListener('pointerup', this.onUp);
+    window.addEventListener('keydown', this.onKey); window.addEventListener('hashchange', this.onHash);
+  }
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.onResize); window.removeEventListener('pointermove', this.onMove); window.removeEventListener('pointerup', this.onUp);
+    window.removeEventListener('keydown', this.onKey); window.removeEventListener('hashchange', this.onHash); if (this.ro) this.ro.disconnect();
+  }
+  applyTheme(t) { document.documentElement.dataset.theme = t; try { localStorage.setItem(LS_THEME, t); } catch (e) {} this.setState({ theme: t }); }
+  loadDocs() { try { return JSON.parse(localStorage.getItem(LS_DOCS) || '{}') || {}; } catch (e) { return {}; } }
+  init() {
+    const docs = this.loadDocs(); let cur = null; try { cur = localStorage.getItem(LS_CUR); } catch (e) {}
+    let doc = docs[cur] || Object.values(docs).sort((a, b) => b.updated - a.updated)[0];
+    if (!doc) doc = window.HaliTemplates.newDoc('social', 'announcement', 'sq');
+    this.setState({ ready: true, doc, gallery: false }, () => { this.save(doc); this.readHash(); this.watchViewport(); setTimeout(() => this.watchViewport(), 250); });
+  }
+  watchViewport() {
+    const n = document.querySelector('[data-vp]'); if (!n) { setTimeout(() => this.watchViewport(), 60); return; }
+    this.vp = n; cancelAnimationFrame(this.mRaf);
+    this.mRaf = requestAnimationFrame(() => { const w = n.offsetWidth - 16, h = n.offsetHeight - 16; if (w > 0 && (Math.abs(w - this.state.vw) > 8 || Math.abs(h - this.state.vh) > 8)) this.setState({ vw: w, vh: h }); else this.forceUpdate(); });
+  }
+  componentDidUpdate(pp, ps) { if (ps.sheet !== this.state.sheet || ps.preview !== this.state.preview || ps.win !== this.state.win || ps.notice !== this.state.notice) this.watchViewport(); }
+  readHash() {
+    const HT = window.HaliTemplates, h = decodeURIComponent(location.hash.slice(1));
+    const m = /^t=([\w-]+)\/([\w-]+)(?:\/([\w-]+))?/.exec(h), g = /^new(?:=([\w-]+))?/.exec(h);
+    if (m && HT.CAT[m[1]]) { this.createFrom(m[1], m[2], m[3] && HT.FMT[m[3]] ? m[3] : HT.CAT[m[1]].formats[0]); history.replaceState(null, '', location.pathname + location.search); }
+    else if (g) { this.setState({ gallery: true, gTab: 'templates', gCat: g[1] && HT.CAT[g[1]] ? g[1] : 'social', gFmt: null }); history.replaceState(null, '', location.pathname + location.search); }
+  }
+  save(doc) {
+    clearTimeout(this.saveT);
+    this.saveT = setTimeout(() => {
+      const docs = this.loadDocs(); docs[doc.id] = doc;
+      try { localStorage.setItem(LS_DOCS, JSON.stringify(docs)); localStorage.setItem(LS_CUR, doc.id); if (this.state.notice) this.setState({ notice: null }); }
+      catch (e) { this.setState({ notice: { tone: 'attention', text: 'Browser storage is full, so this version is not saved. Export a design file to keep it, or delete old designs.' } }); }
+    }, 300);
+  }
+  setDoc(doc, extra) { this.setState(Object.assign({ doc }, extra || {})); this.save(doc); }
+  pushHist(prev) { this.past.push(prev); if (this.past.length > 100) this.past.shift(); this.future = []; }
+  commit(mut, tag) {
+    const prev = this.state.doc, next = structuredClone(prev); mut(next); next.updated = Date.now();
+    const now = Date.now(); if (!(tag && tag === this.lastTag && now - this.lastT < 1200)) this.pushHist(prev);
+    this.lastTag = tag; this.lastT = now; this.setDoc(next);
+  }
+  undo() { if (!this.past.length) return; this.future.push(this.state.doc); this.lastTag = null; this.setDoc(this.past.pop(), { editing: null }); }
+  redo() { if (!this.future.length) return; this.past.push(this.state.doc); this.lastTag = null; this.setDoc(this.future.pop(), { editing: null }); }
+
+  /* ---------- element ops ---------- */
+  updEl(pi, id, fn, ov, tag) { this.commit(d => { const el = d.pages[pi] && d.pages[pi].els.find(e => e.id === id); if (!el) return; fn(el); el.ov = el.ov || {}; (ov || []).forEach(k => { el.ov[k] = true; }); }, tag); }
+  updSel(fn, ov, tag) { this.updEl(this.state.pi, this.state.sel, fn, ov, tag ? tag + this.state.sel : null); }
+  selEl() { const { doc, pi, sel } = this.state; const p = doc && doc.pages[pi]; return p ? p.els.find(e => e.id === sel) || null : null; }
+  deleteSel() { const { pi, sel } = this.state; if (!sel) return; this.commit(d => { d.pages[pi].els = d.pages[pi].els.filter(e => e.id !== sel); }); this.setState({ sel: null }); }
+  dupSel() {
+    const el = this.selEl(); if (!el) return; const HT = window.HaliTemplates; const n = structuredClone(el); n.id = HT.uid(); n.role = 'custom-' + n.id; n.custom = true; n.x += 24; n.y += 24;
+    this.commit(d => { const els = d.pages[this.state.pi].els; els.splice(els.findIndex(e => e.id === el.id) + 1, 0, n); }); this.setState({ sel: n.id });
+  }
+  layer(dir) { const { pi, sel } = this.state; this.commit(d => { const els = d.pages[pi].els, i = els.findIndex(e => e.id === sel), j = i + dir; if (i < 0 || j < 0 || j >= els.length) return; [els[i], els[j]] = [els[j], els[i]]; }); }
+  addEl(kind) {
+    const HT = window.HaliTemplates, M = HT.make, d = this.state.doc, c = HT.SCHEMES[d.scheme] || HT.SCHEMES.paper, W = d.w, H = d.h, u = Math.min(W, H * 1.6) / 1080;
+    let el;
+    if (kind === 'heading') el = M.T('h', W * 0.1, H * 0.4, W * 0.8, 120 * u, 'New heading', { size: Math.round(72 * u), weight: 600, ls: -0.03, lh: 1.08, color: c.fg });
+    else if (kind === 'text') el = M.T('t', W * 0.1, H * 0.45, W * 0.8, 90 * u, 'New paragraph. Click to edit in the panel or double-click on the canvas.', { size: Math.round(30 * u), lh: 1.4, color: c.muted });
+    else if (kind === 'label') el = M.T('o', W * 0.1, H * 0.1, W * 0.5, 36 * u, 'Overline label', { font: 'mono', size: Math.round(22 * u), upper: true, ls: 0.06, color: c.muted, weight: 500 });
+    else if (kind === 'button') el = M.T('b', W * 0.1, H * 0.7, 360 * u, 80 * u, 'Create proposal', { size: Math.round(30 * u), weight: 500, color: c.ctaFg, bg: c.ctaBg, radius: Math.round(12 * u), align: 'center', valign: 'center', lh: 1 });
+    else if (kind === 'image') el = M.I('i', W * 0.25, H * 0.25, W * 0.5, H * 0.5, { hatch: c.hatch, radius: Math.round(10 * u) });
+    else if (kind === 'shape') el = M.R('s', W * 0.3, H * 0.3, W * 0.4, H * 0.2, { bg: c.accent, radius: Math.round(10 * u) });
+    else if (kind === 'line') el = M.L('l', W * 0.1, H * 0.5, W * 0.4, { color: c.accent, dash: 'dashed', thick: Math.max(2, Math.round(4 * u)) });
+    else if (kind === 'logo') el = M.G('g', W * 0.1, H * 0.1, Math.max(20, 56 * u), 'lockup', c.tone);
+    el.role = 'custom-' + el.id; el.custom = true;
+    this.commit(d2 => { d2.pages[this.state.pi].els.push(el); });
+    this.setState({ sel: el.id, sheet: this.state.win < 960 ? 'edit' : this.state.sheet });
+    if (kind === 'image') setTimeout(() => this.fileInput && this.fileInput.click(), 50);
+  }
+
+  /* ---------- page ops ---------- */
+  selectPage(i, scroll) { this.setState({ pi: i, sel: null, editing: null, resetAsk: false }); if (scroll !== false) this.scrollToPage(i); }
+  scrollToPage(i) {
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      const vp = this.vp, el = this.pageEls[i]; if (!vp || !el) return;
+      const vr = vp.getBoundingClientRect(), er = el.getBoundingClientRect();
+      const top = vp.scrollTop + (er.top - vr.top) - Math.max(16, (vp.clientHeight - er.height) / 2);
+      const left = vp.scrollLeft + (er.left - vr.left) - Math.max(16, (vp.clientWidth - er.width) / 2);
+      const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      this.scrollLock = Date.now(); vp.scrollTo({ top: Math.max(0, top), left: Math.max(0, left), behavior: reduce ? 'auto' : 'smooth' });
+    }));
+  }
+  movePage(i, j) { if (j < 0 || j >= this.state.doc.pages.length || i === j) return; this.commit(d => { const [p] = d.pages.splice(i, 1); d.pages.splice(j, 0, p); }); this.selectPage(j); }
+  dupPage(i) { const HT = window.HaliTemplates; this.commit(d => { const p = structuredClone(d.pages[i]); p.id = HT.uid(); p.name = p.name + ' copy'; p.els.forEach(e => { e.id = HT.uid(); }); d.pages.splice(i + 1, 0, p); }); this.selectPage(i + 1); }
+  delPage(i) { if (this.state.doc.pages.length < 2) return; this.commit(d => { d.pages.splice(i, 1); }); const n = Math.min(i, this.state.doc.pages.length - 2); this.selectPage(Math.max(0, n)); }
+  insertPage(at, key) {
+    const HT = window.HaliTemplates, d0 = this.state.doc; let page;
+    if (key === '__blank') { const c = HT.SCHEMES[d0.scheme] || HT.SCHEMES.paper; page = { id: HT.uid(), key: null, custom: true, name: 'Blank page', els: [Object.assign(HT.make.R('background', 0, 0, d0.w, d0.h, { bg: c.bg }), {})] }; }
+    else { const fresh = HT.buildPages(d0.cat, d0.tpl, d0.fmt, d0.scheme); page = structuredClone(fresh.find(p => p.key === key) || fresh[0]); }
+    this.commit(d => { d.pages.splice(at, 0, page); }); this.setState({ addAt: null }); this.selectPage(at);
+  }
+
+  /* ---------- canvas interaction ---------- */
+  scale() {
+    const { zoom, doc } = this.state; if (!doc) return 1; if (zoom !== 'fit') return zoom;
+    const n = this.vp && this.vp.isConnected ? this.vp : document.querySelector('[data-vp]');
+    const vw = n && n.offsetWidth ? n.offsetWidth - 16 : this.state.vw, vh = n && n.offsetHeight ? n.offsetHeight - 16 : this.state.vh;
+    const s = Math.min((vw - 48) / doc.w, (vh - (this.state.win < 960 ? 140 : 80)) / doc.h); return Math.max(0.04, Math.min(s, doc.w < 700 ? 2 : 1));
+  }
+  elDown(ev, pi, el) {
+    if (this.state.preview) return; ev.stopPropagation(); if (this.state.editing === el.id) return;
+    this.setState({ pi, sel: el.id, editing: this.state.editing && this.state.editing !== el.id ? null : this.state.editing, resetAsk: false });
+    this.drag = { mode: 'move', pi, id: el.id, sx: ev.clientX, sy: ev.clientY, o: { x: el.x, y: el.y, w: el.w, h: el.h }, s: this.scale(), moved: false, base: this.state.doc };
+  }
+  handleDown(ev, dir, pi, el) { ev.stopPropagation(); ev.preventDefault(); this.drag = { mode: 'resize', dir, pi, id: el.id, sx: ev.clientX, sy: ev.clientY, o: { x: el.x, y: el.y, w: el.w, h: el.h }, s: this.scale(), moved: false, base: this.state.doc }; }
+  dragMove(e) {
+    const dr = this.drag; if (!dr) return; const dx = (e.clientX - dr.sx) / dr.s, dy = (e.clientY - dr.sy) / dr.s;
+    if (!dr.moved) { if (Math.abs(dx) + Math.abs(dy) < 3 / dr.s) return; dr.moved = true; this.pushHist(dr.base); this.lastTag = null; }
+    const doc = this.state.doc; let { x, y, w, h } = dr.o;
+    if (dr.mode === 'move') {
+      x += dx; y += dy;
+      if (this.props.snap ?? true) { const t = 8 / dr.s, W = doc.w, H = doc.h;
+        if (Math.abs(x + w / 2 - W / 2) < t) x = W / 2 - w / 2; if (Math.abs(y + h / 2 - H / 2) < t) y = H / 2 - h / 2;
+        if (Math.abs(x) < t) x = 0; if (Math.abs(y) < t) y = 0; if (Math.abs(x + w - W) < t) x = W - w; if (Math.abs(y + h - H) < t) y = H - h; }
+    } else {
+      if (dr.dir.includes('e')) w = Math.max(8, dr.o.w + dx); if (dr.dir.includes('s')) h = Math.max(2, dr.o.h + dy);
+      if (dr.dir.includes('w')) { w = Math.max(8, dr.o.w - dx); x = dr.o.x + dr.o.w - w; } if (dr.dir.includes('n')) { h = Math.max(2, dr.o.h - dy); y = dr.o.y + dr.o.h - h; }
+    }
+    const R = Math.round;
+    const next = Object.assign({}, doc, { pages: doc.pages.map((p, i) => i !== dr.pi ? p : Object.assign({}, p, { els: p.els.map(el => el.id !== dr.id ? el : Object.assign({}, el, { x: R(x), y: R(y), w: R(w), h: R(h), ov: Object.assign({}, el.ov, { geom: true }) })) })) });
+    this.setState({ doc: next });
+  }
+  dragEnd() { if (this.drag && this.drag.moved) this.save(this.state.doc); this.drag = null; }
+  key(e) {
+    const t = e.target, typing = t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable), mod = e.metaKey || e.ctrlKey, k = e.key.toLowerCase();
+    if (mod && k === 'z' && !typing) { e.preventDefault(); e.shiftKey ? this.redo() : this.undo(); return; }
+    if (mod && k === 'y' && !typing) { e.preventDefault(); this.redo(); return; }
+    if (typing || !this.state.ready) return;
+    if (e.key === 'Escape') { this.setState({ sel: null, gallery: false, exportOpen: false, sheet: null }); return; }
+    if (!this.state.sel) return;
+    if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); this.deleteSel(); }
+    else if (mod && k === 'd') { e.preventDefault(); this.dupSel(); }
+    else if (e.key.startsWith('Arrow')) { e.preventDefault(); const s = e.shiftKey ? 10 : 1; const dx = e.key === 'ArrowLeft' ? -s : e.key === 'ArrowRight' ? s : 0, dy = e.key === 'ArrowUp' ? -s : e.key === 'ArrowDown' ? s : 0; this.updSel(el => { el.x += dx; el.y += dy; }, ['geom'], 'nudge'); }
+  }
+
+  /* ---------- rendering of artwork ---------- */
+  renderEl(el, pi, total, opt) {
+    if (el.hidden) return null;
+    const e = React.createElement, s = el.s || {}, HT = window.HaliTemplates;
+    const base = { position: 'absolute', left: el.x, top: el.y, width: el.w, height: el.h, opacity: s.opacity ?? 1, transform: el.rot ? 'rotate(' + el.rot + 'deg)' : undefined, boxSizing: 'border-box' };
+    const ia = opt.interactive ? { onPointerDown: (ev) => this.elDown(ev, pi, el), style: Object.assign(base, { cursor: 'move', touchAction: 'none' }) } : { style: base };
+    if (el.type === 'text') {
+      const editing = opt.interactive && this.state.editing === el.id;
+      let text = el.text; if (el.auto === 'pagenum') text = String(pi + 1).padStart(2, '0') + ' / ' + String(total).padStart(2, '0');
+      Object.assign(ia.style, { display: 'flex', flexDirection: 'column', justifyContent: s.valign === 'center' ? 'center' : s.valign === 'bottom' ? 'flex-end' : 'flex-start', padding: s.pad || 0, background: s.bg || 'transparent', borderRadius: s.radius || 0, border: s.border || 'none', color: s.color, fontFamily: FONT[s.font] || FONT.sans, fontSize: s.size, fontWeight: s.weight, lineHeight: s.lh, letterSpacing: (s.ls || 0) + 'em', textAlign: s.align, textTransform: s.upper ? 'uppercase' : 'none', fontStyle: s.italic ? 'italic' : 'normal', whiteSpace: 'pre-wrap', overflowWrap: 'break-word', textWrap: 'pretty' });
+      if (opt.interactive) ia.onDoubleClick = () => { if (el.auto) return; this.setState({ editing: el.id, sel: el.id, pi }); };
+      if (editing) ia.style.cursor = 'text';
+      const inner = editing
+        ? e('div', { key: 'ed', contentEditable: true, suppressContentEditableWarning: true, style: { outline: 'none', cursor: 'text' }, onPointerDown: (ev) => ev.stopPropagation(), ref: (n) => { if (n && document.activeElement !== n) { n.focus(); const r = document.createRange(); r.selectNodeContents(n); const sl = getSelection(); sl.removeAllRanges(); sl.addRange(r); } },
+            onKeyDown: (ev) => { if (ev.key === 'Escape') ev.currentTarget.blur(); }, onBlur: (ev) => { const txt = ev.currentTarget.innerText.replace(/\n$/, ''); this.setState({ editing: null }); if (txt !== el.text) this.updEl(pi, el.id, x => { x.text = txt; }, ['text']); } }, text)
+        : e('div', { key: 'tx' }, text);
+      return e('div', Object.assign({ key: el.id }, ia), inner);
+    }
+    if (el.type === 'shape') { Object.assign(ia.style, { background: s.bg, borderRadius: s.radius, border: s.border || 'none' }); return e('div', Object.assign({ key: el.id }, ia)); }
+    if (el.type === 'line') { Object.assign(ia.style, { height: Math.max(el.h, s.thick), borderTop: s.thick + 'px ' + s.dash + ' ' + s.color }); return e('div', Object.assign({ key: el.id }, ia)); }
+    if (el.type === 'image') {
+      Object.assign(ia.style, { borderRadius: s.radius, overflow: 'hidden', border: s.border || 'none', background: el.src ? (s.bg || 'transparent') : 'repeating-linear-gradient(45deg, ' + s.hatch + ' 0 2px, transparent 2px 18px)' });
+      const kids = [];
+      if (el.src) kids.push(e('img', { key: 'i', src: el.src, alt: '', draggable: false, style: { width: '100%', height: '100%', objectFit: s.fit || 'cover', display: 'block' } }));
+      else if (opt.interactive) kids.push(e('div', { key: 'l', style: { position: 'absolute', inset: 0, display: 'grid', placeItems: 'center', font: '500 ' + Math.max(12, Math.min(el.w, el.h) * 0.05) + 'px/1.2 ' + FONT.mono, color: '#736D65', textTransform: 'uppercase', letterSpacing: '.05em', textAlign: 'center', padding: 8 } }, s.label || 'Image'));
+      if (s.overlay) kids.push(e('div', { key: 'o', style: { position: 'absolute', inset: 0, background: 'rgba(28,26,24,' + s.overlay / 100 + ')' } }));
+      return e('div', Object.assign({ key: el.id }, ia), kids);
+    }
+    if (el.type === 'logo') return e('img', Object.assign({ key: el.id, src: HT.logoSrc(el.logo, el.tone), alt: 'Hali', draggable: false }, ia, { style: Object.assign(ia.style, { objectFit: 'contain', display: 'block' }) }));
+    return null;
+  }
+  pageBgOf(p) { const b = p.els.find(x => x.role === 'background' && x.type === 'shape'); return (b && b.s.bg) || p.bg || '#FFFFFF'; }
+  art(doc, page, pi, scale, opt) {
+    const e = React.createElement, total = doc.pages.length;
+    const inner = e('div', { id: opt.nodeId, style: { position: 'relative', width: doc.w, height: doc.h, overflow: 'hidden', background: page.bg || '#FFFFFF', transform: scale === 1 ? 'none' : 'scale(' + scale + ')', transformOrigin: '0 0', fontFamily: FONT.sans }, onPointerDown: opt.interactive ? () => { if (this.state.pi !== pi || this.state.sel) this.setState({ pi, sel: null, editing: null }); } : undefined }, page.els.map(el => this.renderEl(el, pi, total, opt)));
+    const kids = [e('div', { key: 'clip', style: { position: 'absolute', inset: 0, overflow: 'hidden' } }, inner)];
+    if (opt.interactive && (this.props.showSafeArea ?? true)) {
+      const f = window.HaliTemplates.FMT[doc.fmt];
+      if (f && f.safe) kids.push(e('div', { key: 'safe', title: 'Platform safe area', style: { position: 'absolute', left: f.safe.x * scale, top: f.safe.y * scale, width: f.safe.w * scale, height: f.safe.h * scale, border: '1px dashed rgba(52,98,184,.7)', pointerEvents: 'none', borderRadius: doc.fmt === 'avatar' ? '50%' : 0 } }));
+    }
+    if (opt.interactive && this.state.pi === pi && this.state.sel && !this.state.preview) {
+      const el = page.els.find(x => x.id === this.state.sel);
+      if (el && !el.hidden) {
+        const bx = { left: el.x * scale - 1, top: el.y * scale - 1, width: el.w * scale + 2, height: Math.max(el.h, (el.s && el.s.thick) || 0) * scale + 2 };
+        const dirs = el.type === 'line' ? ['w', 'e'] : ['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w'];
+        const pos = (d) => ({ left: d.includes('w') ? -6 : d.includes('e') ? bx.width - 6 : bx.width / 2 - 6, top: d.includes('n') ? -6 : d.includes('s') ? bx.height - 6 : bx.height / 2 - 6 });
+        const cur = { n: 'ns', s: 'ns', e: 'ew', w: 'ew', nw: 'nwse', se: 'nwse', ne: 'nesw', sw: 'nesw' };
+        kids.push(e('div', { key: 'sel', style: Object.assign({ position: 'absolute', border: '1.5px solid #3462B8', pointerEvents: 'none', boxSizing: 'border-box' }, bx) },
+          dirs.map(d => e('div', { key: d, onPointerDown: (ev) => this.handleDown(ev, d, pi, el), style: Object.assign({ position: 'absolute', width: 12, height: 12, background: '#FFFFFF', border: '1.5px solid #3462B8', borderRadius: 2, boxSizing: 'border-box', pointerEvents: 'auto', cursor: cur[d] + '-resize', touchAction: 'none' }, pos(d)) })),
+          e('div', { key: 'dim', style: { position: 'absolute', left: 0, top: bx.height + 6, font: '500 11px/1 ' + FONT.mono, color: '#FFFFFF', background: '#3462B8', padding: '3px 5px', borderRadius: 3, whiteSpace: 'nowrap' } }, el.w + ' × ' + el.h)));
+      }
+    }
+    return e('div', { style: { position: 'relative', width: Math.round(doc.w * scale), height: Math.round(doc.h * scale), background: this.pageBgOf(page), flex: 'none' } }, kids);
+  }
+  thumb(doc, page, pi, bw, bh) { const s = Math.min(bw / doc.w, bh / doc.h); return this.art(doc, page, pi, s, {}); }
+
+  /* ---------- templates / designs ---------- */
+  createFrom(cat, tpl, fmt) { const d = window.HaliTemplates.newDoc(cat, tpl, fmt); this.past = []; this.future = []; this.setDoc(d, { gallery: false, pi: 0, sel: null, editing: null, zoom: 'fit', sheet: null }); setTimeout(() => this.scrollToPage(0), 60); }
+  openSaved(id) { const d = this.loadDocs()[id]; if (!d) return; this.past = []; this.future = []; this.setDoc(d, { gallery: false, pi: 0, sel: null, zoom: 'fit' }); }
+  dupSaved(id) { const docs = this.loadDocs(), d = docs[id]; if (!d) return; const n = structuredClone(d); n.id = 'd' + Date.now().toString(36); n.name = d.name + ' (copy)'; n.updated = Date.now(); this.past = []; this.future = []; this.setDoc(n, { gallery: false, pi: 0, sel: null }); }
+  delSaved(id) {
+    if (this.state.delAsk !== id) { this.setState({ delAsk: id }); return; }
+    const docs = this.loadDocs(); delete docs[id]; try { localStorage.setItem(LS_DOCS, JSON.stringify(docs)); } catch (e) {} this.setState({ delAsk: null });
+  }
+
+  /* ---------- export ---------- */
+  async runExport() {
+    const HT = window.HaliTemplates, X = window.HaliExport, { doc, exp, pi } = this.state;
+    this.setState({ exporting: true, exportDone: false, exportMsg: null });
+    try {
+      let jobs;
+      if (exp.scope === 'page') jobs = [{ doc, pages: [pi] }];
+      else if (exp.scope === 'sizes') jobs = HT.CAT[doc.cat].formats.map(f => { const d = f === doc.fmt ? doc : HT.reflow(doc, f, doc.scheme); return { doc: d, pages: d.pages.map((_, i) => i) }; });
+      else if (exp.scope === 'designs') jobs = Object.values(this.loadDocs()).map(d => ({ doc: d.id === doc.id ? doc : d, pages: d.pages.map((_, i) => i) }));
+      else jobs = [{ doc, pages: doc.pages.map((_, i) => i) }];
+      const files = [], used = {};
+      const uniq = (n) => { if (!used[n]) { used[n] = 1; return n; } used[n]++; return n.replace(/(\.[a-z]+)$/, '-' + used[n] + '$1'); };
+      for (const job of jobs) {
+        const base = X.slug(job.doc.name.replace(/ — .*$/, '')) + '-' + job.doc.w + 'x' + job.doc.h;
+        if (exp.format === 'json') { files.push({ name: uniq(base + '.hali.json'), blob: new Blob([JSON.stringify(job.doc, null, 1)], { type: 'application/json' }) }); continue; }
+        await new Promise(r => this.setState({ exportDoc: job.doc }, r)); await frames(3);
+        for (const i of job.pages) {
+          const node = document.getElementById('xp-' + i); if (!node) throw new Error('Page ' + (i + 1) + ' did not render for export.');
+          const blob = await X.capture(node, { format: exp.format, scale: exp.format === 'svg' ? 1 : exp.scale, quality: exp.quality / 100, w: job.doc.w, h: job.doc.h, bg: this.pageBgOf(job.doc.pages[i]) });
+          if (!blob || !blob.size) throw new Error('The export produced an empty file.');
+          const suffix = job.doc.pages.length > 1 ? '-p' + String(i + 1).padStart(2, '0') : '';
+          files.push({ name: uniq(base + suffix + (exp.format !== 'svg' && exp.scale !== 1 ? '@' + exp.scale + 'x' : '') + '.' + X.ext(exp.format)), blob });
+        }
+      }
+      if (!files.length) throw new Error('Nothing to export.');
+      let name;
+      if (files.length === 1) { name = files[0].name; X.download(files[0].blob, name); }
+      else { name = X.slug(exp.scope === 'designs' ? 'hali-designs' : doc.name.replace(/ — .*$/, '')) + (exp.scope === 'sizes' ? '-all-sizes' : '') + '.zip'; X.download(await X.zip(files), name); }
+      this.setState({ exporting: false, exportDone: true, exportDoc: null, exportMsg: { tone: 'success', text: 'Downloaded ' + (files.length === 1 ? name : files.length + ' files in ' + name) + '.' } });
+      setTimeout(() => this.setState({ exportDone: false }), 2400);
+    } catch (err) {
+      this.setState({ exporting: false, exportDoc: null, exportMsg: { tone: 'error', text: 'Export failed: ' + (err && err.message ? err.message : err) + ' Try PNG at 1×, or check your connection.' } });
+    }
+  }
+  importJSON(ev) {
+    const f = ev.target.files && ev.target.files[0]; ev.target.value = ''; if (!f) return;
+    const fr = new FileReader();
+    fr.onload = () => {
+      try { const d = JSON.parse(fr.result); if (!d || !Array.isArray(d.pages) || !d.w || !d.h || !window.HaliTemplates.CAT[d.cat]) throw new Error('bad');
+        d.id = 'd' + Date.now().toString(36); d.updated = Date.now(); this.past = []; this.future = []; this.setDoc(d, { pi: 0, sel: null, exportOpen: false, notice: { tone: 'success', text: 'Imported "' + d.name + '".' } }); }
+      catch (e) { this.setState({ exportMsg: { tone: 'error', text: 'That file is not a Hali design file. Choose a .hali.json file exported from this editor.' } }); }
+    };
+    fr.readAsText(f);
+  }
+
+  renderVals() {
+    const HT = window.HaliTemplates, st = this.state;
+    if (!st.ready || !HT) return { ready: false, gallery: false, exportOpen: false, notice: null, isMobile: false };
+    const doc = st.doc, pi = Math.min(st.pi, doc.pages.length - 1), page = doc.pages[pi], el = page.els.find(x => x.id === st.sel) || null;
+    const isMobile = st.win < 960, tablet = st.win < 1280, s = this.scale(), cat = HT.CAT[doc.cat], fmt = HT.FMT[doc.fmt];
+    const on = (b) => b ? 'var(--surface-card)' : 'transparent';
+    const sel = (b) => b ? { border: 'var(--text-primary)', bg: 'var(--surface-selected)' } : { border: 'var(--border-default)', bg: 'var(--surface-card)' };
+    const es = (el && el.s) || {};
+    const num = (key, ov, f) => (ev) => { const n = parseFloat(ev.target.value); if (isNaN(n)) return; this.updSel(x => { f ? f(x, n) : (x.s[key] = n); }, ov || [key], key); };
+    const set = (key, val, ov) => () => this.updSel(x => { x.s[key] = val; }, ov || [key]);
+    const swRow = (cur, fn) => SWATCHES.map(([name, hex]) => ({ name: name + ' ' + hex, hex, ring: (cur || '').toUpperCase() === hex ? '0 0 0 2px var(--surface-card), 0 0 0 4px var(--focus-color)' : 'none', onClick: () => fn(hex) }));
+    const bp = parseBorder(es.border);
+    const setBorder = (p) => this.updSel(x => { const b = Object.assign(parseBorder(x.s.border), p); if (b.st === 'none' || !b.w) x.s.border = ''; else x.s.border = b.w + 'px ' + b.st + ' ' + b.c; }, ['border']);
+    const setPageBg = (hex) => this.commit(d => { const p = d.pages[pi]; const b = p.els.find(x => x.role === 'background' && x.type === 'shape'); if (b) { b.s.bg = hex; b.ov = Object.assign(b.ov || {}, { bg: true }); } else p.bg = hex; }, 'pagebg' + pi);
+    const panelPos = isMobile ? 'fixed' : 'relative';
+    const layouts = (cat.templates.find(t => t.id === doc.tpl) || cat.templates[0]).multi ? HT.buildPages(doc.cat, doc.tpl, doc.fmt, doc.scheme).map(p => ({ key: p.key, name: p.name })) : [{ key: doc.pages[0].key || 'p1', name: 'Template page' }];
+    layouts.push({ key: '__blank', name: 'Blank page' });
+    const tmpl = cat.templates.find(t => t.id === doc.tpl);
+
+    // gallery
+    const gCat = HT.CAT[st.gCat] || HT.CAT.social, gFmt = st.gFmt && gCat.formats.includes(st.gFmt) ? st.gFmt : gCat.formats[0];
+    const galleryItems = st.gallery && st.gTab === 'templates' ? gCat.templates.map(t => {
+      const k = gCat.id + '|' + t.id + '|' + gFmt; if (!this.thumbs[k]) this.thumbs[k] = HT.newDoc(gCat.id, t.id, gFmt);
+      const d = this.thumbs[k]; return { name: t.name, meta: d.pages.length > 1 ? d.pages.length + ' pages · ' + d.w + '×' + d.h : d.w + '×' + d.h, thumb: this.thumb(d, d.pages[0], 0, 180, 160), onClick: () => this.createFrom(gCat.id, t.id, gFmt) };
+    }) : [];
+    const saved = st.gallery && st.gTab === 'mine' ? Object.values(this.loadDocs()).sort((a, b) => b.updated - a.updated) : [];
+
+    const exp = st.exp, exportScopes = [{ id: 'page', label: 'Current page', meta: '1 file' }];
+    if (doc.pages.length > 1) exportScopes.push({ id: 'all', label: 'All pages, in order', meta: doc.pages.length + ' files · ZIP' });
+    if (cat.formats.length > 1) exportScopes.push({ id: 'sizes', label: 'Every size in ' + cat.name.toLowerCase(), meta: cat.formats.length + ' sizes · ZIP' });
+    exportScopes.push({ id: 'designs', label: 'All saved designs', meta: Object.keys(this.loadDocs()).length + ' designs · ZIP' });
+    const scopeOk = exportScopes.some(o => o.id === exp.scope) ? exp.scope : 'page';
+    const setExp = (p) => this.setState({ exp: Object.assign({}, st.exp, p), exportDone: false, exportMsg: null });
+    const X = window.HaliExport, base = X ? X.slug(doc.name.replace(/ — .*$/, '')) + '-' + doc.w + 'x' + doc.h : '';
+    const extn = exp.format === 'json' ? 'hali.json' : X ? X.ext(exp.format) : 'png';
+    const fname = scopeOk === 'page' ? base + (doc.pages.length > 1 && exp.format !== 'json' ? '-p' + String(pi + 1).padStart(2, '0') : '') + (exp.format !== 'svg' && exp.format !== 'json' && exp.scale !== 1 ? '@' + exp.scale + 'x' : '') + '.' + extn
+      : scopeOk === 'all' && exp.format === 'json' ? base + '.hali.json' : (scopeOk === 'designs' ? 'hali-designs' : X ? X.slug(doc.name.replace(/ — .*$/, '')) + (scopeOk === 'sizes' ? '-all-sizes' : '') : '') + '.zip';
+    const notes = { png: 'Lossless, keeps exact brand colours. Best for social and web.', jpg: 'Smaller files with no transparency. Background uses the page colour.', svg: 'Vector wrapper with embedded fonts. Opens in browsers; design tools may not support embedded HTML text.', json: 'Editable design file. Re-open it here with Import design file.' };
+
+    return {
+      ready: true, notice: st.notice, isMobile,
+      themeIcon: st.theme === 'dark' ? 'sun' : 'moon', toggleTheme: () => this.applyTheme(st.theme === 'dark' ? 'light' : 'dark'),
+      docName: doc.name, onDocName: (ev) => { const v = ev.target.value; this.commit(d => { d.name = v; }, 'name'); },
+      openGallery: () => this.setState({ gallery: true, gTab: 'templates', gCat: doc.cat, gFmt: doc.fmt }), closeGallery: () => this.setState({ gallery: false }),
+      undo: () => this.undo(), redo: () => this.redo(), cantUndo: !this.past.length, cantRedo: !this.future.length,
+      previewIcon: st.preview ? 'pencil' : 'eye', previewLabel: st.preview ? 'Exit preview' : 'Preview', togglePreview: () => this.setState({ preview: !st.preview, sel: null, editing: null, sheet: null }),
+      openExport: () => this.setState({ exportOpen: true, exportMsg: null, exportDone: false }), closeExport: () => this.setState({ exportOpen: false }),
+
+      leftDisplay: st.preview ? 'none' : isMobile ? (st.sheet === 'pages' ? 'flex' : 'none') : 'flex',
+      rightDisplay: st.preview ? 'none' : isMobile ? (st.sheet === 'edit' ? 'flex' : 'none') : 'flex',
+      panelPos, sheetBottom: isMobile ? '56px' : 'auto', sheetMax: isMobile ? '64vh' : 'none', sheetShadow: isMobile ? 'var(--shadow-overlay)' : 'none',
+      leftWidth: isMobile ? 'auto' : tablet ? '232px' : '264px', rightWidth: isMobile ? 'auto' : tablet ? '280px' : '320px',
+      mobileTabs: [['pages', 'Pages', 'icon-layers'], ['canvas', 'Canvas', 'icon-frame'], ['edit', 'Edit', 'icon-sliders-horizontal']].map(([id, label, icon]) => ({ label, icon, on: (st.sheet || 'canvas') === id, bg: (st.sheet || 'canvas') === id ? 'var(--surface-selected)' : 'transparent', onClick: () => this.setState({ sheet: id === 'canvas' ? null : st.sheet === id ? null : id }) })),
+
+      pageCount: doc.pages.length,
+      openAddEnd: () => this.setState({ addAt: st.addAt === null ? doc.pages.length : null }), addMenuOpen: st.addAt !== null, closeAddMenu: () => this.setState({ addAt: null }),
+      addMenuLabel: st.addAt === null ? '' : 'Insert as page ' + (st.addAt + 1) + ' of ' + (doc.pages.length + 1),
+      pageLayouts: layouts.map(l => ({ name: l.name, onClick: () => this.insertPage(st.addAt ?? doc.pages.length, l.key) })),
+      pagesView: doc.pages.map((p, i) => ({ name: p.name, num: String(i + 1).padStart(2, '0'), active: i === pi, first: i === 0, last: i === doc.pages.length - 1, only: doc.pages.length < 2,
+        border: i === pi ? '1.5px solid var(--text-primary)' : st.dragPage !== null && st.dragPage !== i ? '1px dashed var(--border-strong)' : '1px solid var(--border-default)', bg: i === pi ? 'var(--surface-selected)' : 'var(--surface-card)',
+        thumb: this.thumb(doc, p, i, 64, 64), onSelect: () => { this.selectPage(i); if (isMobile) this.setState({ sheet: null }); },
+        onUp: () => this.movePage(i, i - 1), onDown: () => this.movePage(i, i + 1), onDup: () => this.dupPage(i), onDel: () => this.delPage(i),
+        onInsertBefore: () => this.setState({ addAt: i }), onInsertAfter: () => this.setState({ addAt: i + 1 }),
+        onDragStart: (ev) => { ev.dataTransfer.effectAllowed = 'move'; ev.dataTransfer.setData('text/plain', String(i)); this.setState({ dragPage: i }); },
+        onDragOver: (ev) => { ev.preventDefault(); ev.dataTransfer.dropEffect = 'move'; },
+        onDrop: (ev) => { ev.preventDefault(); const from = parseInt(ev.dataTransfer.getData('text/plain'), 10); this.setState({ dragPage: null }); if (!isNaN(from)) this.movePage(from, i); } })),
+      addTools: [['heading', 'Heading', 'icon-heading'], ['text', 'Text', 'icon-pilcrow'], ['label', 'Label', 'icon-tag'], ['button', 'Button', 'icon-mouse-pointer-click'], ['image', 'Image', 'icon-image'], ['shape', 'Shape', 'icon-square'], ['line', 'Line', 'icon-minus'], ['logo', 'Logo', 'icon-hexagon']].map(([k, label, icon]) => ({ label, icon, onClick: () => this.addEl(k) })),
+      layersView: page.els.slice().reverse().map(x => ({ label: x.type === 'text' ? (x.auto ? 'Page number' : (x.text || '').slice(0, 40) || pretty(x.role) || 'Text') : (pretty(x.role) || x.type[0].toUpperCase() + x.type.slice(1)) + (x.type === 'logo' ? ' · ' + x.logo : ''),
+        icon: ICON[x.type], bg: x.id === st.sel ? 'var(--surface-selected)' : 'transparent', fg: x.hidden ? 'var(--text-disabled)' : 'var(--text-primary)', eye: x.hidden ? 'eye-off' : 'eye', eyeLabel: x.hidden ? 'Show layer' : 'Hide layer',
+        onSelect: () => this.setState({ sel: x.id, editing: null }), onToggle: () => this.updEl(pi, x.id, y => { y.hidden = !y.hidden; }, ['hidden']) })),
+
+      sizeLabel: fmt.name + ' · ' + doc.w + ' × ' + doc.h + ' px', zoomLabel: Math.round(s * 100) + '%',
+      zoomIn: () => this.setState({ zoom: Math.min(4, s * 1.25) }), zoomOut: () => this.setState({ zoom: Math.max(0.04, s / 1.25) }), zoomFit: () => { this.setState({ zoom: 'fit' }); this.watchViewport(); this.scrollToPage(pi); },
+      viewportRef: (n) => { if (n && n !== this.vp) { this.vp = n; setTimeout(() => this.watchViewport(), 0); } },
+      onViewportScroll: () => {
+        if (Date.now() - (this.scrollLock || 0) < 700 || this.raf) return;
+        this.raf = requestAnimationFrame(() => { this.raf = null; const vp = this.vp; if (!vp) return; const c = vp.getBoundingClientRect(); const mid = c.top + c.height / 2; let best = this.state.pi, bd = 1e9;
+          Object.keys(this.pageEls).forEach(k => { const n = this.pageEls[k]; if (!n || +k >= this.state.doc.pages.length) return; const r = n.getBoundingClientRect(); const d = Math.abs(r.top + r.height / 2 - mid); if (d < bd) { bd = d; best = +k; } });
+          if (best !== this.state.pi) this.setState({ pi: best, sel: null, editing: null }); });
+      },
+      onViewportDown: (ev) => { if (ev.target === ev.currentTarget || ev.target === ev.currentTarget.firstChild) this.setState({ sel: null, editing: null }); },
+      canvasPages: doc.pages.map((p, i) => ({ label: 'Page ' + String(i + 1).padStart(2, '0') + ' · ' + p.name, labelColor: i === pi ? 'var(--text-primary)' : 'var(--text-tertiary)', outline: i === pi && doc.pages.length > 1 && !st.preview ? '2px solid var(--border-strong)' : 'none',
+        ref: (n) => { this.pageEls[i] = n; }, onSelect: () => this.selectPage(i), board: this.art(doc, p, i, s, { interactive: !st.preview }) })),
+
+      hasSel: !!el, noSel: !el, deselect: () => this.setState({ sel: null, editing: null }),
+      isText: el && el.type === 'text', isLine: el && el.type === 'line', isImage: el && el.type === 'image', isLogo: el && el.type === 'logo',
+      hasFill: el && (el.type === 'text' || el.type === 'shape'), hasBorder: el && bp.st !== 'none',
+      dupSel: () => this.dupSel(), deleteSel: () => this.deleteSel(), layerUp: () => this.layer(1), layerDown: () => this.layer(-1),
+      centerH: () => this.updSel(x => { x.x = Math.round((doc.w - x.w) / 2); }, ['geom']), centerV: () => this.updSel(x => { x.y = Math.round((doc.h - x.h) / 2); }, ['geom']),
+      v: el ? { icon: ICON[el.type], title: el.type === 'text' ? 'Text' + (pretty(el.role) ? ' · ' + pretty(el.role) : '') : (el.type[0].toUpperCase() + el.type.slice(1)) + (pretty(el.role) ? ' · ' + pretty(el.role) : ''),
+        text: el.text || '', font: es.font || 'sans', weight: String(es.weight || 400), size: es.size, lh: es.lh, ls: es.ls, pad: es.pad || 0, color: es.color || '#1C1A18',
+        bgLabel: es.bg && es.bg !== 'transparent' ? es.bg : 'none', bgHex: /^#/.test(es.bg || '') ? es.bg : '#FFFFFF', radius: es.radius || 0, bStyle: bp.st, bWidth: bp.w,
+        thick: es.thick, lineColor: es.color || '#285B57', logo: el.logo, tone: el.tone, hasSrc: !!el.src, imageAction: el.src ? 'Replace image' : 'Upload image', overlay: es.overlay || 0 } : {},
+      h: {
+        text: (ev) => { const t = ev.target.value; this.updSel(x => { x.text = t; }, ['text'], 'text'); },
+        font: (ev) => { const f = ev.target.value; this.updSel(x => { x.s.font = f; }, ['font']); }, weight: (ev) => { const w = +ev.target.value; this.updSel(x => { x.s.weight = w; }, ['weight']); },
+        size: num('size'), lh: num('lh'), ls: num('ls'), pad: num('pad'), radius: num('radius'), thick: num('thick', ['thick'], (x, n) => { x.s.thick = Math.max(1, n); x.h = Math.max(1, n); }),
+        color: (ev) => { const c = ev.target.value; this.updSel(x => { x.s.color = c; }, ['color'], 'color'); },
+        bg: (ev) => { const c = ev.target.value; this.updSel(x => { x.s.bg = c; }, ['bg'], 'bg'); }, bgNone: set('bg', '', ['bg']),
+        lineColor: (ev) => { const c = ev.target.value; this.updSel(x => { x.s.color = c; }, ['color'], 'lcolor'); },
+        bStyle: (ev) => { const v = ev.target.value; setBorder({ st: v, w: bp.w || 3 }); }, bWidth: (ev) => { const n = parseFloat(ev.target.value); if (!isNaN(n)) setBorder({ w: n, st: bp.st === 'none' ? 'solid' : bp.st }); },
+        imageClear: () => this.updSel(x => { x.src = ''; }, []), overlay: (ev) => { const n = +ev.target.value; this.updSel(x => { x.s.overlay = n; }, ['overlay'], 'overlay'); },
+        logo: (ev) => { const v = ev.target.value; this.updSel(x => { x.logo = v; x.w = Math.round(x.h * (HT.LOGO[v] || HT.LOGO.lockup).ratio); }, ['logo', 'geom']); },
+        tone: (ev) => { const v = ev.target.value; this.updSel(x => { x.tone = v; }, ['logo']); }
+      },
+      sw: { color: swRow(es.color, (hex) => this.updSel(x => { x.s.color = hex; }, ['color'])), bg: swRow(es.bg, (hex) => this.updSel(x => { x.s.bg = hex; }, ['bg'])),
+        border: swRow(bp.c, (hex) => setBorder({ c: hex })), line: swRow(es.color, (hex) => this.updSel(x => { x.s.color = hex; }, ['color'])), page: swRow(this.pageBgOf(page), setPageBg) },
+      alignOpts: [['left', 'Align left', 'icon-align-left'], ['center', 'Align centre', 'icon-align-center'], ['right', 'Align right', 'icon-align-right'], ['justify', 'Justify', 'icon-align-justify']].map(([k, label, icon]) => ({ label, icon, on: es.align === k, bg: on(es.align === k), onClick: set('align', k) })),
+      valignOpts: [['top', 'Top', 'icon-align-vertical-justify-start'], ['center', 'Middle', 'icon-align-vertical-justify-center'], ['bottom', 'Bottom', 'icon-align-vertical-justify-end']].map(([k, label, icon]) => ({ label, icon, on: es.valign === k, bg: on(es.valign === k), onClick: set('valign', k) })),
+      textToggles: [['upper', 'UPPERCASE'], ['italic', 'Italic']].map(([k, label]) => ({ label, on: !!es[k], bg: es[k] ? 'var(--surface-selected)' : 'var(--surface-card)', onClick: set(k, !es[k]) })),
+      dashOpts: ['dotted', 'dashed', 'solid'].map(k => ({ label: k[0].toUpperCase() + k.slice(1), on: es.dash === k, bg: on(es.dash === k), onClick: set('dash', k) })),
+      fitOpts: [['cover', 'Fill / crop'], ['contain', 'Fit whole image']].map(([k, label]) => ({ label, on: es.fit === k, bg: on(es.fit === k), onClick: set('fit', k) })),
+      pickImage: () => this.fileInput && this.fileInput.click(), fileRef: (n) => { this.fileInput = n; },
+      onImageFile: (ev) => { const f = ev.target.files && ev.target.files[0]; ev.target.value = ''; if (!f) return; if (f.size > 8e6) { this.setState({ notice: { tone: 'attention', text: 'That image is over 8 MB. Use a smaller file so the design can be saved in this browser.' } }); return; }
+        const fr = new FileReader(); fr.onload = () => this.updSel(x => { if (x.type === 'image') x.src = fr.result; }, []); fr.readAsDataURL(f); },
+      geomFields: el ? [['X', 'x', 1], ['Y', 'y', 1], ['W', 'w', 1], ['H', 'h', 1], ['Rotate °', 'rot', 1], ['Opacity', 'opacity', 0.05]].map(([label, k, step]) => ({ label, step, value: k === 'opacity' ? (es.opacity ?? 1) : (el[k] || 0),
+        onChange: (ev) => { const n = parseFloat(ev.target.value); if (isNaN(n)) return; this.updSel(x => { if (k === 'opacity') x.s.opacity = Math.max(0, Math.min(1, n)); else x[k] = Math.round(n); }, k === 'opacity' ? ['opacity'] : ['geom'], 'g' + k); } })) : [],
+
+      tplLabel: cat.name + ' · ' + (tmpl ? tmpl.name : doc.tpl), fmtId: doc.fmt,
+      formatOptions: cat.formats.map(id => ({ id, label: HT.FMT[id].name + ' · ' + HT.FMT[id].w + '×' + HT.FMT[id].h })),
+      onFormat: (ev) => { const f = ev.target.value; this.pushHist(doc); this.lastTag = null; this.setDoc(HT.reflow(doc, f, doc.scheme), { sel: null, zoom: 'fit' }); setTimeout(() => this.scrollToPage(pi), 60); },
+      schemeOpts: Object.entries(HT.SCHEMES).map(([id, sc]) => ({ name: sc.name, swatch: sc.bg, on: doc.scheme === id, bg: on(doc.scheme === id), onClick: () => { if (doc.scheme === id) return; this.pushHist(doc); this.lastTag = null; this.setDoc(HT.reflow(doc, doc.fmt, id), { sel: null }); } })),
+      pageNum: String(pi + 1).padStart(2, '0'), pageName: page.name, onPageName: (ev) => { const v = ev.target.value; this.commit(d => { d.pages[pi].name = v; }, 'pname' + pi); },
+      pageBg: this.pageBgOf(page), onPageBg: (ev) => setPageBg(ev.target.value),
+      pageFields: page.els.filter(x => x.type === 'text' && !x.auto && x.text).map(x => ({ label: pretty(x.role) || 'Text', value: x.text, rows: Math.min(5, Math.max(1, Math.ceil(x.text.length / 34))),
+        onChange: (ev) => { const t = ev.target.value; this.updEl(pi, x.id, y => { y.text = t; }, ['text'], 'text' + x.id); }, onFocus: () => {} })),
+      resetIdle: !st.resetAsk, resetAsk: st.resetAsk, askReset: () => this.setState({ resetAsk: true }), cancelReset: () => this.setState({ resetAsk: false }),
+      doReset: () => { this.pushHist(doc); this.lastTag = null; const n = HT.newDoc(doc.cat, doc.tpl, doc.fmt, doc.scheme); this.setDoc(Object.assign(n, { id: doc.id, name: doc.name }), { resetAsk: false, sel: null, pi: 0 }); setTimeout(() => this.scrollToPage(0), 60); },
+
+      gallery: st.gallery, gTab: st.gTab, galleryTabs: [{ id: 'templates', label: 'Templates' }, { id: 'mine', label: 'My designs' }], onGalleryTab: (id) => this.setState({ gTab: id }),
+      tabsStyle: { borderBottom: 0 }, gTemplates: st.gTab === 'templates', gMine: st.gTab === 'mine',
+      dialogPad: isMobile ? '0' : '24px', dialogRadius: isMobile ? '0' : 'var(--radius-lg)', exportAlign: isMobile ? 'flex-end' : 'center',
+      galleryDir: isMobile ? 'column' : 'row', galleryNavDir: isMobile ? 'row' : 'column', galleryNavW: isMobile ? 'auto' : '240px',
+      galleryCats: HT.CATEGORIES.map(c => ({ name: c.name, meta: c.templates.length + ' templates · ' + c.formats.length + ' sizes', on: c.id === gCat.id, bg: c.id === gCat.id ? 'var(--surface-selected)' : 'transparent', onClick: () => this.setState({ gCat: c.id, gFmt: null }) })),
+      galleryFmts: gCat.formats.map(id => ({ label: HT.FMT[id].name + ' · ' + HT.FMT[id].w + '×' + HT.FMT[id].h, on: id === gFmt, bg: id === gFmt ? 'var(--action-primary-bg)' : 'var(--surface-card)', fg: id === gFmt ? 'var(--action-primary-fg)' : 'var(--text-primary)', border: id === gFmt ? 'var(--action-primary-bg)' : 'var(--border-default)', onClick: () => this.setState({ gFmt: id }) })),
+      galleryItems, noSaved: st.gTab === 'mine' && !saved.length,
+      savedDocs: saved.map(d => ({ name: d.name, meta: d.pages.length + (d.pages.length > 1 ? ' pages' : ' page') + ' · ' + new Date(d.updated).toLocaleString(), thumb: this.thumb(d, d.pages[0], 0, 200, 140),
+        isCurrent: d.id === doc.id, border: d.id === doc.id ? 'var(--text-primary)' : 'var(--border-default)', openLabel: d.id === doc.id ? 'Open (current)' : 'Open',
+        delLabel: st.delAsk === d.id ? 'Confirm delete' : 'Delete', delVariant: st.delAsk === d.id ? 'danger' : 'ghost',
+        onOpen: () => this.openSaved(d.id), onDup: () => this.dupSaved(d.id), onDel: () => this.delSaved(d.id) })),
+
+      exportOpen: st.exportOpen, exporting: st.exporting, exportDone: st.exportDone, exportMsg: st.exportMsg, exportFilename: fname, formatNote: notes[exp.format],
+      exportCta: st.exporting ? 'Exporting…' : scopeOk === 'page' || (scopeOk === 'all' && exp.format === 'json') ? 'Download' : 'Download ZIP',
+      expFormatOpts: [['png', 'PNG', 'Lossless'], ['jpg', 'JPEG', 'Smaller'], ['svg', 'SVG', 'Vector wrap'], ['json', 'Design', 'Editable file']].map(([id, label, hint]) => Object.assign({ label, hint, on: exp.format === id, onClick: () => setExp({ format: id }) }, sel(exp.format === id))),
+      isRaster: exp.format === 'png' || exp.format === 'jpg', isJpg: exp.format === 'jpg', expQuality: exp.quality, expQualityLabel: exp.quality + '%', onExpQuality: (ev) => setExp({ quality: +ev.target.value }),
+      expScaleOpts: [1, 2, 3].map(n => ({ label: n + '× · ' + doc.w * n + '×' + doc.h * n, on: exp.scale === n, bg: on(exp.scale === n), onClick: () => setExp({ scale: n }) })),
+      expScopeOpts: exportScopes.map(o => Object.assign({ label: o.label, meta: o.meta, on: scopeOk === o.id, onClick: () => setExp({ scope: o.id }) }, sel(scopeOk === o.id))),
+      runExport: () => { if (scopeOk !== exp.scope) this.setState({ exp: Object.assign({}, exp, { scope: scopeOk }) }, () => this.runExport()); else this.runExport(); },
+      importJSON: (ev) => this.importJSON(ev),
+      exportHost: st.exportDoc ? React.createElement('div', null, st.exportDoc.pages.map((p, i) => React.createElement('div', { key: p.id || i }, this.art(st.exportDoc, p, i, 1, { nodeId: 'xp-' + i })))) : null
+    };
+  }
+}
+</script>
+</body>
+</html>

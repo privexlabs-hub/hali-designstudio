@@ -1,0 +1,49 @@
+:root{
+/* Neutrals — warm paper to ink */
+--n-0:#FFFFFF;--n-25:#FBFAF7;--n-50:#F5F3EE;--n-100:#ECE9E2;--n-200:#DDD9D0;--n-300:#C6C1B6;--n-400:#9C968A;--n-500:#736D65;--n-600:#5C5751;--n-700:#44403B;--n-800:#2C2926;--n-900:#1C1A18;
+/* Brand — Hali Deep Sea (teal) */
+--sea-50:#EDF5F4;--sea-100:#D3E6E3;--sea-300:#86B9B3;--sea-500:#367570;--sea-600:#285B57;--sea-700:#1E4744;--sea-900:#10292A;
+/* Semantic hues */
+--blue-50:#EEF3FB;--blue-100:#D9E4F6;--blue-500:#3462B8;--blue-600:#2A519A;--blue-700:#1F3E78;
+--amber-50:#FDF5E4;--amber-100:#F9E6BC;--amber-500:#C98A12;--amber-700:#7A520A;
+--red-50:#FCEEEC;--red-100:#F6D5D0;--red-500:#C2412D;--red-600:#A33424;--red-700:#812819;
+--green-50:#EDF6EE;--green-100:#D2EAD5;--green-500:#3A8A4A;--green-600:#2E7140;--green-700:#235832;
+
+/* Brand roles */
+--brand-ink:var(--n-900);--brand-paper:var(--n-25);--brand-accent:var(--sea-600);--brand-accent-on-dark:var(--sea-300);
+
+/* Surfaces */
+--surface-page:var(--n-25);--surface-card:var(--n-0);--surface-subtle:var(--n-50);--surface-sunken:var(--n-100);--surface-inverse:var(--n-900);--surface-overlay:rgba(28,26,24,.42);
+
+/* Text & icons */
+--text-primary:var(--n-900);--text-secondary:var(--n-600);--text-tertiary:var(--n-500);--text-inverse:var(--n-25);--text-link:var(--sea-600);--text-link-hover:var(--sea-700);--text-disabled:var(--n-400);
+--icon-primary:var(--n-800);--icon-secondary:var(--n-500);
+
+/* Borders */
+--border-subtle:var(--n-100);--border-default:var(--n-200);--border-strong:var(--n-300);--border-input:var(--n-300);--border-input-hover:var(--n-500);
+
+/* Actions */
+--action-primary-bg:var(--n-900);--action-primary-bg-hover:var(--n-700);--action-primary-bg-pressed:var(--n-600);--action-primary-fg:var(--n-0);
+--action-secondary-bg:var(--n-0);--action-secondary-bg-hover:var(--n-50);--action-secondary-bg-pressed:var(--n-100);--action-ghost-bg-hover:var(--n-100);--action-ghost-bg-pressed:var(--n-200);--action-secondary-border:var(--n-300);
+--action-commit-bg:var(--sea-600);--action-commit-bg-hover:var(--sea-700);--action-commit-bg-pressed:var(--sea-900);--action-commit-fg:#FFFFFF;
+--action-danger-bg:var(--red-600);--action-danger-bg-hover:var(--red-700);--action-danger-bg-pressed:#6A2014;--action-danger-fg:#FFFFFF;
+--text-on-accent:#FFFFFF;--surface-selected:var(--n-100);--surface-hover:var(--n-50);--border-focus:var(--n-700);--scrim:rgba(28,26,24,.42);
+
+/* Feedback tones (operation results, never commercial state) */
+--info-bg:var(--blue-50);--info-border:var(--blue-100);--info-fg:var(--blue-700);--info-icon:var(--blue-500);
+--attention-bg:var(--amber-50);--attention-border:var(--amber-100);--attention-fg:var(--amber-700);--attention-icon:var(--amber-500);
+--error-bg:var(--red-50);--error-border:var(--red-100);--error-fg:var(--red-700);--error-icon:var(--red-500);
+--success-bg:var(--green-50);--success-border:var(--green-100);--success-fg:var(--green-700);--success-icon:var(--green-500);
+
+/* Commercial record states — line style carries meaning: dotted = suggested, dashed = not yet agreed, solid = recorded */
+--state-suggested-fg:var(--n-700);--state-suggested-bg:transparent;--state-suggested-line:1.5px dotted var(--n-500);
+--state-draft-fg:var(--n-700);--state-draft-bg:var(--n-50);--state-draft-line:1.5px dashed var(--n-400);
+--state-proposed-fg:var(--blue-700);--state-proposed-bg:var(--blue-50);--state-proposed-line:1.5px dashed var(--blue-500);
+--state-awaiting-fg:var(--amber-700);--state-awaiting-bg:var(--amber-50);--state-awaiting-line:1.5px solid var(--amber-500);
+--state-agreed-fg:var(--sea-700);--state-agreed-bg:var(--sea-50);--state-agreed-line:1.5px solid var(--sea-600);
+--state-closed-fg:var(--n-600);--state-closed-bg:var(--n-50);--state-closed-line:1.5px solid var(--n-300);
+--state-problem-fg:var(--red-700);--state-problem-bg:var(--red-50);--state-problem-line:1.5px solid var(--red-500);
+
+/* Focus */
+--focus-color:var(--blue-500);--focus-ring:0 0 0 2px var(--n-0),0 0 0 4px var(--blue-500);
+}

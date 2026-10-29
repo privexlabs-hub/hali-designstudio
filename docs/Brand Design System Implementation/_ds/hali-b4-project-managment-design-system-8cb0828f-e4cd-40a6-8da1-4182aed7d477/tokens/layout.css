@@ -1,0 +1,27 @@
+/* Layout grid, containers and responsive utilities.
+   Breakpoints: xs <640 (phones) · sm ≥640 (large phones / small tablets) · md ≥960 (tablets landscape / small laptops) · lg ≥1280 (desktop) · xl ≥1600 */
+:root{--gutter:16px;--grid-columns:4;/* @kind other */--grid-gap:16px;--section-space:48px;--bp-xl:1600px;--layout-wide:1440px;--layout-narrow:880px}
+@media (min-width:640px){:root{--gutter:24px;--grid-columns:8;/* @kind other */--grid-gap:20px;--section-space:64px}}
+@media (min-width:960px){:root{--gutter:32px;--grid-columns:12;/* @kind other */--grid-gap:24px;--section-space:80px}}
+.h-container{width:100%;max-width:var(--layout-page);margin-inline:auto;padding-inline:var(--gutter)}
+.h-container-narrow{width:100%;max-width:var(--layout-narrow);margin-inline:auto;padding-inline:var(--gutter)}
+.h-container-form{width:100%;max-width:var(--layout-form);margin-inline:auto;padding-inline:var(--gutter)}
+.h-grid{display:grid;grid-template-columns:repeat(var(--grid-columns),minmax(0,1fr));gap:var(--grid-gap)}
+.h-auto-grid{display:grid;gap:var(--auto-gap,16px);grid-template-columns:repeat(auto-fit,minmax(min(100%,var(--auto-min,240px)),1fr))}
+/* Two-pane split: stacks below 960px. Ratios via --split-a / --split-b */
+.h-split{display:grid;gap:var(--split-gap,16px);grid-template-columns:minmax(0,1fr);align-items:start}
+@media (min-width:960px){.h-split{grid-template-columns:minmax(0,var(--split-a,1fr)) minmax(0,var(--split-b,1fr))}}
+/* Key/value list: label column collapses above value below 640px */
+.h-kv{display:grid;grid-template-columns:minmax(110px,160px) minmax(0,1fr);column-gap:12px;row-gap:10px}
+.h-kv3{display:grid;grid-template-columns:minmax(110px,150px) minmax(0,1fr) auto;column-gap:12px}
+@media (max-width:639px){.h-kv{grid-template-columns:minmax(0,1fr);row-gap:2px}.h-kv>dd{margin-bottom:10px!important}.h-kv3{grid-template-columns:minmax(0,1fr) auto}.h-kv3>dt{grid-column:1/-1}}
+/* List rows: icon | main | meta | status — meta and status wrap under main on phones */
+.h-row{display:grid;grid-template-columns:20px minmax(0,1fr) auto auto;gap:12px;align-items:center}
+.h-row-ref{display:grid;grid-template-columns:56px minmax(0,1fr) auto;gap:12px;align-items:center}
+@media (max-width:639px){.h-row{grid-template-columns:20px minmax(0,1fr) auto;row-gap:6px}.h-row>:nth-child(3):empty{display:none}.h-row>:nth-child(4){grid-column:2;justify-self:start}.h-row-ref{grid-template-columns:minmax(0,1fr) auto;row-gap:4px}.h-row-ref>:first-child{grid-column:1/-1}}
+/* Sticky form actions on phones */
+@media (max-width:639px){.h-sticky-actions{position:sticky;bottom:0;background:var(--surface-page);padding:12px var(--gutter);margin-inline:calc(var(--gutter)*-1);border-top:1px solid var(--border-subtle);z-index:var(--z-sticky)}}
+.h-hide-xs{}@media (max-width:639px){.h-hide-xs{display:none!important}}
+.h-show-xs{display:none!important}@media (max-width:639px){.h-show-xs{display:revert!important}}
+.h-hide-sm-down{}@media (max-width:959px){.h-hide-sm-down{display:none!important}}
+.h-visually-hidden{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}

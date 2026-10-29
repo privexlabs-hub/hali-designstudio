@@ -1,0 +1,78 @@
+.page{min-height:100vh;min-height:100dvh;background:var(--surface-page)}
+.strong{font:600 14px/1.3 var(--font-sans)}
+.more{font:500 14px/1.4 var(--font-sans);display:inline-block;padding-top:10px}
+.inline{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.cardStack{display:flex;flex-direction:column;gap:10px;--pad:20px}
+
+.hero{border-radius:var(--radius-surface);background:#285B57;color:#FFFFFF;padding:clamp(24px,5vw,56px);display:flex;flex-direction:column;gap:20px}
+.heroLogo{height:40px;width:auto;align-self:flex-start;max-width:100%}
+.heroTitle{margin:0;font:600 clamp(28px,5vw,56px)/1.04 var(--font-sans);letter-spacing:-0.035em;max-width:760px;text-wrap:balance}
+.heroOver{font:500 12px/1.2 var(--font-mono);letter-spacing:.06em;text-transform:uppercase;color:#D3E6E3}
+.overview{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:0 32px}
+.overviewItem{display:flex;flex-direction:column;gap:6px;padding:16px 0;border-top:1px solid var(--border-default)}
+.overviewBody{font:400 15px/1.55 var(--font-sans)}
+
+.logoRule{display:grid;grid-template-columns:minmax(0,220px) minmax(0,1fr) auto;gap:16px;align-items:center;padding:12px 0;border-top:1px solid var(--border-subtle)}
+.logoPrev{height:72px;border-radius:var(--radius-sm);border:1px solid var(--border-default);display:grid;place-items:center;padding:0 12px}
+.logoPrev img{max-height:40px;max-width:min(160px,100%)}
+.logoText{display:flex;flex-direction:column;gap:3px;min-width:0}
+.dl{display:inline-flex;align-items:center;gap:4px;font:500 12px/1 var(--font-sans);min-height:32px}
+.iconRow{display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap}
+.agency{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;border-radius:var(--radius-sm);background:#FFFFFF;border:1px solid #DDD9D0;flex-wrap:wrap}
+.powered{font:400 11px/1 var(--font-mono);color:#736D65}
+
+.proportion{display:flex;height:120px;border-radius:var(--radius-surface);overflow:hidden;border:1px solid var(--border-default)}
+.band{border:0;display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-start;gap:4px;padding:10px;cursor:pointer;font:500 11px/1.2 var(--font-mono);text-align:left;min-width:0;overflow:hidden}
+.bandText{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.legend{display:none;margin:0;padding:0;list-style:none;flex-wrap:wrap;gap:6px 14px;font:500 12px/1.3 var(--font-sans)}
+.legend li{display:inline-flex;align-items:center;gap:6px}
+.legendDot{width:12px;height:12px;border-radius:3px;border:1px solid var(--border-strong);flex:none}
+.colourRule{display:grid;grid-template-columns:28px minmax(0,180px) minmax(0,1fr) auto;gap:14px;align-items:center;padding:12px 0;border-top:1px solid var(--border-subtle)}
+.colourDot{width:28px;height:28px;border-radius:6px;border:1px solid var(--border-strong)}
+
+.specimen{display:flex;flex-direction:column;gap:18px;padding:clamp(18px,4vw,40px);border:1px solid var(--border-default);border-radius:var(--radius-surface);background:#FBFAF7;color:#1C1A18;overflow-wrap:anywhere}
+.rule{display:grid;grid-template-columns:minmax(0,200px) minmax(0,1fr);gap:16px;padding:10px 0;border-top:1px solid var(--border-subtle)}
+.ruleA{font:500 14px/1.4 var(--font-sans)}
+.ruleB{font:400 14px/1.5 var(--font-sans);color:var(--text-secondary)}
+.check{display:flex;gap:10px;padding:10px 0;border-top:1px solid var(--border-subtle);font:400 14px/1.5 var(--font-sans)}
+
+.post{aspect-ratio:1;container-type:inline-size;border-radius:var(--radius-sm);position:relative;overflow:hidden}
+.themeCard{display:flex;flex-direction:column;gap:12px;padding:20px;border-radius:var(--radius-surface)}
+.themeLogo{height:28px;align-self:flex-start;max-width:100%}
+.themeBtn{align-self:flex-start;padding:8px 14px;border-radius:6px;color:#FFFFFF;font:500 13px/1 Geist,sans-serif}
+
+.doPair{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--border-default);border-radius:var(--radius-surface);overflow:hidden;background:var(--surface-card)}
+.doSide{display:flex;flex-direction:column;min-width:0}
+.doSide:first-child{border-right:1px solid var(--border-default)}
+.doTile{height:110px;display:grid;place-items:center;padding:12px;text-align:center;overflow-wrap:anywhere}
+.doNote{display:flex;gap:6px;padding:8px 10px;font:400 12px/1.4 var(--font-sans);border-top:1px solid var(--border-default);flex:1}
+
+.pairs{display:flex;flex-direction:column}
+.pairHead,.pairRow{display:grid;grid-template-columns:150px minmax(0,1fr) 90px minmax(0,140px);gap:12px;align-items:center}
+.pairHead{padding:0 0 8px;font:400 11px/1 var(--font-mono);color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.04em}
+.pairRow{padding:8px 0;border-top:1px solid var(--border-subtle)}
+.pairSample{height:40px;border-radius:6px;border:1px solid var(--border-default);display:grid;place-items:center;font:600 15px/1 Geist,sans-serif}
+.pairLabel{font:400 13px/1.4 var(--font-sans)}
+.pairUse{font:400 12px/1.3 var(--font-sans);color:var(--text-secondary)}
+
+@media (max-width:639px){
+  .logoRule{grid-template-columns:minmax(0,1fr) auto;row-gap:10px}
+  .logoPrev{grid-column:1/-1}
+  .proportion{height:72px}
+  .bandText{display:none}
+  .legend{display:flex}
+  .colourRule{grid-template-columns:28px minmax(0,1fr) auto;row-gap:4px}
+  .colourRule>:nth-child(3){grid-column:2/-1;grid-row:2}
+  .rule{grid-template-columns:minmax(0,1fr);gap:4px}
+  .pairHead{display:none}
+  .pairRow{grid-template-columns:104px minmax(0,1fr) auto;row-gap:2px;padding:10px 0}
+  .pairSample{grid-row:span 2;font-size:14px}
+  .pairUse{grid-column:2/-1}
+  .doTile{height:96px;padding:8px}
+}
+@media (max-width:359px){.doPair{grid-template-columns:1fr}.doSide:first-child{border-right:0;border-bottom:1px solid var(--border-default)}}
+
+@media (pointer:coarse){.dl{min-height:var(--size-touch-min);padding:0 6px}}
+/* Phones: the colour bands become a picture; the legend below is the tappable copy control. */
+.legendBtn{display:inline-flex;align-items:center;gap:6px;min-height:var(--size-touch-min);padding:0 10px;border:1px solid var(--border-default);border-radius:var(--radius-pill);background:var(--surface-card);color:var(--text-primary);font:500 13px/1 var(--font-sans);cursor:pointer}
+@media (pointer:coarse){.more{display:inline-flex;align-items:center;min-height:var(--size-touch-min);padding-top:0}}

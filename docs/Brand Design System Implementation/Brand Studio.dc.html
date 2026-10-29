@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <title>Hali Brand Studio</title>
+  <link rel="icon" href="assets/icons/favicon.svg">
+  <link rel="stylesheet" href="_ds/hali-b4-project-managment-design-system-8cb0828f-e4cd-40a6-8da1-4182aed7d477/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/hali-b4-project-managment-design-system-8cb0828f-e4cd-40a6-8da1-4182aed7d477/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/hali-b4-project-managment-design-system-8cb0828f-e4cd-40a6-8da1-4182aed7d477/tokens/themes.css">
+  <link rel="stylesheet" href="_ds/hali-b4-project-managment-design-system-8cb0828f-e4cd-40a6-8da1-4182aed7d477/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/hali-b4-project-managment-design-system-8cb0828f-e4cd-40a6-8da1-4182aed7d477/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/hali-b4-project-managment-design-system-8cb0828f-e4cd-40a6-8da1-4182aed7d477/tokens/layout.css">
+  <link rel="stylesheet" href="_ds/hali-b4-project-managment-design-system-8cb0828f-e4cd-40a6-8da1-4182aed7d477/tokens/base.css">
+  <link rel="stylesheet" href="_ds/hali-b4-project-managment-design-system-8cb0828f-e4cd-40a6-8da1-4182aed7d477/styles.css">
+  <script src="_ds/hali-b4-project-managment-design-system-8cb0828f-e4cd-40a6-8da1-4182aed7d477/_ds_bundle.js"></script>
+  <script src="studio/brand.js"></script>
+  <style>
+    html, body { margin: 0; background: var(--surface-page); color: var(--text-primary); font-family: var(--font-sans); }
+    a { color: var(--text-link); } a:hover { color: var(--text-link-hover); }
+  </style>
+</helmet>
+
+<div style="min-height: 100vh; background: var(--surface-page); color: var(--text-primary);">
+  <header style="display: flex; align-items: center; gap: 12px; height: 56px; padding: 0 var(--gutter); border-bottom: 1px solid var(--border-default); background: var(--surface-card);">
+    <x-import component-from-global-scope="HaliDesignSystem_02149f.Logo" height="24" hint-size="77px,24px"></x-import>
+    <span style="font: 500 12px/1 var(--font-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--text-tertiary);">Brand studio</span>
+    <span style="flex: 1;"></span>
+    <x-import component-from-global-scope="HaliDesignSystem_02149f.IconButton" icon="{{ themeIcon }}" label="Switch light or dark theme" size="sm" on-click="{{ toggleTheme }}" hint-size="32px,32px"></x-import>
+  </header>
+  <main style="max-width: 960px; margin: 0 auto; padding: 56px var(--gutter) 120px; display: flex; flex-direction: column; gap: 40px;">
+    <div style="display: flex; flex-direction: column; gap: 14px; max-width: 720px;">
+      <h1 style="margin: 0; font: 600 clamp(32px, 5vw, 48px)/1.08 var(--font-sans); letter-spacing: -0.03em; text-wrap: balance;">Hali brand studio</h1>
+      <p style="margin: 0; font: 400 17px/1.6 var(--font-sans); color: var(--text-secondary); text-wrap: pretty;">The design system, brand reference, assets and template editor for Hali — all reading the same tokens and files.</p>
+    </div>
+    <div style="display: flex; flex-direction: column;">
+      <sc-for list="{{ tools }}" as="t" hint-placeholder-count="5">
+        <a href="{{ t.href }}" style="display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 16px; align-items: center; padding: 18px 8px; border-top: 1px solid var(--border-default); text-decoration: none; color: var(--text-primary); border-radius: var(--radius-control);" style-hover="background: var(--surface-hover);">
+          <span style="width: 40px; height: 40px; display: grid; place-items: center; border: 1px solid var(--border-default); border-radius: var(--radius-control); background: var(--surface-card);"><i class="{{ t.icon }}" style="font-size: 18px; color: var(--icon-secondary);"></i></span>
+          <span style="display: flex; flex-direction: column; gap: 4px; min-width: 0;"><span style="font: 600 16px/1.3 var(--font-sans);">{{ t.name }}</span><span style="font: 400 14px/1.5 var(--font-sans); color: var(--text-secondary);">{{ t.desc }}</span></span>
+          <i class="icon-arrow-right" style="font-size: 18px; color: var(--icon-secondary);"></i>
+        </a>
+      </sc-for>
+      <sc-for list="{{ planned }}" as="t" hint-placeholder-count="2">
+        <div style="display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 16px; align-items: center; padding: 18px 8px; border-top: 1px dashed var(--border-strong); color: var(--text-secondary);">
+          <span style="width: 40px; height: 40px; display: grid; place-items: center; border: 1.5px dashed var(--border-strong); border-radius: var(--radius-control);"><i class="{{ t.icon }}" style="font-size: 18px; color: var(--text-disabled);"></i></span>
+          <span style="display: flex; flex-direction: column; gap: 4px; min-width: 0;"><span style="font: 600 16px/1.3 var(--font-sans);">{{ t.name }}</span><span style="font: 400 14px/1.5 var(--font-sans);">{{ t.desc }}</span></span>
+          <x-import component-from-global-scope="HaliDesignSystem_02149f.StatusBadge" tone="neutral" size="sm" hint-size="80px,22px">Next phase</x-import>
+        </div>
+      </sc-for>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+      <span style="font: 600 15px/1.3 var(--font-sans);">Start a design</span>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+        <sc-for list="{{ quick }}" as="q" hint-placeholder-count="7"><a href="{{ q.href }}" style="height: 34px; display: inline-flex; align-items: center; padding: 0 14px; border: 1px solid var(--border-default); border-radius: var(--radius-pill); background: var(--surface-card); color: var(--text-primary); text-decoration: none; font: 500 13px/1 var(--font-sans);">{{ q.label }}</a></sc-for>
+      </div>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { theme: 'light' };
+  componentDidMount() { const boot = () => { if (!window.HaliBrand) return setTimeout(boot, 40); this.setState({ theme: window.HaliBrand.theme() }); }; boot(); }
+  renderVals() {
+    const st = this.state;
+    return {
+      themeIcon: st.theme === 'dark' ? 'sun' : 'moon', toggleTheme: () => this.setState({ theme: window.HaliBrand.theme(st.theme === 'dark' ? 'light' : 'dark') }),
+      tools: [['Brand Studio Editor.dc.html', 'Template editor', 'Social, carousel, article, banner, ad, avatar, email and web templates. Edit, resize and export PNG, JPEG, SVG or ZIP.', 'icon-pen-tool'],
+        ['Document Editor.dc.html', 'Document editor', 'Books and ebooks, reports, whitepapers, proposals, case studies, presentations, articles, newsletters and resumes. Export PDF, DOCX, PPTX, EPUB, HTML, Markdown or PNG.', 'icon-book-text'],
+        ['Brand Playbook.dc.html', 'Brand identity playbook', 'Logo, colour, type, layout, motif, social and document rules, light and dark, do and don\'t, accessibility and governance.', 'icon-book-open'],
+        ['Design System.dc.html', 'Design system', 'Twelve sections: overview, logo, colour, type, spacing, radius and shadow, motif, voice, components, slides, UI kits, governance. Click any value to copy.', 'icon-swatch-book'],
+        ['Brand Voice.dc.html', 'Brand voice and knowledge', 'A copy-ready reference for AI tools and content planning, with verified facts separated from items that need confirmation.', 'icon-message-square-text'],
+        ['Asset Library.dc.html', 'Asset library', 'Logos, favicons, app icons, social images and template graphics. Download one or a ZIP.', 'icon-folder-open']].map(([href, name, desc, icon]) => ({ href, name, desc, icon })),
+      planned: [],
+      quick: [['social', 'Social post'], ['carousel', 'Carousel'], ['article', 'Article banner'], ['banners', 'Banner or cover'], ['ads', 'Ad'], ['avatar', 'Avatar'], ['engagement', 'Engagement post'], ['email', 'Email graphic'], ['web', 'Web graphic']].map(([c, label]) => ({ label, href: 'Brand Studio Editor.dc.html#new=' + c })).concat([['book', 'Ebook'], ['report', 'Report'], ['proposal', 'Proposal'], ['presentation', 'Presentation'], ['resume', 'Resume']].map(([t, label]) => ({ label, href: 'Document Editor.dc.html#type=' + t })))
+    };
+  }
+}
+</script>
+</body>
+</html>

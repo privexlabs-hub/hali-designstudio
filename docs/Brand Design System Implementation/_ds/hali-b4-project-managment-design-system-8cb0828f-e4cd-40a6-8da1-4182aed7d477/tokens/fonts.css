@@ -1,0 +1,4 @@
+/* One superfamily: Geist (UI + display) and Geist Mono (references, versions, timestamps). SIL OFL, via Google Fonts. */
+@import url("https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap");
+/* Icons: Lucide icon font (CDN). Use <i class="icon-file-text"></i> or the Icon component. */
+@import url("https://unpkg.com/lucide-static@0.460.0/font/lucide.css");

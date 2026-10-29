@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <title>Hali — Brand voice and knowledge</title>
+  <link rel="icon" href="assets/icons/favicon.svg">
+  <link rel="stylesheet" href="_ds/hali-b4-project-managment-design-system-8cb0828f-e4cd-40a6-8da1-4182aed7d477/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/hali-b4-project-managment-design-system-8cb0828f-e4cd-40a6-8da1-4182aed7d477/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/hali-b4-project-managment-design-system-8cb0828f-e4cd-40a6-8da1-4182aed7d477/tokens/themes.css">
+  <link rel="stylesheet" href="_ds/hali-b4-project-managment-design-system-8cb0828f-e4cd-40a6-8da1-4182aed7d477/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/hali-b4-project-managment-design-system-8cb0828f-e4cd-40a6-8da1-4182aed7d477/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/hali-b4-project-managment-design-system-8cb0828f-e4cd-40a6-8da1-4182aed7d477/tokens/layout.css">
+  <link rel="stylesheet" href="_ds/hali-b4-project-managment-design-system-8cb0828f-e4cd-40a6-8da1-4182aed7d477/tokens/base.css">
+  <link rel="stylesheet" href="_ds/hali-b4-project-managment-design-system-8cb0828f-e4cd-40a6-8da1-4182aed7d477/styles.css">
+  <script src="_ds/hali-b4-project-managment-design-system-8cb0828f-e4cd-40a6-8da1-4182aed7d477/_ds_bundle.js"></script>
+  <script src="studio/brand.js"></script>
+  <style>
+    html, body { margin: 0; background: var(--surface-page); color: var(--text-primary); font-family: var(--font-sans); }
+    a { color: var(--text-link); } a:hover { color: var(--text-link-hover); }
+  </style>
+</helmet>
+
+<div style="min-height: 100vh; background: var(--surface-page); color: var(--text-primary);">
+  <header style="position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: 12px; height: 56px; padding: 0 var(--gutter); border-bottom: 1px solid var(--border-default); background: var(--surface-card);">
+    <a href="Brand Studio.dc.html" aria-label="Brand Studio home" style="display: flex; align-items: center;"><x-import component-from-global-scope="HaliDesignSystem_02149f.Logo" height="24" hint-size="77px,24px"></x-import></a>
+    <nav aria-label="Studio" style="flex: 1; min-width: 0; display: flex; gap: 2px; overflow-x: auto;">
+      <sc-for list="{{ studioNav }}" as="n" hint-placeholder-count="7">
+        <a href="{{ n.href }}" aria-current="{{ n.current }}" style="flex: none; padding: 8px 10px; border-radius: var(--radius-control); font: 500 13px/1 var(--font-sans); text-decoration: none; color: var(--text-primary); background: {{ n.bg }}; white-space: nowrap;">{{ n.label }}</a>
+      </sc-for>
+    </nav>
+    <x-import component-from-global-scope="HaliDesignSystem_02149f.IconButton" icon="{{ themeIcon }}" label="Switch light or dark theme" size="sm" on-click="{{ toggleTheme }}" hint-size="32px,32px"></x-import>
+  </header>
+
+  <main style="max-width: 880px; margin: 0 auto; padding: 40px var(--gutter) 120px; display: flex; flex-direction: column; gap: 28px;">
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <span style="font: 500 12px/1.2 var(--font-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--text-tertiary);">Brand voice &amp; knowledge</span>
+      <h1 style="margin: 0; font: 600 clamp(30px, 4.6vw, 44px)/1.08 var(--font-sans); letter-spacing: -0.03em; text-wrap: balance;">Everything an AI tool or writer needs to write as Hali</h1>
+      <p style="margin: 0; font: 400 16px/1.6 var(--font-sans); color: var(--text-secondary); text-wrap: pretty;">Copy one section or the whole reference into ChatGPT, Claude or a content calendar. Each section is marked Verified (stated in Hali's source documents) or Needs confirmation (a gap or proposal the brand owner must approve). Nothing here is invented.</p>
+    </div>
+
+    <div style="position: sticky; top: 56px; z-index: 5; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 12px 0; background: var(--surface-page); border-bottom: 1px solid var(--border-default);">
+      <div role="group" aria-label="Filter sections" style="display: flex; gap: 2px; padding: 2px; background: var(--surface-sunken); border-radius: var(--radius-control);">
+        <sc-for list="{{ filters }}" as="f" hint-placeholder-count="3"><button onClick="{{ f.onClick }}" aria-pressed="{{ f.on }}" style="height: 30px; padding: 0 12px; border: 0; border-radius: 4px; background: {{ f.bg }}; color: var(--text-primary); font: 500 12px/1 var(--font-sans); cursor: pointer; white-space: nowrap;">{{ f.label }}</button></sc-for>
+      </div>
+      <div style="flex: 1;"></div>
+      <x-import component-from-global-scope="HaliDesignSystem_02149f.Button" variant="secondary" size="sm" icon-start="file-down" on-click="{{ downloadMd }}" hint-size="110px,32px">Markdown</x-import>
+      <x-import component-from-global-scope="HaliDesignSystem_02149f.Button" variant="secondary" size="sm" icon-start="file-text" on-click="{{ downloadTxt }}" hint-size="96px,32px">Plain text</x-import>
+      <x-import component-from-global-scope="HaliDesignSystem_02149f.Button" variant="primary" size="sm" icon-start="{{ allIcon }}" success="{{ allCopied }}" on-click="{{ copyAll }}" hint-size="140px,32px">{{ allLabel }}</x-import>
+    </div>
+
+    <sc-if value="{{ copyError }}" hint-placeholder-val="{{ false }}">
+      <x-import component-from-global-scope="HaliDesignSystem_02149f.Alert" tone="error" title="Copy failed" hint-size="100%,60px">Your browser blocked clipboard access. Download the Markdown file instead.</x-import>
+    </sc-if>
+
+    <nav aria-label="Contents" style="display: flex; flex-wrap: wrap; gap: 6px;">
+      <sc-for list="{{ sections }}" as="s" hint-placeholder-count="10"><a href="{{ s.href }}" style="height: 28px; display: inline-flex; align-items: center; padding: 0 10px; border: 1px solid var(--border-default); border-radius: var(--radius-pill); text-decoration: none; color: var(--text-primary); font: 500 12px/1 var(--font-sans); background: var(--surface-card);">{{ s.title }}</a></sc-for>
+    </nav>
+
+    <div style="display: flex; flex-direction: column;">
+      <sc-for list="{{ sections }}" as="s" hint-placeholder-count="6">
+        <section id="{{ s.id }}" style="display: flex; flex-direction: column; gap: 12px; padding: 24px 0; border-top: 1px solid var(--border-default); scroll-margin-top: 130px;">
+          <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+            <h2 style="margin: 0; flex: 1; min-width: 200px; font: 600 20px/1.3 var(--font-sans); letter-spacing: -0.01em;">{{ s.title }}</h2>
+            <x-import component-from-global-scope="HaliDesignSystem_02149f.StatusBadge" tone="{{ s.tone }}" icon="{{ s.badgeIcon }}" size="sm" hint-size="120px,22px">{{ s.badge }}</x-import>
+            <x-import component-from-global-scope="HaliDesignSystem_02149f.Button" variant="ghost" size="sm" icon-start="copy" success="{{ s.copied }}" on-click="{{ s.onCopy }}" hint-size="80px,32px">{{ s.copyLabel }}</x-import>
+          </div>
+          <div style="font: 400 15px/1.65 var(--font-sans); white-space: pre-line; text-wrap: pretty; color: var(--text-primary); padding: 16px 18px; border: {{ s.border }}; border-radius: var(--radius-surface); background: var(--surface-card);">{{ s.body }}</div>
+        </section>
+      </sc-for>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { theme: 'light', filter: 'all', copied: null, copyError: false };
+  componentDidMount() { const boot = () => { if (!window.HaliBrand) return setTimeout(boot, 40); this.setState({ theme: window.HaliBrand.theme() }); }; boot(); }
+  async doCopy(key, text) {
+    const ok = await window.HaliBrand.copy(text); this.setState({ copied: ok ? key : null, copyError: !ok });
+    clearTimeout(this.t); this.t = setTimeout(() => this.setState({ copied: null }), 1800);
+  }
+  renderVals() {
+    const B = window.HaliBrand, st = this.state;
+    const base = { studioNav: [['Brand Studio.dc.html', 'Studio'], ['Brand Playbook.dc.html', 'Playbook'], ['Design System.dc.html', 'Design system'], ['Brand Voice.dc.html', 'Voice & knowledge'], ['Asset Library.dc.html', 'Assets'], ['Brand Studio Editor.dc.html', 'Templates'], ['Document Editor.dc.html', 'Documents']].map(([href, label]) => ({ href, label, current: href === 'Brand Voice.dc.html' ? 'page' : undefined, bg: href === 'Brand Voice.dc.html' ? 'var(--surface-selected)' : 'transparent' })),
+      themeIcon: st.theme === 'dark' ? 'sun' : 'moon', toggleTheme: () => this.setState({ theme: window.HaliBrand.theme(st.theme === 'dark' ? 'light' : 'dark') }), copyError: st.copyError };
+    if (!B) return Object.assign(base, { sections: [], filters: [] });
+    const list = B.VOICE.filter(s => st.filter === 'all' || s.status === st.filter);
+    const header = 'HALI — BRAND VOICE AND KNOWLEDGE REFERENCE\nUse only these facts. Sections marked "Needs confirmation" are gaps or proposals: use [bracketed placeholders] rather than inventing details.\n\n';
+    const mdHeader = '# Hali — Brand voice and knowledge reference\n\n> Use only these facts. Sections marked *Needs confirmation* are gaps or proposals: use [bracketed placeholders] rather than inventing details.\n\n';
+    return Object.assign(base, {
+      filters: [['all', 'All sections'], ['verified', 'Verified'], ['confirm', 'Needs confirmation']].map(([id, label]) => ({ label, on: st.filter === id, bg: st.filter === id ? 'var(--surface-card)' : 'transparent', onClick: () => this.setState({ filter: id }) })),
+      allCopied: st.copied === '__all', allIcon: 'copy', allLabel: st.copied === '__all' ? 'Copied' : st.filter === 'all' ? 'Copy everything' : 'Copy ' + list.length + ' sections',
+      copyAll: () => this.doCopy('__all', header + B.voiceText(list, false)),
+      downloadMd: () => B.download(mdHeader + B.voiceText(list, true) + '\n', 'hali-brand-voice-and-knowledge.md', 'text/markdown'),
+      downloadTxt: () => B.download(header + B.voiceText(list, false) + '\n', 'hali-brand-voice-and-knowledge.txt', 'text/plain'),
+      sections: list.map(s => ({ id: s.id, href: '#' + s.id, title: s.title, body: s.body, tone: s.status === 'verified' ? 'success' : 'attention', badge: s.status === 'verified' ? 'Verified' : 'Needs confirmation', badgeIcon: s.status === 'verified' ? 'shield-check' : 'circle-help',
+        border: s.status === 'verified' ? '1px solid var(--border-default)' : '1.5px dashed var(--attention-icon)', copied: st.copied === s.id, copyLabel: st.copied === s.id ? 'Copied' : 'Copy',
+        onCopy: () => this.doCopy(s.id, B.voiceText([s], false)) }))
+    });
+  }
+}
+</script>
+</body>
+</html>

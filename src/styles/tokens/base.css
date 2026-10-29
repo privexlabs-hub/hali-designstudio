@@ -1,0 +1,13 @@
+*,*::before,*::after{box-sizing:border-box}
+:root{color-scheme:light}
+html{-webkit-text-size-adjust:100%}
+img,svg{max-width:100%}
+body{margin:0;background:var(--surface-page);color:var(--text-primary);font:var(--type-body);-webkit-font-smoothing:antialiased;font-feature-settings:"ss01","cv11"}
+a{color:var(--text-link);text-underline-offset:2px}a:hover{color:var(--text-link-hover)}
+button,input,select,textarea{color:inherit;font-family:inherit}
+:focus-visible{outline:2px solid var(--focus-color);outline-offset:2px}
+.tabular{font-variant-numeric:tabular-nums}
+@media (prefers-reduced-motion:reduce){*{transition-duration:0ms!important;animation-duration:0ms!important}}
+@keyframes hali-spin{to{transform:rotate(360deg)}}
+h1,h2,h3{text-wrap:balance}p{text-wrap:pretty}
+@keyframes hali-indeterminate{0%{left:-40%}100%{left:100%}}

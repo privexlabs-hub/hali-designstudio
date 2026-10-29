@@ -1,0 +1,17 @@
+/* Dark theme — agency workspace only (public pages and client portal are light, agency-branded).
+   Apply with <html data-theme="dark">. Strategy: invert the neutral and hue scales so every semantic alias follows. */
+[data-theme="dark"]{
+color-scheme:dark;
+--n-0:#1F1D1B;--n-25:#161514;--n-50:#24221F;--n-100:#2D2A27;--n-200:#3A3734;--n-300:#4D4945;--n-400:#6E6963;--n-500:#9F998F;--n-600:#B8B2A9;--n-700:#D2CDC4;--n-800:#E7E3DB;--n-900:#F5F3EE;
+--sea-50:#132A2A;--sea-100:#1B3B3B;--sea-300:#3E7A74;--sea-500:#5FA9A1;--sea-600:#6FBDB4;--sea-700:#A9D8D2;--sea-900:#D7EEEB;
+--blue-50:#16233A;--blue-100:#203457;--blue-500:#7AA3EC;--blue-600:#93B5F0;--blue-700:#BCD0F6;
+--amber-50:#2C2210;--amber-100:#463616;--amber-500:#E2AA45;--amber-700:#F2D08E;
+--red-50:#341A16;--red-100:#542922;--red-500:#F07D69;--red-600:#C2412D;--red-700:#F6B4A7;
+--green-50:#15281A;--green-100:#203F29;--green-500:#66BC78;--green-600:#4E9E5F;--green-700:#A8DBB1;
+--action-commit-bg:#2F6E69;--action-commit-bg-hover:#367C76;--action-commit-bg-pressed:#285B57;
+--action-danger-bg:#B33A27;--action-danger-bg-hover:#C2412D;--action-danger-bg-pressed:#9A3122;
+--shadow-1:0 1px 2px rgba(0,0,0,.4);--shadow-2:0 1px 2px rgba(0,0,0,.35),0 4px 12px rgba(0,0,0,.35);--shadow-overlay:0 2px 6px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);
+--scrim:rgba(0,0,0,.6);--surface-overlay:rgba(0,0,0,.6);
+--focus-color:#7AA3EC;--focus-ring:0 0 0 2px var(--n-25),0 0 0 4px #7AA3EC;
+--brand-accent:var(--sea-600);
+}

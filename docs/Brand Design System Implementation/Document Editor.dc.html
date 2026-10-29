@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <title>Hali Brand Studio — Document editor</title>
+  <link rel="icon" href="assets/icons/favicon.svg">
+  <link rel="stylesheet" href="_ds/hali-b4-project-managment-design-system-8cb0828f-e4cd-40a6-8da1-4182aed7d477/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/hali-b4-project-managment-design-system-8cb0828f-e4cd-40a6-8da1-4182aed7d477/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/hali-b4-project-managment-design-system-8cb0828f-e4cd-40a6-8da1-4182aed7d477/tokens/themes.css">
+  <link rel="stylesheet" href="_ds/hali-b4-project-managment-design-system-8cb0828f-e4cd-40a6-8da1-4182aed7d477/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/hali-b4-project-managment-design-system-8cb0828f-e4cd-40a6-8da1-4182aed7d477/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/hali-b4-project-managment-design-system-8cb0828f-e4cd-40a6-8da1-4182aed7d477/tokens/layout.css">
+  <link rel="stylesheet" href="_ds/hali-b4-project-managment-design-system-8cb0828f-e4cd-40a6-8da1-4182aed7d477/tokens/base.css">
+  <link rel="stylesheet" href="_ds/hali-b4-project-managment-design-system-8cb0828f-e4cd-40a6-8da1-4182aed7d477/styles.css">
+  <script src="_ds/hali-b4-project-managment-design-system-8cb0828f-e4cd-40a6-8da1-4182aed7d477/_ds_bundle.js"></script>
+  <script src="studio/brand.js"></script>
+  <script src="studio/export.js"></script>
+  <script src="studio/documents.js"></script>
+  <script src="studio/docexport.js"></script>
+  <style>
+    html, body { margin: 0; height: 100%; background: var(--surface-page); color: var(--text-primary); font-family: var(--font-sans); overflow: hidden; }
+    a { color: var(--text-link); } a:hover { color: var(--text-link-hover); }
+    [contenteditable="true"]:focus { outline: none; }
+  </style>
+</helmet>
+
+<div style="height: 100vh; height: 100dvh; display: flex; flex-direction: column; background: var(--surface-page); color: var(--text-primary);">
+  <header style="flex: none; height: 56px; display: flex; align-items: center; gap: 8px; padding: 0 12px; border-bottom: 1px solid var(--border-default); background: var(--surface-card); min-width: 0;">
+    <a href="Brand Studio.dc.html" title="Brand Studio home" style="display: flex; align-items: center; flex: none; padding: 4px;"><x-import component-from-global-scope="HaliDesignSystem_02149f.Logo" variant="symbol" height="28" hint-size="28px,28px"></x-import></a>
+    <input value="{{ docTitle }}" onChange="{{ onDocTitle }}" aria-label="Document title" style="flex: 1 1 120px; min-width: 0; max-width: 360px; height: 32px; border: 1px solid transparent; border-radius: var(--radius-control); background: transparent; color: var(--text-primary); font: 500 14px/1 var(--font-sans); padding: 0 8px;" style-hover="border-color: var(--border-default);" style-focus="border-color: var(--border-input-hover); outline: none;">
+    <span style="flex: none; font: 400 12px/1 var(--font-mono); color: var(--text-tertiary); white-space: nowrap; display: {{ typeLabelDisplay }};">{{ typeLabel }}</span>
+    <div style="flex: 1 1 0; min-width: 0;"></div>
+    <x-import component-from-global-scope="HaliDesignSystem_02149f.Button" variant="secondary" size="sm" icon-start="files" on-click="{{ openGallery }}" hint-size="110px,32px">Documents</x-import>
+    <x-import component-from-global-scope="HaliDesignSystem_02149f.IconButton" icon="undo-2" label="Undo" size="sm" disabled="{{ cantUndo }}" on-click="{{ undo }}" hint-size="32px,32px"></x-import>
+    <x-import component-from-global-scope="HaliDesignSystem_02149f.IconButton" icon="redo-2" label="Redo" size="sm" disabled="{{ cantRedo }}" on-click="{{ redo }}" hint-size="32px,32px"></x-import>
+    <x-import component-from-global-scope="HaliDesignSystem_02149f.IconButton" icon="{{ previewIcon }}" label="{{ previewLabel }}" size="sm" on-click="{{ togglePreview }}" hint-size="32px,32px"></x-import>
+    <x-import component-from-global-scope="HaliDesignSystem_02149f.IconButton" icon="{{ themeIcon }}" label="Switch light or dark theme" size="sm" on-click="{{ toggleTheme }}" hint-size="32px,32px"></x-import>
+    <x-import component-from-global-scope="HaliDesignSystem_02149f.Button" variant="primary" size="sm" icon-start="download" on-click="{{ openExport }}" hint-size="96px,32px">Export</x-import>
+  </header>
+
+  <sc-if value="{{ notice }}" hint-placeholder-val="{{ false }}">
+    <div style="flex: none; padding: 8px 12px; border-bottom: 1px solid var(--border-default); background: var(--surface-card);">
+      <x-import component-from-global-scope="HaliDesignSystem_02149f.Alert" tone="{{ notice.tone }}" hint-size="100%,44px">{{ notice.text }}</x-import>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ ready }}" hint-placeholder-val="{{ true }}">
+  <div style="flex: 1; min-height: 0; display: flex; position: relative;">
+    <!-- LEFT: page navigator -->
+    <aside aria-label="Pages" style="display: {{ leftDisplay }}; position: {{ panelPos }}; left: 0; right: 0; bottom: {{ sheetBottom }}; z-index: 40; width: {{ leftWidth }}; max-height: {{ sheetMax }}; flex: none; flex-direction: column; border-right: 1px solid var(--border-default); border-top: 1px solid var(--border-default); background: var(--surface-card); box-shadow: {{ sheetShadow }};">
+      <div style="flex: none; padding: 12px 12px 8px; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+        <span style="font: 500 12px/1.2 var(--font-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--text-tertiary);">{{ pagesHeading }}</span>
+        <x-import component-from-global-scope="HaliDesignSystem_02149f.Button" variant="ghost" size="sm" icon-start="plus" on-click="{{ openAddEnd }}" hint-size="90px,32px">{{ addPageLabel }}</x-import>
+      </div>
+      <sc-if value="{{ overflowCount }}" hint-placeholder-val="{{ false }}">
+        <div style="flex: none; margin: 0 12px 8px; padding: 10px; border: 1.5px solid var(--attention-icon); border-radius: var(--radius-control); background: var(--attention-bg); display: flex; flex-direction: column; gap: 8px;">
+          <span style="font: 400 12px/1.4 var(--font-sans); color: var(--attention-fg);">{{ overflowText }}</span>
+          <x-import component-from-global-scope="HaliDesignSystem_02149f.Button" variant="secondary" size="sm" icon-start="split" on-click="{{ fixAllOverflow }}" hint-size="160px,32px">Flow onto new pages</x-import>
+        </div>
+      </sc-if>
+      <sc-if value="{{ addMenuOpen }}" hint-placeholder-val="{{ false }}">
+        <div style="flex: none; margin: 0 12px 8px; padding: 8px; max-height: 300px; overflow: auto; border: 1px solid var(--border-default); border-radius: var(--radius-surface); background: var(--surface-subtle); display: flex; flex-direction: column; gap: 2px;">
+          <span style="font: 400 12px/1.4 var(--font-sans); color: var(--text-secondary); padding: 0 4px 4px;">{{ addMenuLabel }}</span>
+          <sc-for list="{{ pageKinds }}" as="k" hint-placeholder-count="6">
+            <button onClick="{{ k.onClick }}" style="text-align: left; min-height: 30px; padding: 0 8px; border: 0; border-radius: var(--radius-control); background: transparent; color: var(--text-primary); font: 400 13px/1.2 var(--font-sans); cursor: pointer;" style-hover="background: var(--surface-sunken);">{{ k.name }}</button>
+          </sc-for>
+          <button onClick="{{ closeAddMenu }}" style="text-align: left; height: 28px; padding: 0 8px; border: 0; background: transparent; color: var(--text-tertiary); font: 400 12px/1 var(--font-sans); cursor: pointer;">Cancel</button>
+        </div>
+      </sc-if>
+      <div style="flex: 1; min-height: 0; overflow: auto; padding: 0 8px 12px; display: flex; flex-direction: column; gap: 2px;">
+        <sc-for list="{{ pagesView }}" as="p" hint-placeholder-count="8">
+          <div draggable="true" onDragStart="{{ p.onDragStart }}" onDragOver="{{ p.onDragOver }}" onDrop="{{ p.onDrop }}" style="display: flex; flex-direction: column; gap: 4px; padding: 4px; border-radius: var(--radius-control); background: {{ p.bg }}; border: {{ p.border }};">
+            <button onClick="{{ p.onSelect }}" aria-current="{{ p.active }}" style="display: grid; grid-template-columns: 30px minmax(0, 1fr) auto; gap: 8px; align-items: center; min-height: 36px; padding: 0 6px; border: 0; background: transparent; color: var(--text-primary); cursor: pointer; text-align: left;">
+              <span style="font: 500 11px/1 var(--font-mono); color: var(--text-tertiary);">{{ p.num }}</span>
+              <span style="display: flex; flex-direction: column; gap: 2px; min-width: 0;">
+                <span style="font: 500 13px/1.25 var(--font-sans); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ p.name }}</span>
+                <span style="font: 400 11px/1.2 var(--font-mono); color: var(--text-tertiary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ p.meta }}</span>
+              </span>
+              <i class="{{ p.flag }}" title="{{ p.flagTitle }}" style="font-size: 14px; color: var(--attention-icon);"></i>
+            </button>
+            <sc-if value="{{ p.active }}" hint-placeholder-val="{{ false }}">
+              <div style="display: flex; gap: 2px; justify-content: flex-end; flex-wrap: wrap;">
+                <x-import component-from-global-scope="HaliDesignSystem_02149f.IconButton" icon="arrow-up" label="Move page up" size="sm" disabled="{{ p.first }}" on-click="{{ p.onUp }}" hint-size="32px,32px"></x-import>
+                <x-import component-from-global-scope="HaliDesignSystem_02149f.IconButton" icon="arrow-down" label="Move page down" size="sm" disabled="{{ p.last }}" on-click="{{ p.onDown }}" hint-size="32px,32px"></x-import>
+                <x-import component-from-global-scope="HaliDesignSystem_02149f.IconButton" icon="copy" label="Duplicate page" size="sm" on-click="{{ p.onDup }}" hint-size="32px,32px"></x-import>
+                <x-import component-from-global-scope="HaliDesignSystem_02149f.IconButton" icon="between-horizontal-start" label="Insert page before" size="sm" on-click="{{ p.onInsertBefore }}" hint-size="32px,32px"></x-import>
+                <x-import component-from-global-scope="HaliDesignSystem_02149f.IconButton" icon="between-horizontal-end" label="Insert page after" size="sm" on-click="{{ p.onInsertAfter }}" hint-size="32px,32px"></x-import>
+                <x-import component-from-global-scope="HaliDesignSystem_02149f.IconButton" icon="trash-2" label="Delete page" size="sm" disabled="{{ p.only }}" on-click="{{ p.onDel }}" hint-size="32px,32px"></x-import>
+              </div>
+            </sc-if>
+          </div>
+        </sc-for>
+      </div>
+    </aside>
+
+    <!-- CENTER: canvas -->
+    <main style="flex: 1; min-width: 0; display: flex; flex-direction: column; background: var(--surface-sunken);">
+      <div style="flex: none; height: 44px; display: flex; align-items: center; gap: 8px; padding: 0 12px; border-bottom: 1px solid var(--border-default); background: var(--surface-subtle); overflow-x: auto;">
+        <span style="font: 400 12px/1 var(--font-mono); color: var(--text-secondary); white-space: nowrap;">{{ sizeLabel }}</span>
+        <div style="flex: 1;"></div>
+        <x-import component-from-global-scope="HaliDesignSystem_02149f.IconButton" icon="zoom-out" label="Zoom out" size="sm" on-click="{{ zoomOut }}" hint-size="32px,32px"></x-import>
+        <button onClick="{{ zoomFit }}" title="Fit width" style="height: 28px; min-width: 56px; padding: 0 8px; border: 1px solid var(--border-default); border-radius: var(--radius-control); background: var(--surface-card); color: var(--text-primary); font: 500 12px/1 var(--font-mono); cursor: pointer;">{{ zoomLabel }}</button>
+        <x-import component-from-global-scope="HaliDesignSystem_02149f.IconButton" icon="zoom-in" label="Zoom in" size="sm" on-click="{{ zoomIn }}" hint-size="32px,32px"></x-import>
+      </div>
+      <div data-vp="1" data-canvas="1" ref="{{ viewportRef }}" onScroll="{{ onViewportScroll }}" style="flex: 1; min-height: 0; overflow: auto; position: relative; overscroll-behavior: contain;">
+        <div style="min-width: 100%; width: max-content; display: flex; flex-direction: column; align-items: center; gap: 32px; padding: 28px 24px 120px; box-sizing: border-box;">
+          <sc-for list="{{ canvasPages }}" as="cp" hint-placeholder-count="2">
+            <div ref="{{ cp.ref }}" data-screen-label="{{ cp.label }}" style="display: flex; flex-direction: column; gap: 8px;">
+              <div style="display: flex; gap: 8px; align-items: center; justify-content: space-between;">
+                <button onClick="{{ cp.onSelect }}" style="display: flex; gap: 8px; align-items: center; border: 0; background: transparent; padding: 0; color: {{ cp.labelColor }}; font: 500 12px/1 var(--font-mono); cursor: pointer;">{{ cp.label }}</button>
+                <sc-if value="{{ cp.overflow }}" hint-placeholder-val="{{ false }}">
+                  <button onClick="{{ cp.onSplit }}" style="display: inline-flex; gap: 6px; align-items: center; height: 24px; padding: 0 8px; border: 1.5px solid var(--attention-icon); border-radius: var(--radius-pill); background: var(--attention-bg); color: var(--attention-fg); font: 500 11px/1 var(--font-sans); cursor: pointer;"><i class="icon-triangle-alert" style="font-size: 12px;"></i>Content overflows · move to next page</button>
+                </sc-if>
+              </div>
+              <div onClick="{{ cp.onSelect }}" style="outline: {{ cp.outline }}; outline-offset: 3px; box-shadow: var(--shadow-2);">{{ cp.page }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </main>
+
+    <!-- RIGHT: properties -->
+    <aside aria-label="Properties" style="display: {{ rightDisplay }}; position: {{ panelPos }}; left: 0; right: 0; bottom: {{ sheetBottom }}; z-index: 40; width: {{ rightWidth }}; max-height: {{ sheetMax }}; flex: none; flex-direction: column; border-left: 1px solid var(--border-default); border-top: 1px solid var(--border-default); background: var(--surface-card); overflow: auto; box-shadow: {{ sheetShadow }};">
+      <sc-if value="{{ hasSel }}" hint-placeholder-val="{{ false }}">
+        <div style="padding: 12px; display: flex; flex-direction: column; gap: 14px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <i class="{{ selIcon }}" style="font-size: 16px; color: var(--icon-secondary);"></i>
+            <span style="flex: 1; font: 600 14px/1.3 var(--font-sans);">{{ selTitle }}</span>
+            <x-import component-from-global-scope="HaliDesignSystem_02149f.IconButton" icon="x" label="Deselect block" size="sm" on-click="{{ deselect }}" hint-size="32px,32px"></x-import>
+          </div>
+          <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+            <sc-for list="{{ blockActions }}" as="a" hint-placeholder-count="7"><x-import component-from-global-scope="HaliDesignSystem_02149f.IconButton" icon="{{ a.icon }}" label="{{ a.label }}" variant="secondary" size="sm" disabled="{{ a.disabled }}" on-click="{{ a.onClick }}" hint-size="32px,32px"></x-import></sc-for>
+          </div>
+          <sc-if value="{{ canConvert }}" hint-placeholder-val="{{ false }}">
+            <label style="display: flex; flex-direction: column; gap: 6px;"><span style="font: 500 12px/1.2 var(--font-mono); text-transform: uppercase; letter-spacing: .04em; color: var(--text-tertiary);">Block type</span>
+              <select value="{{ convertValue }}" onChange="{{ onConvert }}" style="height: 32px; border: 1px solid var(--border-input); border-radius: var(--radius-control); background: var(--surface-card); color: var(--text-primary); font: 400 13px/1 var(--font-sans); padding: 0 6px;">
+                <sc-for list="{{ convertOpts }}" as="o" hint-placeholder-count="5"><option value="{{ o.id }}">{{ o.label }}</option></sc-for>
+              </select></label>
+          </sc-if>
+          <sc-for list="{{ blockFields }}" as="f" hint-placeholder-count="1">
+            <label style="display: flex; flex-direction: column; gap: 6px;">
+              <span style="font: 500 12px/1.2 var(--font-mono); text-transform: uppercase; letter-spacing: .04em; color: var(--text-tertiary);">{{ f.label }}</span>
+              <textarea value="{{ f.value }}" onChange="{{ f.onChange }}" rows="{{ f.rows }}" style="resize: vertical; padding: 8px; border: 1px solid var(--border-input); border-radius: var(--radius-control); background: var(--surface-card); color: var(--text-primary); font: 400 13px/1.45 var(--font-sans);"></textarea>
+              <span style="font: 400 11px/1.4 var(--font-sans); color: var(--text-tertiary);">{{ f.help }}</span>
+            </label>
+          </sc-for>
+          <sc-if value="{{ isImage }}" hint-placeholder-val="{{ false }}">
+            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+              <x-import component-from-global-scope="HaliDesignSystem_02149f.Button" variant="secondary" size="sm" icon-start="image-up" on-click="{{ pickImage }}" hint-size="130px,32px">{{ imageAction }}</x-import>
+              <sc-if value="{{ hasSrc }}" hint-placeholder-val="{{ false }}"><x-import component-from-global-scope="HaliDesignSystem_02149f.Button" variant="ghost" size="sm" on-click="{{ clearImage }}" hint-size="80px,32px">Remove</x-import></sc-if>
+            </div>
+          </sc-if>
+          <sc-for list="{{ blockOptions }}" as="g" hint-placeholder-count="1">
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+              <span style="font: 500 12px/1.2 var(--font-mono); text-transform: uppercase; letter-spacing: .04em; color: var(--text-tertiary);">{{ g.label }}</span>
+              <div role="group" aria-label="{{ g.label }}" style="display: flex; gap: 2px; padding: 2px; background: var(--surface-sunken); border-radius: var(--radius-control); flex-wrap: wrap;">
+                <sc-for list="{{ g.items }}" as="o" hint-placeholder-count="3"><button onClick="{{ o.onClick }}" aria-pressed="{{ o.on }}" title="{{ o.label }}" style="flex: 1; min-width: 40px; height: 28px; border: 0; border-radius: 4px; background: {{ o.bg }}; color: var(--text-primary); font: 500 12px/1 var(--font-sans); cursor: pointer; white-space: nowrap;"><i class="{{ o.icon }}" style="font-size: 14px;"></i>{{ o.text }}</button></sc-for>
+              </div>
+            </div>
+          </sc-for>
+          <sc-for list="{{ blockNumbers }}" as="nf" hint-placeholder-count="1">
+            <label style="display: flex; flex-direction: column; gap: 6px;"><span style="font: 500 12px/1.2 var(--font-mono); text-transform: uppercase; letter-spacing: .04em; color: var(--text-tertiary);">{{ nf.label }} · {{ nf.display }}</span>
+              <input type="range" min="{{ nf.min }}" max="{{ nf.max }}" step="{{ nf.step }}" value="{{ nf.value }}" onChange="{{ nf.onChange }}"></label>
+          </sc-for>
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <span style="font: 500 12px/1.2 var(--font-mono); text-transform: uppercase; letter-spacing: .04em; color: var(--text-tertiary);">Text colour · {{ colorLabel }}</span>
+            <div style="display: flex; flex-wrap: wrap; gap: 4px; align-items: center;">
+              <button onClick="{{ colorReset }}" title="Use the page default" aria-label="Use the page default colour" style="height: 22px; padding: 0 6px; border-radius: 4px; border: 1px solid var(--border-strong); background: var(--surface-card); color: var(--text-primary); font: 500 11px/1 var(--font-sans); cursor: pointer;">Auto</button>
+              <sc-for list="{{ swatches }}" as="s" hint-placeholder-count="8"><button onClick="{{ s.onClick }}" title="{{ s.name }}" aria-label="{{ s.name }}" style="width: 22px; height: 22px; border-radius: 4px; background: {{ s.hex }}; border: 1px solid var(--border-strong); box-shadow: {{ s.ring }}; cursor: pointer; padding: 0;"></button></sc-for>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ noSel }}" hint-placeholder-val="{{ true }}">
+        <div style="padding: 12px; display: flex; flex-direction: column; gap: 16px;">
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <span style="font: 500 12px/1.2 var(--font-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--text-tertiary);">Page {{ pageNum }} · {{ pageKind }}</span>
+            <input value="{{ pageName }}" onChange="{{ onPageName }}" aria-label="Page name" style="height: 32px; border: 1px solid var(--border-input); border-radius: var(--radius-control); background: var(--surface-card); color: var(--text-primary); font: 400 13px/1 var(--font-sans); padding: 0 8px;">
+            <sc-for list="{{ pageOptions }}" as="g" hint-placeholder-count="2">
+              <div style="display: flex; flex-direction: column; gap: 6px;">
+                <span style="font: 400 12px/1 var(--font-sans); color: var(--text-secondary);">{{ g.label }}</span>
+                <div role="group" aria-label="{{ g.label }}" style="display: flex; gap: 2px; padding: 2px; background: var(--surface-sunken); border-radius: var(--radius-control);">
+                  <sc-for list="{{ g.items }}" as="o" hint-placeholder-count="3"><button onClick="{{ o.onClick }}" aria-pressed="{{ o.on }}" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; height: 28px; border: 0; border-radius: 4px; background: {{ o.bg }}; color: var(--text-primary); font: 500 12px/1 var(--font-sans); cursor: pointer;"><span style="display: {{ o.swDisplay }}; width: 10px; height: 10px; border-radius: 2px; background: {{ o.sw }}; border: 1px solid var(--border-strong);"></span>{{ o.text }}</button></sc-for>
+                </div>
+              </div>
+            </sc-for>
+            <sc-for list="{{ pageToggles }}" as="t" hint-placeholder-count="2">
+              <x-import component-from-global-scope="HaliDesignSystem_02149f.Switch" label="{{ t.label }}" checked="{{ t.on }}" size="sm" on-change="{{ t.onClick }}" hint-size="100%,24px"></x-import>
+            </sc-for>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 8px; padding-top: 12px; border-top: 1px solid var(--border-subtle);">
+            <span style="font: 500 12px/1.2 var(--font-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--text-tertiary);">Add block to this page</span>
+            <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px;">
+              <sc-for list="{{ addBlocks }}" as="t" hint-placeholder-count="12">
+                <button onClick="{{ t.onClick }}" title="{{ t.label }}" style="display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 2px; border: 1px solid var(--border-default); border-radius: var(--radius-control); background: var(--surface-card); color: var(--text-primary); font: 400 11px/1.15 var(--font-sans); cursor: pointer; text-align: center;" style-hover="background: var(--surface-hover);"><i class="{{ t.icon }}" style="font-size: 16px; color: var(--icon-secondary);"></i>{{ t.label }}</button>
+              </sc-for>
+            </div>
+            <span style="font: 400 12px/1.4 var(--font-sans); color: var(--text-tertiary);">Click a block on the page to select it, then type to edit. Structured blocks (lists, tables, timelines) edit in this panel.</span>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 8px; padding-top: 12px; border-top: 1px solid var(--border-subtle);">
+            <span style="font: 500 12px/1.2 var(--font-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--text-tertiary);">Document</span>
+            <label style="display: flex; flex-direction: column; gap: 4px;"><span style="font: 400 12px/1 var(--font-sans); color: var(--text-secondary);">Author</span>
+              <input value="{{ docAuthor }}" onChange="{{ onDocAuthor }}" style="height: 32px; border: 1px solid var(--border-input); border-radius: var(--radius-control); background: var(--surface-card); color: var(--text-primary); font: 400 13px/1 var(--font-sans); padding: 0 8px;"></label>
+            <label style="display: flex; flex-direction: column; gap: 4px;"><span style="font: 400 12px/1 var(--font-sans); color: var(--text-secondary);">Page size</span>
+              <select value="{{ sizeId }}" onChange="{{ onSize }}" style="height: 32px; border: 1px solid var(--border-input); border-radius: var(--radius-control); background: var(--surface-card); color: var(--text-primary); font: 400 13px/1 var(--font-sans); padding: 0 6px;">
+                <sc-for list="{{ sizeOpts }}" as="o" hint-placeholder-count="3"><option value="{{ o.id }}">{{ o.label }}</option></sc-for>
+              </select></label>
+            <label style="display: flex; flex-direction: column; gap: 4px;"><span style="font: 400 12px/1 var(--font-sans); color: var(--text-secondary);">Page numbering starts on</span>
+              <select value="{{ numberFrom }}" onChange="{{ onNumberFrom }}" style="height: 32px; border: 1px solid var(--border-input); border-radius: var(--radius-control); background: var(--surface-card); color: var(--text-primary); font: 400 13px/1 var(--font-sans); padding: 0 6px;">
+                <sc-for list="{{ numberOpts }}" as="o" hint-placeholder-count="5"><option value="{{ o.id }}">{{ o.label }}</option></sc-for>
+              </select></label>
+            <x-import component-from-global-scope="HaliDesignSystem_02149f.Switch" label="Running header with the document title" checked="{{ docHeader }}" size="sm" on-change="{{ toggleDocHeader }}" hint-size="100%,24px"></x-import>
+            <sc-if value="{{ resetIdle }}" hint-placeholder-val="{{ true }}">
+              <x-import component-from-global-scope="HaliDesignSystem_02149f.Button" variant="secondary" size="sm" icon-start="rotate-ccw" on-click="{{ askReset }}" hint-size="160px,32px">Reset to template</x-import>
+            </sc-if>
+            <sc-if value="{{ resetAsk }}" hint-placeholder-val="{{ false }}">
+              <span style="font: 400 13px/1.4 var(--font-sans); color: var(--text-secondary);">This replaces every page with the original template. You can undo it.</span>
+              <div style="display: flex; gap: 6px;">
+                <x-import component-from-global-scope="HaliDesignSystem_02149f.Button" variant="danger" size="sm" on-click="{{ doReset }}" hint-size="130px,32px">Reset document</x-import>
+                <x-import component-from-global-scope="HaliDesignSystem_02149f.Button" variant="ghost" size="sm" on-click="{{ cancelReset }}" hint-size="80px,32px">Cancel</x-import>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+      </sc-if>
+    </aside>
+
+    <sc-if value="{{ isMobile }}" hint-placeholder-val="{{ false }}">
+      <nav aria-label="Editor panels" style="position: absolute; left: 0; right: 0; bottom: 0; height: 56px; z-index: 41; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--border-default); background: var(--surface-card);">
+        <sc-for list="{{ mobileTabs }}" as="m" hint-placeholder-count="3">
+          <button onClick="{{ m.onClick }}" aria-pressed="{{ m.on }}" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border: 0; background: {{ m.bg }}; color: var(--text-primary); font: 500 12px/1 var(--font-sans); cursor: pointer; min-height: 44px;"><i class="{{ m.icon }}" style="font-size: 18px;"></i>{{ m.label }}</button>
+        </sc-for>
+      </nav>
+    </sc-if>
+  </div>
+  </sc-if>
+
+  <!-- Document chooser -->
+  <sc-if value="{{ gallery }}" hint-placeholder-val="{{ false }}">
+    <div role="dialog" aria-modal="true" aria-label="Documents" style="position: fixed; inset: 0; z-index: 50; background: var(--scrim); display: flex; align-items: center; justify-content: center; padding: {{ dialogPad }};">
+      <div style="width: 100%; max-width: 980px; height: 100%; max-height: 780px; display: flex; flex-direction: column; background: var(--surface-page); border-radius: {{ dialogRadius }}; box-shadow: var(--shadow-overlay); overflow: hidden;">
+        <div style="flex: none; display: flex; align-items: center; gap: 12px; padding: 16px 20px; border-bottom: 1px solid var(--border-default); background: var(--surface-card);">
+          <span style="flex: 1; font: 600 18px/1.3 var(--font-sans);">Documents</span>
+          <x-import component-from-global-scope="HaliDesignSystem_02149f.IconButton" icon="x" label="Close" size="sm" on-click="{{ closeGallery }}" hint-size="32px,32px"></x-import>
+        </div>
+        <div style="flex: 1; min-height: 0; overflow: auto; padding: 16px 20px 32px; display: flex; flex-direction: column; gap: 24px;">
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <span style="font: 600 15px/1.3 var(--font-sans);">New document</span>
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: 0 16px;">
+              <sc-for list="{{ typeCards }}" as="t" hint-placeholder-count="9">
+                <button onClick="{{ t.onClick }}" style="display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 12px; align-items: center; padding: 12px 6px; border: 0; border-top: 1px solid var(--border-default); background: transparent; color: var(--text-primary); cursor: pointer; text-align: left;" style-hover="background: var(--surface-hover);">
+                  <span style="width: 36px; height: 36px; display: grid; place-items: center; border: 1px solid var(--border-default); border-radius: var(--radius-control); background: var(--surface-card);"><i class="{{ t.icon }}" style="font-size: 17px; color: var(--icon-secondary);"></i></span>
+                  <span style="display: flex; flex-direction: column; gap: 3px; min-width: 0;"><span style="font: 500 14px/1.3 var(--font-sans);">{{ t.name }}</span><span style="font: 400 11px/1.3 var(--font-mono); color: var(--text-tertiary);">{{ t.meta }}</span></span>
+                </button>
+              </sc-for>
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <span style="font: 600 15px/1.3 var(--font-sans);">Saved in this browser</span>
+            <sc-if value="{{ noSaved }}" hint-placeholder-val="{{ false }}"><span style="font: 400 13px/1.5 var(--font-sans); color: var(--text-secondary);">No saved documents yet. Documents save automatically as you edit.</span></sc-if>
+            <sc-for list="{{ savedDocs }}" as="s" hint-placeholder-count="2">
+              <div style="display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; padding: 10px 6px; border-top: 1px solid var(--border-default);">
+                <span style="flex: 1; min-width: 200px; display: flex; flex-direction: column; gap: 3px;"><span style="font: 500 14px/1.3 var(--font-sans);">{{ s.name }}</span><span style="font: 400 11px/1.3 var(--font-mono); color: var(--text-tertiary);">{{ s.meta }}</span></span>
+                <x-import component-from-global-scope="HaliDesignSystem_02149f.Button" variant="secondary" size="sm" on-click="{{ s.onOpen }}" hint-size="60px,32px">{{ s.openLabel }}</x-import>
+                <x-import component-from-global-scope="HaliDesignSystem_02149f.Button" variant="ghost" size="sm" on-click="{{ s.onDup }}" hint-size="80px,32px">Duplicate</x-import>
+                <x-import component-from-global-scope="HaliDesignSystem_02149f.Button" variant="{{ s.delVariant }}" size="sm" disabled="{{ s.isCurrent }}" on-click="{{ s.onDel }}" hint-size="70px,32px">{{ s.delLabel }}</x-import>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- Export -->
+  <sc-if value="{{ exportOpen }}" hint-placeholder-val="{{ false }}">
+    <div role="dialog" aria-modal="true" aria-label="Export document" style="position: fixed; inset: 0; z-index: 50; background: var(--scrim); display: flex; align-items: {{ exportAlign }}; justify-content: center; padding: {{ dialogPad }};">
+      <div style="width: 100%; max-width: 560px; max-height: 100%; overflow: auto; display: flex; flex-direction: column; gap: 18px; padding: 20px; background: var(--surface-card); border-radius: var(--radius-lg); box-shadow: var(--shadow-overlay);">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="flex: 1; font: 600 18px/1.3 var(--font-sans);">Export {{ typeLabelLower }}</span>
+          <x-import component-from-global-scope="HaliDesignSystem_02149f.IconButton" icon="x" label="Close" size="sm" on-click="{{ closeExport }}" hint-size="32px,32px"></x-import>
+        </div>
+        <div role="radiogroup" aria-label="Format" style="display: flex; flex-direction: column; gap: 6px;">
+          <sc-for list="{{ expFormats }}" as="o" hint-placeholder-count="6">
+            <button role="radio" aria-checked="{{ o.on }}" onClick="{{ o.onClick }}" style="display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 12px; align-items: center; padding: 10px 12px; border: 1px solid {{ o.border }}; border-radius: var(--radius-control); background: {{ o.bg }}; color: var(--text-primary); cursor: pointer; text-align: left;">
+              <span style="font: 600 13px/1 var(--font-mono);">{{ o.label }}</span>
+              <span style="font: 400 12px/1.4 var(--font-sans); color: var(--text-secondary);">{{ o.hint }}</span>
+            </button>
+          </sc-for>
+        </div>
+        <sc-if value="{{ scopeShow }}" hint-placeholder-val="{{ true }}">
+          <div role="group" aria-label="Pages" style="display: flex; gap: 2px; padding: 2px; background: var(--surface-sunken); border-radius: var(--radius-control);">
+            <sc-for list="{{ expScopes }}" as="o" hint-placeholder-count="2"><button onClick="{{ o.onClick }}" aria-pressed="{{ o.on }}" style="flex: 1; height: 30px; border: 0; border-radius: 4px; background: {{ o.bg }}; color: var(--text-primary); font: 500 12px/1 var(--font-sans); cursor: pointer;">{{ o.label }}</button></sc-for>
+          </div>
+        </sc-if>
+        <div style="display: flex; flex-direction: column; gap: 4px; padding: 10px 12px; border-radius: var(--radius-control); background: var(--surface-subtle);">
+          <span style="font: 400 11px/1.2 var(--font-mono); color: var(--text-tertiary); text-transform: uppercase; letter-spacing: .04em;">File</span>
+          <span style="font: 400 12px/1.4 var(--font-mono); overflow-wrap: anywhere;">{{ exportFilename }}</span>
+          <span style="font: 400 12px/1.45 var(--font-sans); color: var(--text-secondary);">{{ exportNote }}</span>
+        </div>
+        <sc-if value="{{ exportMsg }}" hint-placeholder-val="{{ false }}">
+          <x-import component-from-global-scope="HaliDesignSystem_02149f.Alert" tone="{{ exportMsg.tone }}" hint-size="100%,44px">{{ exportMsg.text }}</x-import>
+        </sc-if>
+        <div style="display: flex; gap: 8px; justify-content: space-between; flex-wrap: wrap; align-items: center;">
+          <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <button onClick="{{ saveJSON }}" style="display: inline-flex; align-items: center; gap: 6px; border: 0; background: transparent; padding: 0; color: var(--text-link); font: 500 13px/1 var(--font-sans); cursor: pointer;"><i class="icon-file-down" style="font-size: 16px;"></i>Save document file</button>
+            <label style="display: inline-flex; align-items: center; gap: 6px; font: 500 13px/1 var(--font-sans); color: var(--text-link); cursor: pointer;"><i class="icon-file-up" style="font-size: 16px;"></i>Open document file<input type="file" accept="application/json,.json" onChange="{{ importJSON }}" style="display: none;"></label>
+          </div>
+          <x-import component-from-global-scope="HaliDesignSystem_02149f.Button" variant="commit" icon-start="download" loading="{{ exporting }}" success="{{ exportDone }}" on-click="{{ runExport }}" hint-size="140px,40px">{{ exportCta }}</x-import>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <input type="file" accept="image/*" ref="{{ fileRef }}" onChange="{{ onImageFile }}" style="display: none;">
+  <div aria-hidden="true" style="position: fixed; left: -200000px; top: 0; pointer-events: none;">{{ exportHost }}</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const LS_DOCS = 'hali-docs:docs', LS_CUR = 'hali-docs:current';
+const FONT = { sans: '"Geist", ui-sans-serif, system-ui, sans-serif', mono: '"Geist Mono", ui-monospace, monospace' };
+const SW = [['Ink', '#1C1A18'], ['Graphite', '#5C5751'], ['Slate', '#736D65'], ['Paper', '#FBFAF7'], ['White', '#FFFFFF'], ['Deep Sea', '#285B57'], ['Sea 300', '#86B9B3'], ['Sea 100', '#D3E6E3'], ['Blue 500', '#3462B8'], ['Amber 700', '#7A520A'], ['Red 600', '#A33424']];
+const frames = (n) => new Promise(r => { const f = () => (--n <= 0 ? r() : requestAnimationFrame(f)); requestAnimationFrame(f); });
+const TEXTY = ['heading', 'para', 'kicker', 'meta', 'quote'];
+const LOGOF = { lockup: ['hali-lockup-horizontal.svg', 'hali-lockup-horizontal-reverse.svg', 1.2], symbol: ['hali-symbol.svg', 'hali-symbol-light.svg', 1.6], wordmark: ['hali-wordmark.svg', 'hali-wordmark-reverse.svg', 1], stacked: ['hali-lockup-stacked.svg', 'hali-lockup-stacked-reverse.svg', 3] };
+const TONES = { note: ['#DDD9D0', 'icon-notebook-pen'], info: ['#3462B8', 'icon-info'], attention: ['#C98A12', 'icon-clock'], success: ['#3A8A4A', 'icon-circle-check'] };
+
+class Component extends DCLogic {
+  state = { ready: false, doc: null, pi: 0, sel: null, zoom: 'fit', vw: 900, win: typeof window !== 'undefined' ? window.innerWidth : 1280, theme: 'light', gallery: false, exportOpen: false,
+    exp: { format: null, scope: 'all' }, exporting: false, exportDone: false, exportMsg: null, preview: false, sheet: null, addAt: null, resetAsk: false, exportDoc: null, notice: null, delAsk: null, overflow: {}, dragPage: null };
+  past = []; future = []; pageEls = {};
+
+  componentDidMount() {
+    const boot = () => (window.HaliDocs && window.HaliDocExport && window.HaliExport && window.HaliBrand ? this.init() : setTimeout(boot, 40)); boot();
+    this.onResize = () => { this.setState({ win: window.innerWidth }); this.measure(); };
+    this.onKey = (e) => this.key(e);
+    window.addEventListener('resize', this.onResize); window.addEventListener('keydown', this.onKey);
+  }
+  componentWillUnmount() { window.removeEventListener('resize', this.onResize); window.removeEventListener('keydown', this.onKey); }
+  componentDidUpdate(pp, ps) {
+    if (ps.sheet !== this.state.sheet || ps.preview !== this.state.preview || ps.win !== this.state.win) this.measure();
+    if (ps.doc !== this.state.doc || ps.zoom !== this.state.zoom || ps.vw !== this.state.vw) { cancelAnimationFrame(this.ofRaf); this.ofRaf = requestAnimationFrame(() => this.checkOverflow()); }
+  }
+  init() {
+    this.setState({ theme: window.HaliBrand.theme() });
+    const docs = this.loadDocs(); let cur = null; try { cur = localStorage.getItem(LS_CUR); } catch (e) {}
+    let doc = docs[cur] || Object.values(docs).sort((a, b) => b.updated - a.updated)[0];
+    const h = decodeURIComponent(location.hash.slice(1)), m = /^type=([\w-]+)/.exec(h);
+    let gallery = !doc;
+    if (m && window.HaliDocs.TYPES[m[1]]) { doc = window.HaliDocs.newDocument(m[1]); gallery = false; history.replaceState(null, '', location.pathname + location.search); }
+    else if (/^new/.test(h)) { gallery = true; history.replaceState(null, '', location.pathname + location.search); }
+    if (!doc) doc = window.HaliDocs.newDocument('book');
+    this.setState({ ready: true, doc, gallery }, () => { this.save(doc); this.measure(); setTimeout(() => this.measure(), 250); });
+  }
+  measure() { requestAnimationFrame(() => { const n = document.querySelector('[data-vp]'); if (n && n.offsetWidth && Math.abs(n.offsetWidth - this.state.vw) > 4) this.setState({ vw: n.offsetWidth }); }); }
+  loadDocs() { try { return JSON.parse(localStorage.getItem(LS_DOCS) || '{}') || {}; } catch (e) { return {}; } }
+  save(doc) {
+    clearTimeout(this.saveT);
+    this.saveT = setTimeout(() => { const docs = this.loadDocs(); docs[doc.id] = doc;
+      try { localStorage.setItem(LS_DOCS, JSON.stringify(docs)); localStorage.setItem(LS_CUR, doc.id); if (this.state.notice && this.state.notice.storage) this.setState({ notice: null }); }
+      catch (e) { this.setState({ notice: { storage: true, tone: 'attention', text: 'Browser storage is full, so this version is not saved. Use Export → Save document file to keep it.' } }); } }, 300);
+  }
+  setDoc(doc, extra) { this.setState(Object.assign({ doc }, extra || {})); this.save(doc); }
+  commit(mut, tag) {
+    const prev = this.state.doc, next = structuredClone(prev); mut(next); next.updated = Date.now();
+    const now = Date.now(); if (!(tag && tag === this.lastTag && now - this.lastT < 1200)) { this.past.push(prev); if (this.past.length > 100) this.past.shift(); this.future = []; }
+    this.lastTag = tag; this.lastT = now; this.setDoc(next);
+  }
+  undo() { if (!this.past.length) return; this.future.push(this.state.doc); this.lastTag = null; this.setDoc(this.past.pop()); }
+  redo() { if (!this.future.length) return; this.past.push(this.state.doc); this.lastTag = null; this.setDoc(this.future.pop()); }
+  find(d, id) { for (let i = 0; i < d.pages.length; i++) { const j = d.pages[i].blocks.findIndex(b => b.id === id); if (j >= 0) return { pi: i, bi: j, b: d.pages[i].blocks[j] }; } return null; }
+  updBlock(id, fn, tag) { this.commit(d => { const f = this.find(d, id); if (f) fn(f.b); }, tag ? tag + id : null); }
+  key(e) {
+    const t = e.target, typing = t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable), mod = e.metaKey || e.ctrlKey, k = e.key.toLowerCase();
+    if (mod && k === 'z' && !typing) { e.preventDefault(); e.shiftKey ? this.redo() : this.undo(); return; }
+    if (mod && k === 'y' && !typing) { e.preventDefault(); this.redo(); return; }
+    if (typing) return;
+    if (e.key === 'Escape') { this.setState({ sel: null, gallery: false, exportOpen: false, sheet: null }); return; }
+    if (this.state.sel && (e.key === 'Delete' || e.key === 'Backspace')) { e.preventDefault(); this.delBlock(this.state.sel); }
+  }
+
+  /* ---------- pages ---------- */
+  selectPage(i, scroll) { this.setState({ pi: i, sel: null, resetAsk: false }); if (scroll !== false) this.scrollToPage(i); }
+  scrollToPage(i, bid) {
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      const vp = document.querySelector('[data-vp]'), el = bid ? document.querySelector('[data-canvas] [data-bid="' + bid + '"]') : this.pageEls[i]; if (!vp || !el) return;
+      const vr = vp.getBoundingClientRect(), er = el.getBoundingClientRect();
+      const top = vp.scrollTop + (er.top - vr.top) - (er.height < vp.clientHeight ? (vp.clientHeight - er.height) / 2 : 16);
+      const left = vp.scrollLeft + (er.left - vr.left) - Math.max(16, (vp.clientWidth - er.width) / 2);
+      this.scrollLock = Date.now(); vp.scrollTo({ top: Math.max(0, top), left: Math.max(0, left), behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    }));
+  }
+  movePage(i, j) { if (j < 0 || j >= this.state.doc.pages.length || i === j) return; this.commit(d => { const [p] = d.pages.splice(i, 1); d.pages.splice(j, 0, p); }); this.selectPage(j); }
+  dupPage(i) { const D = window.HaliDocs; this.commit(d => { const p = structuredClone(d.pages[i]); p.id = D.uid(); p.name += ' copy'; p.blocks.forEach(b => { b.id = D.uid(); }); d.pages.splice(i + 1, 0, p); }); this.selectPage(i + 1); }
+  delPage(i) { if (this.state.doc.pages.length < 2) return; this.commit(d => { d.pages.splice(i, 1); }); this.selectPage(Math.max(0, Math.min(i, this.state.doc.pages.length - 2))); }
+  insertPage(at, kind) { const p = window.HaliDocs.makePage(this.state.doc.type, kind); this.commit(d => { d.pages.splice(at, 0, p); }); this.setState({ addAt: null }); this.selectPage(at); }
+
+  /* ---------- blocks ---------- */
+  addBlock(type) {
+    const D = window.HaliDocs, b = D.BLOCKS[type][2](), { pi, sel, doc } = this.state;
+    this.commit(d => { const blocks = d.pages[pi].blocks; const j = sel ? blocks.findIndex(x => x.id === sel) : -1; blocks.splice(j >= 0 ? j + 1 : blocks.length, 0, b); });
+    this.setState({ sel: b.id, sheet: this.state.win < 960 ? 'edit' : this.state.sheet }); this.scrollToPage(pi, b.id);
+    if (type === 'image') setTimeout(() => this.fileInput && this.fileInput.click(), 60);
+  }
+  delBlock(id) { this.commit(d => { const f = this.find(d, id); if (f) d.pages[f.pi].blocks.splice(f.bi, 1); }); this.setState({ sel: null }); }
+  dupBlock(id) { const D = window.HaliDocs; let nid; this.commit(d => { const f = this.find(d, id); if (!f) return; const c = structuredClone(f.b); c.id = nid = D.uid(); d.pages[f.pi].blocks.splice(f.bi + 1, 0, c); }); if (nid) this.setState({ sel: nid }); }
+  moveBlock(id, dir) { this.commit(d => { const f = this.find(d, id); if (!f) return; const bl = d.pages[f.pi].blocks, j = f.bi + dir; if (j < 0 || j >= bl.length) return; [bl[f.bi], bl[j]] = [bl[j], bl[f.bi]]; }); }
+  moveBlockPage(id, dir) {
+    const f0 = this.find(this.state.doc, id); if (!f0) return; const np = f0.pi + dir; if (np < 0 || np >= this.state.doc.pages.length) return;
+    this.commit(d => { const f = this.find(d, id); const [b] = d.pages[f.pi].blocks.splice(f.bi, 1); if (dir > 0) d.pages[np].blocks.unshift(b); else d.pages[np].blocks.push(b); });
+    this.setState({ pi: np }); this.scrollToPage(np, id);
+  }
+
+  /* ---------- overflow ---------- */
+  checkOverflow() {
+    const out = {}; document.querySelectorAll('[data-canvas] [data-page-body]').forEach(body => { const last = body.firstChild && body.firstChild.lastElementChild; if (last && last.offsetTop + last.offsetHeight > body.clientHeight + 1) out[body.getAttribute('data-pid')] = true; });
+    const a = Object.keys(out).sort().join(','), b = Object.keys(this.state.overflow).sort().join(',');
+    if (a !== b) this.setState({ overflow: out });
+  }
+  splitPage(pid, silent) {
+    const body = document.querySelector('[data-canvas] [data-page-body][data-pid="' + pid + '"]'); if (!body) return false;
+    const kids = [...body.firstChild.children]; const lim = body.clientHeight; let k = kids.findIndex(c => c.offsetTop + c.offsetHeight > lim);
+    if (k < 0) return false;
+    if (k === 0) { if (!silent) this.setState({ notice: { tone: 'attention', text: 'The first block on this page is taller than the page. Shorten it, reduce its size or split it into two blocks.' } }); return false; }
+    const D = window.HaliDocs;
+    this.commit(d => { const i = d.pages.findIndex(p => p.id === pid); const p = d.pages[i]; const moved = p.blocks.splice(k);
+      d.pages.splice(i + 1, 0, { id: D.uid(), kind: 'continued', name: p.name.replace(/( · continued)?$/, ' · continued'), bg: p.bg, valign: 'top', number: p.number, header: p.header, blocks: moved }); });
+    return true;
+  }
+  async fixAll() {
+    for (let n = 0; n < 40; n++) {
+      await frames(3); this.checkOverflow(); await frames(1);
+      const ids = Object.keys(this.state.overflow); if (!ids.length) break;
+      const ordered = this.state.doc.pages.map(p => p.id).filter(id => ids.includes(id));
+      if (!this.splitPage(ordered[0], true)) { this.setState({ notice: { tone: 'attention', text: 'Some pages still overflow because a single block is taller than the page. Shorten those blocks.' } }); break; }
+    }
+  }
+
+  /* ---------- rendering ---------- */
+  ctx(doc) { const D = window.HaliDocs, size = D.SIZES[doc.size] || D.SIZES.a4; return { D, size, sc: D.SCALE[size.type] }; }
+  txt(b, field, style, opt, extra) {
+    const e = React.createElement, editing = opt.interactive && this.state.sel === b.id;
+    const p = Object.assign({ key: field, 'data-txt': '1', style }, extra || {});
+    if (editing) Object.assign(p, { contentEditable: true, suppressContentEditableWarning: true, spellCheck: true,
+      onBlur: (ev) => { const v = ev.currentTarget.innerText.replace(/\n$/, ''); if (v !== b[field]) this.updBlock(b.id, x => { x[field] = v; }); },
+      onKeyDown: (ev) => { if (ev.key === 'Escape') ev.currentTarget.blur(); } });
+    return e(field === 'text' && b.t === 'heading' ? 'h' + Math.min(6, b.level + 1) : 'div', p, b[field]);
+  }
+  block(b, i, doc, page, opt, c, cx) {
+    const e = React.createElement, { sc, size } = cx, k = b.scale || 1, col = b.color || c.fg, al = b.align || 'left';
+    const base = { textAlign: al, color: col, margin: 0 }, gap = sc.gap;
+    const sel = opt.interactive && this.state.sel === b.id;
+    const wrap = (kids, st, raster) => e('div', { key: b.id, 'data-bid': b.id, 'data-raster': raster ? '1' : undefined, onClick: opt.interactive ? (ev) => { ev.stopPropagation(); if (this.state.sel !== b.id) this.setState({ sel: b.id, pi: i }); } : undefined,
+      style: Object.assign({ position: 'relative', marginBottom: gap, outline: sel ? '2px solid #3462B8' : 'none', outlineOffset: 4, cursor: opt.interactive ? (sel ? 'text' : 'pointer') : 'default', borderRadius: 2 }, st) }, kids);
+    const mono = { fontFamily: FONT.mono, fontSize: sc.small * k, fontWeight: 500, letterSpacing: '0.04em', color: b.color || c.muted, lineHeight: 1.4 };
+    const R = window.HaliDocExport;
+    switch (b.t) {
+      case 'heading': { const s = (b.level === 1 ? sc.h1 : b.level === 2 ? sc.h2 : sc.h3) * k; return wrap([this.txt(b, 'text', Object.assign({}, base, { fontSize: s, fontWeight: 600, lineHeight: 1.15, letterSpacing: b.level === 1 ? '-0.025em' : '-0.015em', textWrap: 'balance' }), opt)], { marginTop: b.level === 1 ? 0 : gap * 0.5, marginBottom: gap * (b.level === 1 ? 0.9 : 0.55) }); }
+      case 'title': return wrap([this.txt(b, 'text', Object.assign({}, base, { fontSize: sc.title * k, fontWeight: 600, lineHeight: 1.04, letterSpacing: '-0.035em', textWrap: 'balance' }), opt),
+        b.sub || sel ? this.txt(b, 'sub', Object.assign({}, base, { fontSize: sc.h3 * k * (size.type === 'slide' ? 1 : 1.05), color: b.color || c.muted, lineHeight: 1.35, marginTop: gap * 0.8, textWrap: 'pretty' }), opt) : null], { marginBottom: gap * 1.4 });
+      case 'kicker': return wrap([this.txt(b, 'text', Object.assign({}, base, mono, { textTransform: 'uppercase', letterSpacing: '0.07em' }), opt)], { marginBottom: gap * 0.6 });
+      case 'meta': return wrap([this.txt(b, 'text', Object.assign({}, base, mono, { fontWeight: 400, letterSpacing: 0, whiteSpace: 'pre-line' }), opt)], { marginBottom: gap * 0.5 });
+      case 'para': {
+        const st = Object.assign({}, base, { fontSize: sc.body * k, lineHeight: sc.lh, textAlign: al, hyphens: al === 'justify' ? 'auto' : 'manual', fontStyle: b.italic ? 'italic' : 'normal', whiteSpace: 'pre-line', textWrap: 'pretty' });
+        if (b.dropcap && !sel && b.text) return wrap([e('div', { key: 'p', 'data-txt': '1', style: st }, [e('span', { key: 'd', style: { float: 'left', fontSize: sc.body * k * 3.3, lineHeight: 0.82, fontWeight: 600, marginRight: 6, marginTop: 4, color: c.accent } }, b.text[0]), b.text.slice(1)])]);
+        return wrap([this.txt(b, 'text', st, opt)]);
+      }
+      case 'quote': return wrap([this.txt(b, 'text', Object.assign({}, base, { fontSize: (size.type === 'slide' ? sc.h2 : sc.h2 * 1.05) * k, fontWeight: 500, lineHeight: 1.25, letterSpacing: '-0.02em', textWrap: 'balance' }), opt),
+        b.cite || sel ? this.txt(b, 'cite', Object.assign({}, base, mono, { marginTop: gap * 0.7, textTransform: 'uppercase' }), opt) : null], { borderLeft: al === 'left' ? '3px solid ' + c.accent : 'none', paddingLeft: al === 'left' ? gap : 0, marginTop: gap * 0.6, marginBottom: gap * 1.2 });
+      case 'callout': { const tn = TONES[b.tone] || TONES.note; return wrap([e('div', { key: 'c', style: { border: '1.5px solid ' + tn[0], borderRadius: 10, padding: gap * 1.1, background: c.surface } }, [
+        this.txt(b, 'title', { fontSize: sc.body * k, fontWeight: 600, color: b.color || c.fg, marginBottom: 6, lineHeight: 1.3 }, opt), this.txt(b, 'text', { fontSize: sc.body * k * 0.95, lineHeight: sc.lh, color: b.color || c.fg, whiteSpace: 'pre-line' }, opt)])]); }
+      case 'list': return wrap([e(b.ordered ? 'ol' : 'ul', { key: 'l', 'data-txt': '1', style: Object.assign({}, base, { fontSize: sc.body * k, lineHeight: sc.lh, paddingLeft: sc.body * 1.6 }) }, R.lines(b.text).map((l, j) => e('li', { key: j, style: { marginBottom: gap * 0.3, paddingLeft: 4 } }, l)))]);
+      case 'image': return wrap([b.src ? e('img', { key: 'i', src: b.src, alt: b.caption || '', style: { display: 'block', width: '100%', height: b.h * k, objectFit: b.fit || 'cover', borderRadius: 6 } })
+        : e('div', { key: 'h', style: { height: b.h * k, borderRadius: 6, border: '1px solid ' + c.line, background: 'repeating-linear-gradient(45deg, ' + c.line + ' 0 2px, transparent 2px 18px)', display: 'grid', placeItems: 'center', fontFamily: FONT.mono, fontSize: sc.small, color: c.muted, textTransform: 'uppercase', letterSpacing: '.05em' } }, opt.interactive ? 'Click, then upload an image' : ''),
+        b.caption ? e('div', { key: 'c', style: Object.assign({}, mono, { fontWeight: 400, letterSpacing: 0, marginTop: 8, textAlign: al }) }, b.caption) : null], {}, true);
+      case 'table': { const rows = R.rows(b.text); return wrap([e('table', { key: 't', style: { width: '100%', borderCollapse: 'collapse', fontSize: sc.body * 0.9 * k, lineHeight: 1.4, color: col } }, e('tbody', null, rows.map((r, j) => e('tr', { key: j }, r.map((cell, m) => e(j === 0 ? 'th' : 'td', { key: m, style: { textAlign: 'left', padding: (sc.gap * 0.45) + 'px ' + (sc.gap * 0.6) + 'px', borderBottom: '1px solid ' + c.line, borderTop: j === 0 ? '1.5px solid ' + c.fg : 'none', fontWeight: j === 0 ? 600 : (r.length > 1 && /total/i.test(r[0]) ? 600 : 400), verticalAlign: 'top' } }, cell)))))),
+        b.caption ? e('div', { key: 'c', style: Object.assign({}, mono, { fontWeight: 400, letterSpacing: 0, marginTop: 8 }) }, b.caption) : null], {}, true); }
+      case 'stats': return wrap([e('div', { key: 's', style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(' + Math.round(sc.h1 * 3.2) + 'px, 1fr))', gap: gap } }, R.rows(b.text).map((r, j) => e('div', { key: j, style: { borderTop: '2px solid ' + c.accent, paddingTop: gap * 0.6 } }, [
+        e('div', { key: 'v', style: { fontSize: sc.h1 * 1.1 * k, fontWeight: 600, letterSpacing: '-0.035em', lineHeight: 1.05, color: b.color || c.accent, fontVariantNumeric: 'tabular-nums' } }, r[0]), e('div', { key: 'l', style: { fontSize: sc.small * 1.1 * k, color: c.muted, marginTop: 6, lineHeight: 1.35 } }, r[1] || '')])))], {}, true);
+      case 'chart': { const rows = R.chartRows(b.text), mx = Math.max(1, ...rows.map(r => r[1])); const fmtv = (v) => (b.unit === '$' ? '$' : '') + v.toLocaleString() + (b.unit === '%' ? '%' : '');
+        return wrap([e('div', { key: 'c', style: { display: 'flex', flexDirection: 'column', gap: gap * 0.6 } }, rows.map((r, j) => e('div', { key: j, style: { display: 'grid', gridTemplateColumns: '28% minmax(0,1fr) auto', gap: gap * 0.6, alignItems: 'center', fontSize: sc.small * 1.1 * k, color: col } }, [
+          e('span', { key: 'l', style: { color: c.muted } }, r[0]), e('span', { key: 'b', style: { height: sc.body * 1.1 * k, width: Math.max(2, r[1] / mx * 100) + '%', background: /propos|potential/i.test(r[0]) ? 'transparent' : c.accent, border: /propos|potential/i.test(r[0]) ? '1.5px dashed #3462B8' : 'none', borderRadius: 3, boxSizing: 'border-box' } }), e('span', { key: 'v', style: { fontWeight: 500, fontVariantNumeric: 'tabular-nums' } }, fmtv(r[1]))]))),
+          b.caption ? e('div', { key: 'cap', style: Object.assign({}, mono, { fontWeight: 400, letterSpacing: 0, marginTop: 10 }) }, b.caption) : null], {}, true); }
+      case 'kv': return wrap([e('div', { key: 'k', style: { display: 'grid', gridTemplateColumns: 'minmax(0, 32%) minmax(0, 1fr)', fontSize: sc.body * 0.95 * k, lineHeight: 1.45 } }, R.rows(b.text).flatMap((r, j) => [
+        e('div', { key: 'a' + j, style: { color: c.muted, padding: (gap * 0.45) + 'px 0', borderTop: '1px solid ' + c.line } }, r[0]), e('div', { key: 'b' + j, style: { color: col, padding: (gap * 0.45) + 'px 0', borderTop: '1px solid ' + c.line } }, r.slice(1).join(' · '))]))], {}, true);
+      case 'timeline': return wrap([e('div', { key: 't', style: { display: 'flex', flexDirection: 'column' } }, R.rows(b.text).map((r, j, all) => e('div', { key: j, style: { display: 'grid', gridTemplateColumns: 'minmax(0, 30%) 18px minmax(0, 1fr)', gap: gap * 0.5, fontSize: sc.body * 0.95 * k, lineHeight: 1.45 } }, [
+        e('div', { key: 'd', style: { fontFamily: FONT.mono, fontSize: sc.small * 1.05 * k, color: c.muted, paddingTop: 2 } }, r[0]), e('div', { key: 'l', style: { position: 'relative' } }, [e('span', { key: 'dot', style: { position: 'absolute', left: 4, top: 6, width: 9, height: 9, borderRadius: '50%', background: c.accent } }), j < all.length - 1 ? e('span', { key: 'ln', style: { position: 'absolute', left: 8, top: 18, bottom: 0, borderLeft: '1.5px solid ' + c.line } }) : null]),
+        e('div', { key: 'x', style: { color: col, paddingBottom: gap * 0.9 } }, r.slice(1).join(' · '))])))], {}, true);
+      case 'people': return wrap([e('div', { key: 'p', style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(' + Math.round(sc.body * 11) + 'px, 1fr))', gap: gap } }, R.rows(b.text).map((r, j) => e('div', { key: j, style: { display: 'flex', gap: gap * 0.7, alignItems: 'flex-start', borderTop: '1px solid ' + c.line, paddingTop: gap * 0.7 } }, [
+        e('span', { key: 'a', style: { flex: 'none', width: sc.body * 2.6, height: sc.body * 2.6, borderRadius: '50%', background: c.surface, border: '1px solid ' + c.line, display: 'grid', placeItems: 'center', fontSize: sc.small * k, fontWeight: 600, color: c.accent } }, (r[0] || '').replace(/[\[\]]/g, '').split(/\s+/).map(w => w[0] || '').join('').slice(0, 2).toUpperCase()),
+        e('div', { key: 't', style: { display: 'flex', flexDirection: 'column', gap: 2, fontSize: sc.body * 0.92 * k, lineHeight: 1.4 } }, [e('span', { key: 'n', style: { fontWeight: 600, color: col } }, r[0]), e('span', { key: 'r', style: { color: c.muted } }, r[1] || ''), r[2] ? e('span', { key: 'b', style: { color: col } }, r[2]) : null])])))], {}, true);
+      case 'cta': { const dark = c.tone === 'reverse'; return wrap([e('div', { key: 'b', style: { display: 'flex', justifyContent: al === 'center' ? 'center' : al === 'right' ? 'flex-end' : 'flex-start' } }, e('span', { style: { display: 'inline-block', padding: (sc.body * 0.7 * k) + 'px ' + (sc.body * 1.4 * k) + 'px', borderRadius: 8, background: dark ? '#FBFAF7' : '#1C1A18', color: dark ? '#1C1A18' : '#FFFFFF', fontSize: sc.body * k, fontWeight: 500, lineHeight: 1 } }, b.text)),
+        b.sub ? e('div', { key: 's', style: Object.assign({}, mono, { fontWeight: 400, letterSpacing: 0, marginTop: 10, textAlign: al }) }, b.sub) : null], { marginTop: gap * 0.4 }, true); }
+      case 'divider': return wrap([e('div', { key: 'd', style: { borderTop: Math.max(2, Math.round(sc.body / 7)) + 'px ' + (b.dash || 'solid') + ' ' + (b.color || c.accent), width: '100%' } })], { paddingTop: 4, paddingBottom: 4 }, true);
+      case 'spacer': return wrap([], { height: (b.h || 40) * k, marginBottom: 0, background: sel ? 'rgba(52,98,184,.08)' : 'transparent' });
+      case 'toc': return wrap([e('div', { key: 't', style: { display: 'flex', flexDirection: 'column' } }, R.toc(doc).map((t, j) => e('div', { key: j, style: { display: 'flex', alignItems: 'baseline', gap: 8, padding: (gap * 0.35) + 'px 0', fontSize: sc.body * (t.level === 0 ? 1.02 : 0.98) * k, fontWeight: t.level === 0 ? 600 : 400, color: col, borderBottom: '1px solid ' + c.line } }, [
+        e('span', { key: 'a', style: { flex: '0 1 auto' } }, t.title), e('span', { key: 'b', style: { flex: 1, borderBottom: '1.5px dotted ' + c.muted, transform: 'translateY(-4px)', minWidth: 16 } }), e('span', { key: 'c', style: { fontFamily: FONT.mono, fontSize: sc.small * k, color: c.muted } }, String(t.page))])))], {}, true);
+      case 'logo': { const f = LOGOF[b.variant] || LOGOF.lockup; return wrap([e('img', { key: 'l', src: 'assets/logo/' + f[c.tone === 'reverse' ? 1 : 0], alt: 'Hali', style: { display: 'block', height: sc.h2 * f[2] * k, margin: al === 'center' ? '0 auto' : al === 'right' ? '0 0 0 auto' : 0 } })], {}, true); }
+      default: return null;
+    }
+  }
+  page(doc, p, i, opt) {
+    const e = React.createElement, cx = this.ctx(doc), { size, sc, D } = cx, c = D.SCHEMES[p.bg] || D.SCHEMES.paper, [mt, mr, mb, ml] = size.m, fixed = !!size.h;
+    const num = window.HaliDocExport.pageLabel(doc, i);
+    const flow = e('div', { style: { marginTop: p.valign === 'top' ? 0 : 'auto', marginBottom: p.valign === 'center' ? 'auto' : 0, display: 'flow-root' } },
+      p.blocks.length ? p.blocks.map(b => this.block(b, i, doc, p, opt, c, cx)) : (opt.interactive ? [e('div', { key: 'empty', style: { padding: 24, border: '1.5px dashed ' + c.line, borderRadius: 8, fontFamily: FONT.mono, fontSize: sc.small, color: c.muted, textAlign: 'center' } }, 'Empty page — add a block from the panel')] : []));
+    const body = e('div', { 'data-page-body': '1', 'data-pid': p.id, style: fixed ? { position: 'absolute', left: ml, right: mr, top: mt, bottom: mb, display: 'flex', flexDirection: 'column', overflow: opt.interactive ? 'visible' : 'hidden' } : { padding: mt + 'px ' + mr + 'px ' + mb + 'px ' + ml + 'px', display: 'flex', flexDirection: 'column', minHeight: 120 } }, flow);
+    const kids = [body];
+    if (fixed && doc.header && p.header) kids.push(e('div', { key: 'hd', 'data-txt': '1', style: { position: 'absolute', left: ml, right: mr, top: Math.round(mt * 0.42), fontFamily: FONT.mono, fontSize: sc.small * 0.9, color: c.muted, letterSpacing: '0.04em', textTransform: 'uppercase', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' } }, doc.title));
+    if (fixed && num) kids.push(e('div', { key: 'pn', 'data-txt': '1', style: { position: 'absolute', left: ml, right: mr, bottom: Math.round(mb * 0.38), textAlign: size.type === 'slide' ? 'right' : 'center', fontFamily: FONT.mono, fontSize: sc.small * 0.95, color: c.muted } }, String(num)));
+    if (opt.interactive && fixed && this.state.overflow[p.id]) kids.push(e('div', { key: 'ov', style: { position: 'absolute', left: 0, right: 0, bottom: mb, borderTop: '2px dashed #C98A12', pointerEvents: 'none' } }));
+    return e('div', { 'data-xpage': opt.interactive ? undefined : '1', key: p.id, onClick: opt.interactive ? () => { if (this.state.sel || this.state.pi !== i) this.setState({ sel: null, pi: i }); } : undefined,
+      style: { position: 'relative', width: size.w, height: fixed ? size.h : 'auto', background: c.bg, color: c.fg, fontFamily: FONT.sans, boxSizing: 'border-box', overflow: fixed && !opt.interactive ? 'hidden' : 'visible', zoom: opt.scale && opt.scale !== 1 ? opt.scale : undefined, flex: 'none' } }, kids);
+  }
+
+  /* ---------- export ---------- */
+  async runExport(fmt, scope) {
+    const X = window.HaliExport, DX = window.HaliDocExport, D = window.HaliDocs, st = this.state;
+    const full = st.doc, doc = scope === 'page' ? Object.assign({}, full, { pages: [full.pages[st.pi]] }) : full, size = D.SIZES[doc.size];
+    const base = X.slug(doc.title) + (scope === 'page' ? '-p' + String(st.pi + 1).padStart(2, '0') : '');
+    this.setState({ exporting: true, exportDone: false, exportMsg: null });
+    const progress = (a, b) => this.setState({ exportMsg: { tone: 'info', text: 'Rendering page ' + a + ' of ' + b + '…' } });
+    try {
+      let blob, name, extra = '';
+      const nodes = async () => { await new Promise(r => this.setState({ exportDoc: doc }, r)); await frames(3); if (document.fonts) await document.fonts.ready; await Promise.all([...document.querySelectorAll('[data-xhost] img')].map(i => i.complete ? 0 : new Promise(r => { i.onload = i.onerror = r; }))); return [...document.querySelectorAll('[data-xhost] [data-xpage]')]; };
+      if (fmt === 'md') { blob = new Blob([DX.markdown(doc)], { type: 'text/markdown' }); name = base + '.md'; }
+      else if (fmt === 'txt') { blob = new Blob([DX.plain(doc)], { type: 'text/plain' }); name = base + '.txt'; }
+      else if (fmt === 'docx') { blob = await DX.docx(doc, size.h ? size : Object.assign({}, D.SIZES.a4)); name = base + '.docx'; }
+      else if (fmt === 'html') { const n = await nodes(); blob = new Blob([DX.htmlFile(doc, n, false)], { type: 'text/html' }); name = base + '.html'; }
+      else if (fmt === 'print') { const n = await nodes(); await DX.printNodes(doc, n); this.setState({ exporting: false, exportDoc: null, exportMsg: { tone: 'success', text: 'The print dialog opened. Choose "Save as PDF" as the destination for a PDF with selectable text.' } }); return; }
+      else if (fmt === 'pdf') { const n = await nodes(); blob = await DX.pdf(doc, n, progress); name = base + '.pdf'; }
+      else if (fmt === 'pptx') { const n = await nodes(); blob = await DX.pptx(doc, n, progress); name = base + '.pptx'; }
+      else if (fmt === 'epub') { const n = await nodes(); const cover = await X.capture(n[0], { format: 'png', scale: 2, w: n[0].offsetWidth, h: n[0].offsetHeight }); blob = await DX.epub(doc, cover); name = base + '.epub'; }
+      else if (fmt === 'png') { const n = await nodes(); const files = [];
+        for (let i = 0; i < n.length; i++) { progress(i + 1, n.length); files.push({ name: base + '-p' + String((scope === 'page' ? st.pi : i) + 1).padStart(2, '0') + '.png', blob: await X.capture(n[i], { format: 'png', scale: 2, w: n[i].offsetWidth, h: n[i].offsetHeight }) }); }
+        if (files.length === 1) { blob = files[0].blob; name = files[0].name; } else { blob = await X.zip(files); name = base + '-pages.zip'; extra = ' (' + files.length + ' pages)'; } }
+      if (!blob || !blob.size) throw new Error('The file came out empty.');
+      X.download(blob, name);
+      this.setState({ exporting: false, exportDone: true, exportDoc: null, exportMsg: { tone: 'success', text: 'Downloaded ' + name + extra + '.' } }); setTimeout(() => this.setState({ exportDone: false }), 2400);
+    } catch (err) { this.setState({ exporting: false, exportDoc: null, exportMsg: { tone: 'error', text: 'Export failed: ' + (err && err.message ? err.message : err) + ' Check your connection and try again, or choose another format.' } }); }
+  }
+  importJSON(ev) {
+    const f = ev.target.files && ev.target.files[0]; ev.target.value = ''; if (!f) return; const fr = new FileReader();
+    fr.onload = () => { try { const d = JSON.parse(fr.result); if (!d || !Array.isArray(d.pages) || !window.HaliDocs.TYPES[d.type]) throw new Error('bad');
+      d.id = 'doc' + Date.now().toString(36); d.updated = Date.now(); this.past = []; this.future = []; this.setDoc(d, { pi: 0, sel: null, exportOpen: false, notice: { tone: 'success', text: 'Opened "' + d.title + '".' } }); }
+      catch (e) { this.setState({ exportMsg: { tone: 'error', text: 'That file is not a Hali document file. Choose a .hali-doc.json file saved from this editor.' } }); } };
+    fr.readAsText(f);
+  }
+
+  renderVals() {
+    const D = window.HaliDocs, st = this.state;
+    if (!st.ready || !D) return { ready: false, gallery: false, exportOpen: false, notice: null, isMobile: false, exportHost: null };
+    cancelAnimationFrame(this.ofRaf); this.ofRaf = requestAnimationFrame(() => { this.checkOverflow(); const n = document.querySelector('[data-vp]'); if (n && n.offsetWidth && Math.abs(n.offsetWidth - this.state.vw) > 4) this.setState({ vw: n.offsetWidth }); });
+    const doc = st.doc, T = D.TYPES[doc.type], size = D.SIZES[doc.size] || D.SIZES.a4, pi = Math.min(st.pi, doc.pages.length - 1), page = doc.pages[pi];
+    const isMobile = st.win < 960, tablet = st.win < 1280;
+    const fit = Math.max(0.1, Math.min(1, (st.vw - 64) / size.w)), s = st.zoom === 'fit' ? fit : st.zoom;
+    const on = (b) => b ? 'var(--surface-card)' : 'transparent';
+    const found = st.sel ? this.find(doc, st.sel) : null, b = found ? found.b : null;
+    const kinds = D.KIND_NAMES(doc.type);
+    const kindName = (k) => (kinds.find(x => x.id === k) || { name: k === 'continued' ? 'Continued' : k }).name;
+    const ovIds = Object.keys(st.overflow).filter(id => doc.pages.some(p => p.id === id));
+    const word = size.type === 'slide' ? 'Slides' : size.h ? 'Pages' : 'Sections';
+    const setB = (fn, tag) => () => this.updBlock(b.id, fn, tag);
+
+    // selected-block panel
+    let fields = [], options = [], numbers = [], convert = [];
+    if (b) {
+      const fld = (label, key, rows, help) => ({ label, value: b[key] || '', rows: rows || 3, help: help || '', onChange: (ev) => { const v = ev.target.value; this.updBlock(b.id, x => { x[key] = v; }, 'f' + key); } });
+      const opt = (label, key, items) => ({ label, items: items.map(([v, text, icon]) => ({ text: icon ? '' : text, label: text, icon: icon || '', on: b[key] === v, bg: on(b[key] === v), onClick: setB(x => { x[key] = v; }) })) });
+      const T2 = { heading: [fld('Heading', 'text', 2)], para: [fld('Paragraph', 'text', 6)], kicker: [fld('Overline', 'text', 1)], meta: [fld('Text', 'text', 2)], title: [fld('Title', 'text', 2), fld('Subtitle', 'sub', 2)],
+        quote: [fld('Quote', 'text', 3), fld('Attribution', 'cite', 1)], callout: [fld('Title', 'title', 1), fld('Text', 'text', 3)], list: [fld('Items', 'text', 5, 'One item per line.')],
+        image: [fld('Caption', 'caption', 2)], table: [fld('Rows', 'text', 6, 'One row per line; separate cells with |. The first row is the header.'), fld('Caption', 'caption', 1)],
+        stats: [fld('Statistics', 'text', 4, 'One per line: value | label. Use only confirmed or illustrative figures.')], chart: [fld('Bars', 'text', 5, 'One per line: label: number. Labels with "proposed" draw dashed.'), fld('Caption', 'caption', 1)],
+        kv: [fld('Details', 'text', 5, 'One per line: label | value')], timeline: [fld('Timeline', 'text', 5, 'One per line: when | what happens')], people: [fld('People', 'text', 5, 'One per line: name | role | one line')],
+        cta: [fld('Button label', 'text', 1, 'Name the exact action.'), fld('Supporting line', 'sub', 1)], toc: [], divider: [], spacer: [], logo: [] };
+      fields = T2[b.t] || [];
+      if (!['spacer', 'divider', 'toc', 'stats', 'kv', 'timeline', 'people', 'table', 'chart'].includes(b.t)) options.push(opt('Alignment', 'align', [['left', 'Left', 'icon-align-left'], ['center', 'Centre', 'icon-align-center'], ['right', 'Right', 'icon-align-right']].concat(b.t === 'para' ? [['justify', 'Justify', 'icon-align-justify']] : [])));
+      if (b.t === 'heading') options.push(opt('Level', 'level', [[1, 'H1'], [2, 'H2'], [3, 'H3']]));
+      if (b.t === 'list') options.push(opt('List style', 'ordered', [[false, 'Bullets'], [true, 'Numbered']]));
+      if (b.t === 'callout') options.push(opt('Tone', 'tone', [['note', 'Note'], ['info', 'Info'], ['attention', 'Attention'], ['success', 'Success']]));
+      if (b.t === 'divider') options.push(opt('Line', 'dash', [['dotted', 'Dotted'], ['dashed', 'Dashed'], ['solid', 'Solid']]));
+      if (b.t === 'image') options.push(opt('Fit', 'fit', [['cover', 'Fill'], ['contain', 'Fit']]));
+      if (b.t === 'logo') options.push(opt('Logo', 'variant', [['lockup', 'Lockup'], ['symbol', 'Symbol'], ['wordmark', 'Wordmark'], ['stacked', 'Stacked']]));
+      if (b.t === 'para') options.push({ label: 'Style', items: [['italic', 'Italic'], ['dropcap', 'Drop cap']].map(([kk, text]) => ({ text, label: text, icon: '', on: !!b[kk], bg: b[kk] ? 'var(--surface-card)' : 'transparent', onClick: setB(x => { x[kk] = !x[kk]; }) })) });
+      numbers.push({ label: 'Size', display: Math.round((b.scale || 1) * 100) + '%', min: 0.5, max: 2, step: 0.05, value: b.scale || 1, onChange: (ev) => { const v = +ev.target.value; this.updBlock(b.id, x => { x.scale = v; }, 'scale'); } });
+      if (b.t === 'image') numbers.push({ label: 'Height', display: b.h + 'px', min: 80, max: Math.round((size.h || 1200) * 0.8), step: 10, value: b.h, onChange: (ev) => { const v = +ev.target.value; this.updBlock(b.id, x => { x.h = v; }, 'h'); } });
+      if (b.t === 'spacer') numbers.push({ label: 'Height', display: b.h + 'px', min: 8, max: 600, step: 4, value: b.h, onChange: (ev) => { const v = +ev.target.value; this.updBlock(b.id, x => { x.h = v; }, 'h'); } });
+      if (TEXTY.includes(b.t)) convert = [['heading', 'Heading'], ['para', 'Paragraph'], ['kicker', 'Overline'], ['meta', 'Metadata'], ['quote', 'Pull quote']].map(([id, label]) => ({ id, label }));
+    }
+    const types = Object.entries(D.TYPES);
+    const saved = st.gallery ? Object.values(this.loadDocs()).sort((a, c) => c.updated - a.updated) : [];
+    const fmts = { pdf: ['PDF', 'Every page as it looks here, page order preserved. Text is rendered as image.'], print: ['Print', 'Opens the print dialog — save as PDF for selectable text and exact page sizes.'], docx: ['DOCX', 'Editable Word document with headings, lists, tables, images and page breaks.'],
+      pptx: ['PPTX', 'Editable PowerPoint: text stays editable; charts, tables and images are placed as pictures.'], epub: ['EPUB', 'Reflowable ebook with chapters, contents, cover and images.'], html: ['HTML', 'A single web page with every page laid out as designed.'],
+      md: ['Markdown', 'Clean structured text for CMSs and AI tools.'], txt: ['Text', 'Plain text, no formatting.'], png: ['PNG', 'One image per page at 2×; several pages download as a ZIP.'] };
+    const fmt = st.exp.format && T.exports.includes(st.exp.format) ? st.exp.format : T.exports[0];
+    const pageScoped = ['pdf', 'print', 'png', 'html', 'md', 'txt', 'docx'].includes(fmt);
+    const scope = pageScoped ? st.exp.scope : 'all';
+    const X = window.HaliExport, base = X.slug(doc.title) + (scope === 'page' ? '-p' + String(pi + 1).padStart(2, '0') : '');
+    const ext = { pdf: '.pdf', print: ' (print dialog)', docx: '.docx', pptx: '.pptx', epub: '.epub', html: '.html', md: '.md', txt: '.txt', png: scope === 'page' || doc.pages.length === 1 ? '.png' : '-pages.zip' }[fmt];
+    const setExp = (p) => this.setState({ exp: Object.assign({}, st.exp, p), exportMsg: null, exportDone: false });
+
+    return {
+      ready: true, notice: st.notice, isMobile,
+      themeIcon: st.theme === 'dark' ? 'sun' : 'moon', toggleTheme: () => this.setState({ theme: window.HaliBrand.theme(st.theme === 'dark' ? 'light' : 'dark') }),
+      docTitle: doc.title, onDocTitle: (ev) => { const v = ev.target.value; this.commit(d => { d.title = v; }, 'title'); }, typeLabel: T.name, typeLabelLower: T.name.toLowerCase(), typeLabelDisplay: isMobile ? 'none' : 'inline',
+      openGallery: () => this.setState({ gallery: true }), closeGallery: () => this.setState({ gallery: false }),
+      undo: () => this.undo(), redo: () => this.redo(), cantUndo: !this.past.length, cantRedo: !this.future.length,
+      previewIcon: st.preview ? 'pencil' : 'eye', previewLabel: st.preview ? 'Exit preview' : 'Preview', togglePreview: () => this.setState({ preview: !st.preview, sel: null, sheet: null }),
+      openExport: () => this.setState({ exportOpen: true, exportMsg: null, exportDone: false }), closeExport: () => this.setState({ exportOpen: false }),
+      leftDisplay: st.preview ? 'none' : isMobile ? (st.sheet === 'pages' ? 'flex' : 'none') : 'flex', rightDisplay: st.preview ? 'none' : isMobile ? (st.sheet === 'edit' ? 'flex' : 'none') : 'flex',
+      panelPos: isMobile ? 'fixed' : 'relative', sheetBottom: isMobile ? '56px' : 'auto', sheetMax: isMobile ? '64vh' : 'none', sheetShadow: isMobile ? 'var(--shadow-overlay)' : 'none',
+      leftWidth: isMobile ? 'auto' : tablet ? '232px' : '256px', rightWidth: isMobile ? 'auto' : tablet ? '284px' : '320px',
+      mobileTabs: [['pages', word, 'icon-layers'], ['canvas', 'Canvas', 'icon-file'], ['edit', 'Edit', 'icon-sliders-horizontal']].map(([id, label, icon]) => ({ label, icon, on: (st.sheet || 'canvas') === id, bg: (st.sheet || 'canvas') === id ? 'var(--surface-selected)' : 'transparent', onClick: () => this.setState({ sheet: id === 'canvas' || st.sheet === id ? null : id }) })),
+
+      pagesHeading: word + ' · ' + doc.pages.length, addPageLabel: 'Add', openAddEnd: () => this.setState({ addAt: st.addAt === null ? doc.pages.length : null }), addMenuOpen: st.addAt !== null, closeAddMenu: () => this.setState({ addAt: null }),
+      addMenuLabel: st.addAt === null ? '' : 'Insert at position ' + (st.addAt + 1) + ' — choose a ' + T.name.toLowerCase() + ' page:',
+      pageKinds: kinds.map(k => ({ name: k.name, onClick: () => this.insertPage(st.addAt ?? doc.pages.length, k.id) })).concat([{ name: 'Blank page', onClick: () => this.insertPage(st.addAt ?? doc.pages.length, 'continued') }]),
+      overflowCount: ovIds.length > 0, overflowText: ovIds.length + (ovIds.length === 1 ? ' page has' : ' pages have') + ' more content than fits. Move the overflow onto new pages, or shorten the text.', fixAllOverflow: () => this.fixAll(),
+      pagesView: doc.pages.map((p, i) => { const lab = window.HaliDocExport.pageLabel(doc, i); return { name: p.name, num: String(i + 1).padStart(2, '0'), meta: kindName(p.kind) + (lab ? ' · p. ' + lab : '') + ' · ' + p.blocks.length + ' blocks', active: i === pi, first: i === 0, last: i === doc.pages.length - 1, only: doc.pages.length < 2,
+        flag: st.overflow[p.id] ? 'icon-triangle-alert' : '', flagTitle: st.overflow[p.id] ? 'Content overflows this page' : '',
+        bg: i === pi ? 'var(--surface-selected)' : 'transparent', border: st.dragPage !== null && st.dragPage !== i ? '1px dashed var(--border-strong)' : '1px solid transparent',
+        onSelect: () => { this.selectPage(i); if (isMobile) this.setState({ sheet: null }); }, onUp: () => this.movePage(i, i - 1), onDown: () => this.movePage(i, i + 1), onDup: () => this.dupPage(i), onDel: () => this.delPage(i),
+        onInsertBefore: () => this.setState({ addAt: i }), onInsertAfter: () => this.setState({ addAt: i + 1 }),
+        onDragStart: (ev) => { ev.dataTransfer.effectAllowed = 'move'; ev.dataTransfer.setData('text/plain', String(i)); this.setState({ dragPage: i }); }, onDragOver: (ev) => { ev.preventDefault(); },
+        onDrop: (ev) => { ev.preventDefault(); const from = parseInt(ev.dataTransfer.getData('text/plain'), 10); this.setState({ dragPage: null }); if (!isNaN(from)) this.movePage(from, i); } }; }),
+
+      sizeLabel: size.name + (size.h ? '' : ' · height grows with content'), zoomLabel: Math.round(s * 100) + '%',
+      zoomIn: () => this.setState({ zoom: Math.min(2, s * 1.2) }), zoomOut: () => this.setState({ zoom: Math.max(0.1, s / 1.2) }), zoomFit: () => { this.setState({ zoom: 'fit' }); this.measure(); this.scrollToPage(pi); },
+      viewportRef: (n) => { if (n && n !== this.vp) { this.vp = n; this.measure(); } },
+      onViewportScroll: () => { if (Date.now() - (this.scrollLock || 0) < 700 || this.raf) return; this.raf = requestAnimationFrame(() => { this.raf = null; const vp = document.querySelector('[data-vp]'); if (!vp) return; const c = vp.getBoundingClientRect(), mid = c.top + c.height / 2; let best = this.state.pi, bd = 1e9;
+        Object.keys(this.pageEls).forEach(k => { const n = this.pageEls[k]; if (!n || +k >= this.state.doc.pages.length) return; const r = n.getBoundingClientRect(); const d = (r.top <= mid && r.bottom >= mid) ? 0 : Math.min(Math.abs(r.top - mid), Math.abs(r.bottom - mid)); if (d < bd) { bd = d; best = +k; } });
+        if (best !== this.state.pi && !this.state.sel) this.setState({ pi: best }); }); },
+      canvasPages: doc.pages.map((p, i) => ({ label: String(i + 1).padStart(2, '0') + ' · ' + p.name, labelColor: i === pi ? 'var(--text-primary)' : 'var(--text-tertiary)', outline: i === pi && !st.preview ? '2px solid var(--border-strong)' : 'none',
+        overflow: !!st.overflow[p.id] && !st.preview, onSplit: () => this.splitPage(p.id), ref: (n) => { this.pageEls[i] = n; }, onSelect: () => { if (this.state.pi !== i) this.setState({ pi: i }); }, page: this.page(doc, p, i, { interactive: !st.preview, scale: s }) })),
+
+      hasSel: !!b, noSel: !b, deselect: () => this.setState({ sel: null }),
+      selIcon: b ? D.BLOCKS[b.t][1] : '', selTitle: b ? D.BLOCKS[b.t][0] + ' · page ' + (found.pi + 1) : '',
+      blockActions: b ? [['arrow-up', 'Move up', () => this.moveBlock(b.id, -1), found.bi === 0], ['arrow-down', 'Move down', () => this.moveBlock(b.id, 1), found.bi === doc.pages[found.pi].blocks.length - 1],
+        ['arrow-up-to-line', 'Move to previous page', () => this.moveBlockPage(b.id, -1), found.pi === 0], ['arrow-down-to-line', 'Move to next page', () => this.moveBlockPage(b.id, 1), found.pi === doc.pages.length - 1],
+        ['copy-plus', 'Duplicate block', () => this.dupBlock(b.id), false], ['trash-2', 'Delete block (Delete key)', () => this.delBlock(b.id), false]].map(([icon, label, onClick, disabled]) => ({ icon, label, onClick, disabled })) : [],
+      canConvert: convert.length > 0, convertOpts: convert, convertValue: b ? b.t : '', onConvert: (ev) => { const t = ev.target.value; this.updBlock(b.id, x => { x.t = t; if (t === 'heading' && !x.level) x.level = 2; }); },
+      blockFields: fields, blockOptions: options, blockNumbers: numbers,
+      isImage: b && b.t === 'image', hasSrc: b && !!b.src, imageAction: b && b.src ? 'Replace image' : 'Upload image', pickImage: () => this.fileInput && this.fileInput.click(), clearImage: () => b && this.updBlock(b.id, x => { x.src = ''; }),
+      fileRef: (n) => { this.fileInput = n; },
+      onImageFile: (ev) => { const f = ev.target.files && ev.target.files[0]; ev.target.value = ''; const id = this.state.sel; if (!f || !id) return; if (f.size > 8e6) { this.setState({ notice: { tone: 'attention', text: 'That image is over 8 MB. Use a smaller file so the document can be saved in this browser.' } }); return; }
+        const fr = new FileReader(); fr.onload = () => this.updBlock(id, x => { if (x.t === 'image') x.src = fr.result; }); fr.readAsDataURL(f); },
+      colorLabel: b && b.color ? b.color : 'auto', colorReset: () => b && this.updBlock(b.id, x => { x.color = ''; }),
+      swatches: SW.map(([name, hex]) => ({ name: name + ' ' + hex, hex, ring: b && (b.color || '').toUpperCase() === hex ? '0 0 0 2px var(--surface-card), 0 0 0 4px var(--focus-color)' : 'none', onClick: () => b && this.updBlock(b.id, x => { x.color = hex; }) })),
+
+      pageNum: String(pi + 1).padStart(2, '0'), pageKind: kindName(page.kind), pageName: page.name, onPageName: (ev) => { const v = ev.target.value; this.commit(d => { d.pages[pi].name = v; }, 'pn' + pi); },
+      pageOptions: [{ label: 'Background', items: Object.entries(D.SCHEMES).map(([id, sc]) => ({ text: sc.name, sw: sc.bg, swDisplay: 'inline-block', on: page.bg === id, bg: on(page.bg === id), onClick: () => this.commit(d => { d.pages[pi].bg = id; }) })) },
+        { label: 'Vertical position', items: [['top', 'Top'], ['center', 'Middle'], ['bottom', 'Bottom']].map(([id, text]) => ({ text, sw: '', swDisplay: 'none', on: page.valign === id, bg: on(page.valign === id), onClick: () => this.commit(d => { d.pages[pi].valign = id; }) })) }],
+      pageToggles: [['number', 'Show page number'], ['header', 'Show running header']].map(([k, label]) => ({ label, on: !!page[k], onClick: () => this.commit(d => { d.pages[pi][k] = !d.pages[pi][k]; }) })),
+      addBlocks: Object.entries(D.BLOCKS).map(([k, v]) => ({ label: v[0], icon: v[1], onClick: () => this.addBlock(k) })),
+      docAuthor: doc.author || '', onDocAuthor: (ev) => { const v = ev.target.value; this.commit(d => { d.author = v; }, 'author'); },
+      sizeId: doc.size, sizeOpts: T.sizes.map(id => ({ id, label: D.SIZES[id].name })), onSize: (ev) => { const v = ev.target.value; this.commit(d => { d.size = v; }); this.setState({ zoom: 'fit' }); },
+      numberFrom: String(doc.numberFrom), numberOpts: doc.pages.map((p, i) => ({ id: String(i), label: 'Page ' + (i + 1) + ' · ' + p.name })).concat([{ id: '99', label: 'No page numbers' }]), onNumberFrom: (ev) => { const v = +ev.target.value; this.commit(d => { d.numberFrom = v; }); },
+      docHeader: !!doc.header, toggleDocHeader: () => this.commit(d => { d.header = !d.header; }),
+      resetIdle: !st.resetAsk, resetAsk: st.resetAsk, askReset: () => this.setState({ resetAsk: true }), cancelReset: () => this.setState({ resetAsk: false }),
+      doReset: () => { this.past.push(doc); this.future = []; this.lastTag = null; const n = D.newDocument(doc.type); this.setDoc(Object.assign(n, { id: doc.id, title: doc.title, author: doc.author, size: doc.size }), { resetAsk: false, sel: null, pi: 0 }); this.scrollToPage(0); },
+
+      gallery: st.gallery, dialogPad: isMobile ? '0' : '24px', dialogRadius: isMobile ? '0' : 'var(--radius-lg)', exportAlign: isMobile ? 'flex-end' : 'center',
+      typeCards: types.map(([id, t]) => ({ name: t.name, icon: t.icon, meta: t.start.length + ' starter pages · ' + Object.keys(t.kinds).length + ' page types · ' + t.sizes.map(z => D.SIZES[z].name.split(' ·')[0]).join(', '),
+        onClick: () => { const n = D.newDocument(id); this.past = []; this.future = []; this.setDoc(n, { gallery: false, pi: 0, sel: null, zoom: 'fit', overflow: {} }); setTimeout(() => this.scrollToPage(0), 80); } })),
+      noSaved: st.gallery && !saved.length,
+      savedDocs: saved.map(d => ({ name: d.title, meta: (D.TYPES[d.type] || { name: d.type }).name + ' · ' + d.pages.length + ' pages · ' + new Date(d.updated).toLocaleString(), isCurrent: d.id === doc.id, openLabel: d.id === doc.id ? 'Open (current)' : 'Open',
+        delLabel: st.delAsk === d.id ? 'Confirm delete' : 'Delete', delVariant: st.delAsk === d.id ? 'danger' : 'ghost',
+        onOpen: () => { this.past = []; this.future = []; this.setDoc(d, { gallery: false, pi: 0, sel: null, zoom: 'fit', overflow: {} }); },
+        onDup: () => { const n = structuredClone(d); n.id = 'doc' + Date.now().toString(36); n.title += ' (copy)'; n.updated = Date.now(); this.past = []; this.future = []; this.setDoc(n, { gallery: false, pi: 0, sel: null }); },
+        onDel: () => { if (st.delAsk !== d.id) return this.setState({ delAsk: d.id }); const all = this.loadDocs(); delete all[d.id]; try { localStorage.setItem(LS_DOCS, JSON.stringify(all)); } catch (e) {} this.setState({ delAsk: null }); } })),
+
+      exportOpen: st.exportOpen, exporting: st.exporting, exportDone: st.exportDone, exportMsg: st.exportMsg,
+      expFormats: T.exports.map(id => ({ label: fmts[id][0], hint: fmts[id][1], on: fmt === id, bg: fmt === id ? 'var(--surface-selected)' : 'var(--surface-card)', border: fmt === id ? 'var(--text-primary)' : 'var(--border-default)', onClick: () => setExp({ format: id }) })),
+      scopeShow: pageScoped && doc.pages.length > 1, expScopes: [['all', 'Whole document · ' + doc.pages.length + ' ' + word.toLowerCase()], ['page', 'Current page only · ' + (pi + 1)]].map(([id, label]) => ({ label, on: scope === id, bg: on(scope === id), onClick: () => setExp({ scope: id }) })),
+      exportFilename: base + ext, exportNote: fmt === 'docx' && !size.h ? 'Web and email layouts are exported onto A4 pages.' : fmt === 'pptx' ? 'Text uses Geist; install Geist (free) for an exact match in PowerPoint.' : fmt === 'epub' ? 'EPUB reflows text for e-readers, so fixed page layout and page numbers are replaced by the reader\'s own.' : fmt === 'md' || fmt === 'txt' ? 'Layout and colour are not kept in text formats; structure and order are.' : 'Uses the current edited content.',
+      exportCta: st.exporting ? 'Exporting…' : fmt === 'print' ? 'Open print dialog' : 'Download', runExport: () => this.runExport(fmt, scope),
+      saveJSON: () => window.HaliExport.download(new Blob([JSON.stringify(doc, null, 1)], { type: 'application/json' }), window.HaliExport.slug(doc.title) + '.hali-doc.json'), importJSON: (ev) => this.importJSON(ev),
+      exportHost: st.exportDoc ? React.createElement('div', { 'data-xhost': '1', style: { display: 'flex', flexDirection: 'column', alignItems: 'flex-start' } }, st.exportDoc.pages.map((p, i) => this.page(st.exportDoc, p, i, { interactive: false, scale: 1 }))) : null
+    };
+  }
+}
+</script>
+</body>
+</html>

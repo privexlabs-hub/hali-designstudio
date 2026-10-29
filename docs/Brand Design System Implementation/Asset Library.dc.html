@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <title>Hali — Asset library</title>
+  <link rel="icon" href="assets/icons/favicon.svg">
+  <link rel="stylesheet" href="_ds/hali-b4-project-managment-design-system-8cb0828f-e4cd-40a6-8da1-4182aed7d477/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/hali-b4-project-managment-design-system-8cb0828f-e4cd-40a6-8da1-4182aed7d477/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/hali-b4-project-managment-design-system-8cb0828f-e4cd-40a6-8da1-4182aed7d477/tokens/themes.css">
+  <link rel="stylesheet" href="_ds/hali-b4-project-managment-design-system-8cb0828f-e4cd-40a6-8da1-4182aed7d477/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/hali-b4-project-managment-design-system-8cb0828f-e4cd-40a6-8da1-4182aed7d477/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/hali-b4-project-managment-design-system-8cb0828f-e4cd-40a6-8da1-4182aed7d477/tokens/layout.css">
+  <link rel="stylesheet" href="_ds/hali-b4-project-managment-design-system-8cb0828f-e4cd-40a6-8da1-4182aed7d477/tokens/base.css">
+  <link rel="stylesheet" href="_ds/hali-b4-project-managment-design-system-8cb0828f-e4cd-40a6-8da1-4182aed7d477/styles.css">
+  <script src="_ds/hali-b4-project-managment-design-system-8cb0828f-e4cd-40a6-8da1-4182aed7d477/_ds_bundle.js"></script>
+  <script src="studio/brand.js"></script>
+  <script src="studio/export.js"></script>
+  <style>
+    html, body { margin: 0; background: var(--surface-page); color: var(--text-primary); font-family: var(--font-sans); }
+    a { color: var(--text-link); } a:hover { color: var(--text-link-hover); }
+  </style>
+</helmet>
+
+<div style="min-height: 100vh; background: var(--surface-page); color: var(--text-primary);">
+  <header style="position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: 12px; height: 56px; padding: 0 var(--gutter); border-bottom: 1px solid var(--border-default); background: var(--surface-card);">
+    <a href="Brand Studio.dc.html" aria-label="Brand Studio home" style="display: flex; align-items: center;"><x-import component-from-global-scope="HaliDesignSystem_02149f.Logo" height="24" hint-size="77px,24px"></x-import></a>
+    <nav aria-label="Studio" style="flex: 1; min-width: 0; display: flex; gap: 2px; overflow-x: auto;">
+      <sc-for list="{{ studioNav }}" as="n" hint-placeholder-count="7">
+        <a href="{{ n.href }}" aria-current="{{ n.current }}" style="flex: none; padding: 8px 10px; border-radius: var(--radius-control); font: 500 13px/1 var(--font-sans); text-decoration: none; color: var(--text-primary); background: {{ n.bg }}; white-space: nowrap;">{{ n.label }}</a>
+      </sc-for>
+    </nav>
+    <x-import component-from-global-scope="HaliDesignSystem_02149f.IconButton" icon="{{ themeIcon }}" label="Switch light or dark theme" size="sm" on-click="{{ toggleTheme }}" hint-size="32px,32px"></x-import>
+  </header>
+
+  <main style="max-width: 1200px; margin: 0 auto; padding: 40px var(--gutter) 120px; display: flex; flex-direction: column; gap: 32px;">
+    <div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; justify-content: space-between;">
+      <div style="display: flex; flex-direction: column; gap: 12px; max-width: 680px;">
+        <span style="font: 500 12px/1.2 var(--font-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--text-tertiary);">Asset library · {{ total }} files</span>
+        <h1 style="margin: 0; font: 600 clamp(30px, 4.6vw, 44px)/1.08 var(--font-sans); letter-spacing: -0.03em;">Brand assets</h1>
+        <p style="margin: 0; font: 400 16px/1.6 var(--font-sans); color: var(--text-secondary);">The same files the editor and templates use, from <code style="font-family: var(--font-mono); font-size: 14px;">assets/</code>. Download one, or select several and download a ZIP.</p>
+      </div>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <x-import component-from-global-scope="HaliDesignSystem_02149f.Button" variant="ghost" size="sm" on-click="{{ toggleAll }}" hint-size="100px,32px">{{ selectAllLabel }}</x-import>
+        <x-import component-from-global-scope="HaliDesignSystem_02149f.Button" variant="primary" size="sm" icon-start="download" loading="{{ zipping }}" success="{{ zipDone }}" disabled="{{ noneSelected }}" on-click="{{ downloadZip }}" hint-size="180px,32px">{{ zipLabel }}</x-import>
+      </div>
+    </div>
+    <sc-if value="{{ msg }}" hint-placeholder-val="{{ false }}">
+      <x-import component-from-global-scope="HaliDesignSystem_02149f.Alert" tone="{{ msg.tone }}" hint-size="100%,44px">{{ msg.text }}</x-import>
+    </sc-if>
+
+    <sc-for list="{{ groups }}" as="g" hint-placeholder-count="3">
+      <section style="display: flex; flex-direction: column; gap: 14px;">
+        <div style="display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; border-bottom: 1px solid var(--border-default); padding-bottom: 10px;">
+          <h2 style="margin: 0; font: 600 18px/1.3 var(--font-sans);">{{ g.name }}</h2>
+          <span style="font: 400 12px/1.3 var(--font-mono); color: var(--text-tertiary);">{{ g.path }}</span>
+          <span style="flex: 1;"></span>
+          <button onClick="{{ g.onSelect }}" style="border: 0; background: transparent; color: var(--text-link); font: 500 13px/1 var(--font-sans); cursor: pointer; padding: 4px 0;">{{ g.selectLabel }}</button>
+        </div>
+        <span style="font: 400 13px/1.5 var(--font-sans); color: var(--text-secondary); max-width: 720px;">{{ g.note }}</span>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); gap: 12px;">
+          <sc-for list="{{ g.items }}" as="a" hint-placeholder-count="6">
+            <div style="display: flex; flex-direction: column; border: {{ a.border }}; border-radius: var(--radius-surface); overflow: hidden; background: var(--surface-card);">
+              <div style="height: 120px; display: grid; place-items: center; padding: 16px; background: {{ a.bg }};">
+                <sc-if value="{{ a.isImage }}" hint-placeholder-val="{{ true }}"><img src="{{ a.src }}" alt="{{ a.name }}" loading="lazy" style="max-width: 100%; max-height: 88px; display: block;"></sc-if>
+                <sc-if value="{{ a.isFile }}" hint-placeholder-val="{{ false }}"><i class="{{ a.icon }}" style="font-size: 32px; color: var(--icon-secondary);"></i></sc-if>
+              </div>
+              <div style="padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; border-top: 1px solid var(--border-default);">
+                <span style="font: 500 13px/1.3 var(--font-sans);">{{ a.name }}</span>
+                <span style="font: 400 11px/1.3 var(--font-mono); color: var(--text-tertiary); overflow-wrap: anywhere;">{{ a.file }}</span>
+                <div style="display: flex; align-items: center; gap: 8px; justify-content: space-between;">
+                  <x-import component-from-global-scope="HaliDesignSystem_02149f.Checkbox" label="Select" checked="{{ a.selected }}" on-change="{{ a.onToggle }}" hint-size="70px,24px"></x-import>
+                  <a href="{{ a.href }}" download="{{ a.file }}" onClick="{{ a.onDownload }}" style="display: inline-flex; align-items: center; gap: 4px; font: 500 12px/1 var(--font-sans);"><i class="icon-download" style="font-size: 14px;"></i>{{ a.ext }}</a>
+                </div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+    </sc-for>
+
+    <section style="display: flex; flex-direction: column; gap: 12px;">
+      <h2 style="margin: 0; font: 600 18px/1.3 var(--font-sans); border-bottom: 1px solid var(--border-default); padding-bottom: 10px;">Fonts and external assets</h2>
+      <sc-for list="{{ external }}" as="e" hint-placeholder-count="3">
+        <div style="display: grid; grid-template-columns: minmax(0, 200px) minmax(0, 1fr); gap: 16px; padding: 10px 0; border-bottom: 1px solid var(--border-subtle);">
+          <span style="font: 500 14px/1.4 var(--font-sans);">{{ e.name }}</span>
+          <span style="font: 400 14px/1.5 var(--font-sans); color: var(--text-secondary);">{{ e.note }} <a href="{{ e.href }}" target="_blank" rel="noopener">{{ e.link }}</a></span>
+        </div>
+      </sc-for>
+    </section>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const LOGO_FILES = [['Horizontal lockup', 'hali-lockup-horizontal.svg', '#FBFAF7'], ['Horizontal lockup · reverse', 'hali-lockup-horizontal-reverse.svg', '#1C1A18'], ['Horizontal lockup · mono', 'hali-lockup-horizontal-mono.svg', '#FFFFFF'], ['Stacked lockup', 'hali-lockup-stacked.svg', '#FBFAF7'], ['Stacked lockup · reverse', 'hali-lockup-stacked-reverse.svg', '#285B57'],
+  ['Wordmark', 'hali-wordmark.svg', '#FBFAF7'], ['Wordmark · reverse', 'hali-wordmark-reverse.svg', '#1C1A18'], ['Wordmark · mono', 'hali-wordmark-mono.svg', '#FFFFFF'], ['Wordmark · mono reverse', 'hali-wordmark-mono-reverse.svg', '#1C1A18'],
+  ['Symbol', 'hali-symbol.svg', '#FBFAF7'], ['Symbol · Deep Sea', 'hali-symbol-sea.svg', '#FBFAF7'], ['Symbol · light', 'hali-symbol-light.svg', '#285B57'], ['Symbol · ink', 'hali-symbol-ink.svg', '#F5F3EE'], ['Symbol · mono', 'hali-symbol-mono.svg', '#FFFFFF'], ['Symbol · mono reverse', 'hali-symbol-mono-reverse.svg', '#1C1A18']];
+const ICON_FILES = [['Favicon (SVG source)', 'favicon.svg'], ['Favicon 16', 'favicon-16.png'], ['Favicon 32', 'favicon-32.png'], ['Favicon 48', 'favicon-48.png'], ['Apple touch icon 180', 'apple-touch-icon-180.png'], ['PWA icon 192', 'icon-192.png'], ['PWA icon 512', 'icon-512.png'], ['Maskable icon 512', 'icon-maskable-512.png'],
+  ['App icon · full bleed', 'app-icon-full-bleed.svg'], ['App icon · maskable', 'app-icon-maskable.svg'], ['Social avatar 400', 'social-avatar-400.png'], ['Social avatar (SVG)', 'social-avatar.svg'], ['Open Graph image 1200×630', 'og-image-1200x630.png'], ['Open Graph image (SVG)', 'og-image.svg'], ['Web app manifest', 'site.webmanifest']];
+const svg = (w, h, body) => '<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="' + h + '" viewBox="0 0 ' + w + ' ' + h + '">' + body + '</svg>';
+const GRAPHICS = [
+  ['Record lines · motif', 'hali-motif-record-lines.svg', svg(480, 120, '<rect width="480" height="120" fill="#FBFAF7"/><line x1="24" y1="30" x2="456" y2="30" stroke="#736D65" stroke-width="4" stroke-dasharray="0 10" stroke-linecap="round"/><line x1="24" y1="60" x2="456" y2="60" stroke="#3462B8" stroke-width="4" stroke-dasharray="16 10"/><line x1="24" y1="90" x2="456" y2="90" stroke="#285B57" stroke-width="4"/>')],
+  ['Image hatch · paper', 'hali-hatch-paper.svg', svg(400, 300, '<defs><pattern id="h" width="18" height="18" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="2.5" height="18" fill="#DDD9D0"/></pattern></defs><rect width="400" height="300" fill="#FBFAF7"/><rect width="400" height="300" fill="url(#h)"/>')],
+  ['Image hatch · ink', 'hali-hatch-ink.svg', svg(400, 300, '<defs><pattern id="h" width="18" height="18" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="2.5" height="18" fill="#44403B"/></pattern></defs><rect width="400" height="300" fill="#1C1A18"/><rect width="400" height="300" fill="url(#h)"/>')],
+  ['Background · Paper', 'hali-bg-paper.svg', svg(1080, 1080, '<rect width="1080" height="1080" fill="#FBFAF7"/>')],
+  ['Background · Ink', 'hali-bg-ink.svg', svg(1080, 1080, '<rect width="1080" height="1080" fill="#1C1A18"/>')],
+  ['Background · Deep Sea', 'hali-bg-deep-sea.svg', svg(1080, 1080, '<rect width="1080" height="1080" fill="#285B57"/>')],
+  ['Image overlay · Ink 45%', 'hali-overlay-ink-45.svg', svg(1080, 1080, '<rect width="1080" height="1080" fill="#1C1A18" fill-opacity="0.45"/>')]
+];
+class Component extends DCLogic {
+  state = { theme: 'light', sel: {}, zipping: false, zipDone: false, msg: null };
+  componentDidMount() { const boot = () => { if (!window.HaliBrand) return setTimeout(boot, 40); this.setState({ theme: window.HaliBrand.theme() }); }; boot();
+    this.urls = Object.fromEntries(GRAPHICS.map(([, f, s]) => [f, URL.createObjectURL(new Blob([s], { type: 'image/svg+xml' }))])); this.forceUpdate(); }
+  componentWillUnmount() { Object.values(this.urls || {}).forEach(u => URL.revokeObjectURL(u)); }
+  all() {
+    const u = this.urls || {};
+    return [
+      { name: 'Logo', path: 'assets/logo/', note: 'Vector masters. Default tone on light backgrounds, reverse on Ink or Deep Sea, mono for one-colour use. Keep clear space equal to the folded corner.', items: LOGO_FILES.map(([name, file, bg]) => ({ name, file, bg, src: 'assets/logo/' + file, href: 'assets/logo/' + file })) },
+      { name: 'Favicons, app icons and social', path: 'assets/icons/', note: 'For Hali-owned surfaces. Agency pages and client portals use the agency\'s own favicon.', items: ICON_FILES.map(([name, file]) => ({ name, file, bg: 'var(--surface-subtle)', src: 'assets/icons/' + file, href: 'assets/icons/' + file, nonImage: file.endsWith('.webmanifest') })) },
+      { name: 'Template graphics', path: 'generated from tokens', note: 'Motif, hatch, backgrounds and overlay used by templates, generated from the brand tokens at download time.', items: GRAPHICS.map(([name, file]) => ({ name, file, bg: 'var(--surface-subtle)', src: u[file] || '', href: u[file] || '#', generated: true })) }
+    ];
+  }
+  async zip() {
+    const X = window.HaliExport, groups = this.all(), files = [];
+    this.setState({ zipping: true, zipDone: false, msg: null });
+    try {
+      for (const g of groups) for (const a of g.items) { if (!this.state.sel[a.file]) continue;
+        const gen = GRAPHICS.find(x => x[1] === a.file);
+        const blob = gen ? new Blob([gen[2]], { type: 'image/svg+xml' }) : await (await fetch(a.href)).blob();
+        files.push({ name: gen ? 'graphics/' + a.file : a.href.replace(/^assets\//, ''), blob }); }
+      X.download(await X.zip(files), 'hali-brand-assets.zip');
+      this.setState({ zipping: false, zipDone: true, msg: { tone: 'success', text: 'Downloaded ' + files.length + ' files in hali-brand-assets.zip.' } }); setTimeout(() => this.setState({ zipDone: false }), 2000);
+    } catch (e) { this.setState({ zipping: false, msg: { tone: 'error', text: 'The ZIP could not be created: ' + (e.message || e) + ' Download files individually instead.' } }); }
+  }
+  renderVals() {
+    const st = this.state, groups = this.all(), allFiles = groups.flatMap(g => g.items.map(a => a.file)), n = allFiles.filter(f => st.sel[f]).length;
+    const setSel = (files, v) => { const s = Object.assign({}, st.sel); files.forEach(f => { s[f] = v; }); this.setState({ sel: s, zipDone: false }); };
+    return {
+      studioNav: [['Brand Studio.dc.html', 'Studio'], ['Brand Playbook.dc.html', 'Playbook'], ['Design System.dc.html', 'Design system'], ['Brand Voice.dc.html', 'Voice & knowledge'], ['Asset Library.dc.html', 'Assets'], ['Brand Studio Editor.dc.html', 'Templates'], ['Document Editor.dc.html', 'Documents']].map(([href, label]) => ({ href, label, current: href === 'Asset Library.dc.html' ? 'page' : undefined, bg: href === 'Asset Library.dc.html' ? 'var(--surface-selected)' : 'transparent' })),
+      themeIcon: st.theme === 'dark' ? 'sun' : 'moon', toggleTheme: () => this.setState({ theme: window.HaliBrand.theme(st.theme === 'dark' ? 'light' : 'dark') }),
+      total: allFiles.length, msg: st.msg, zipping: st.zipping, zipDone: st.zipDone, noneSelected: n === 0, zipLabel: n ? 'Download ' + n + ' as ZIP' : 'Select files to download',
+      selectAllLabel: n === allFiles.length ? 'Clear selection' : 'Select all', toggleAll: () => setSel(allFiles, n !== allFiles.length), downloadZip: () => this.zip(),
+      groups: groups.map(g => { const files = g.items.map(a => a.file), all = files.every(f => st.sel[f]);
+        return { name: g.name, path: g.path, note: g.note, selectLabel: all ? 'Clear group' : 'Select group', onSelect: () => setSel(files, !all),
+          items: g.items.map(a => ({ name: a.name, file: a.file, bg: a.bg, src: a.src, href: a.href, isImage: !a.nonImage, isFile: !!a.nonImage, icon: 'icon-file-json', ext: a.file.split('.').pop().toUpperCase(),
+            selected: !!st.sel[a.file], border: st.sel[a.file] ? '1.5px solid var(--text-primary)' : '1px solid var(--border-default)', onToggle: () => setSel([a.file], !st.sel[a.file]), onDownload: () => {} })) }; }),
+      external: [{ name: 'Geist and Geist Mono', note: 'SIL Open Font License 1.1. Loaded from Google Fonts; self-host the WOFF2 files for production.', href: 'https://fonts.google.com/specimen/Geist', link: 'Google Fonts →' },
+        { name: 'Lucide icons', note: 'ISC licence. Loaded as the lucide-static 0.460.0 icon font from unpkg.', href: 'https://lucide.dev', link: 'lucide.dev →' },
+        { name: 'Not available', note: 'No photography, illustration or agency work samples were supplied. Templates use the hatch placeholder until real agency work is uploaded in the editor.', href: 'Brand Studio Editor.dc.html', link: 'Open the editor →' }]
+    };
+  }
+}
+</script>
+</body>
+</html>
